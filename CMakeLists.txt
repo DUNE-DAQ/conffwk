@@ -31,3 +31,5 @@ daq_add_application(config_test_rw config_test_rw.cxx              TEST	      LI
 #add_test(NAME config_check_py   COMMAND ${TDAQ_RUNNER} ${CMAKE_CURRENT_SOURCE_DIR}/test/pytest.sh ${CMAKE_CURRENT_SOURCE_DIR})
 
 #tdaq_add_test(NAME PyStyleTest POST_INSTALL COMMAND env PYTHONDONTWRITEBYTECODE=x ${CMAKE_CURRENT_SOURCE_DIR}/test/pystyle.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+daq_install()
