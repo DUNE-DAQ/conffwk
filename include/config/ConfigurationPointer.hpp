@@ -8,7 +8,7 @@
 #ifndef PYTHONCONFIGURATION_H 
 #define PYTHONCONFIGURATION_H
 
-#include <config/Configuration.h>
+#include "config/Configuration.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace python {

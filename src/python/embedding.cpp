@@ -15,7 +15,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <memory>
-#include "config/ConfigurationPointer.h"
+#include "config/ConfigurationPointer.hpp"
 
 int main(int argc, char** argv) {
   using namespace boost::python;

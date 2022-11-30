@@ -5,10 +5,12 @@
 #include <mutex>
 #include <string>
 
-#include <ers/ers.h>
+#include "ers/ers.hpp"
 
-#include <config/set.h>
-#include <config/DalFactoryFunctions.h>
+#include "config/set.hpp"
+#include "config/DalFactoryFunctions.hpp"
+
+#include "logging/Logging.hpp"
 
 class DalFactory
 {
@@ -26,11 +28,11 @@ public:
     {
       std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
 
-      ERS_DEBUG(1, "register class " << name);
+      TLOG_DEBUG(1) << "register class " << name;
 
       if (m_classes.emplace(name, DalFactoryFunctions(boost::compute::identity<T>(), algorithms)).second == false)
         {
-          ERS_DEBUG(0, "class " << name << " was already registered");
+          TLOG_DEBUG(0) << "class " << name << " was already registered";
         }
     }
 

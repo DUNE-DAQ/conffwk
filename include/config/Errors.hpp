@@ -8,7 +8,7 @@
 #ifndef CONFIG_ERRORS_H_
 #define CONFIG_ERRORS_H_
 
-#include <ers/Issue.h>
+#include "ers/Issue.hpp"
 
 
 namespace daq {

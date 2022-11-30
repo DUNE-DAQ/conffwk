@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <config/Change.h>
+#include "config/Change.hpp"
 
 class ConfigObject;
 

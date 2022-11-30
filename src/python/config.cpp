@@ -14,10 +14,10 @@
 #include <stdint.h>
 #include <cstdio>
 
-#include "config/ConfigObject.h"
-#include "config/ConfigurationPointer.h"
-#include "config/Schema.h"
-#include "config/Errors.h"
+#include "config/ConfigObject.hpp"
+#include "config/ConfigurationPointer.hpp"
+#include "config/Schema.hpp"
+#include "config/Errors.hpp"
 
 using namespace boost::python;
 

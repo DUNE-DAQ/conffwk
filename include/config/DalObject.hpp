@@ -13,11 +13,11 @@
 #include <mutex>
 #include <string>
 
-#include <config/ConfigObject.h>
-#include <config/Configuration.h>
-#include <config/Change.h>
-#include <config/DalFactoryFunctions.h>
-#include <config/Errors.h>
+#include "config/ConfigObject.hpp"
+#include "config/Configuration.hpp"
+#include "config/Change.hpp"
+#include "config/DalFactoryFunctions.hpp"
+#include "config/Errors.hpp"
 
 
 /**
@@ -70,7 +70,6 @@ protected:
   void clear() noexcept
     {
       p_obj._clear();
-      p_was_read = false;
     }
 
   /**

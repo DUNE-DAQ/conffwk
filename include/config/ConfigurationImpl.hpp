@@ -14,9 +14,9 @@
 #include <set>
 #include <map>
 
-#include "config/map.h"
-#include "config/set.h"
-#include "config/ConfigVersion.h"
+#include "config/map.hpp"
+#include "config/set.hpp"
+#include "config/ConfigVersion.hpp"
 
 class ConfigurationChange;
 class ConfigObject;

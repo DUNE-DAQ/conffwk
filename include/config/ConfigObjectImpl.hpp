@@ -13,7 +13,7 @@
 #include <iostream>
 #include <stdint.h>
 
-#include "config/Errors.h"
+#include "config/Errors.hpp"
 
 class ConfigObject;
 class Configuration;

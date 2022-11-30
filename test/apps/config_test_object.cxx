@@ -3,8 +3,8 @@
 #include <iostream>
 #include <string>
 
-#include <config/Configuration.h>
-#include <config/ConfigObject.h>
+#include "config/Configuration.hpp"
+#include "config/ConfigObject.hpp"
 
 ERS_DECLARE_ISSUE(
   config_test_object,

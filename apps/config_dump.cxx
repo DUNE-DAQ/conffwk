@@ -5,9 +5,9 @@
 
 #include <boost/program_options.hpp>
 
-#include <config/Configuration.h>
-#include <config/ConfigObject.h>
-#include <config/Schema.h>
+#include "config/Configuration.hpp"
+#include "config/ConfigObject.hpp"
+#include "config/Schema.hpp"
 
 ERS_DECLARE_ISSUE(
   config_dump,

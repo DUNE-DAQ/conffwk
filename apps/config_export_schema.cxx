@@ -8,7 +8,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <config/Configuration.h>
+#include "config/Configuration.hpp"
 
 
 int

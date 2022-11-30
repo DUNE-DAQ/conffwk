@@ -14,8 +14,8 @@
 
 #include <mutex>
 
-#include "config/ConfigObjectImpl.h"
-#include "config/Errors.h"
+#include "config/ConfigObjectImpl.hpp"
+#include "config/Errors.hpp"
 
 class Configuration;
 

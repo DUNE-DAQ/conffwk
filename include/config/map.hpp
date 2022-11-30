@@ -1,7 +1,7 @@
 #ifndef CONFIG_MAP_H_
 #define CONFIG_MAP_H_
 
-#include <config/string_ptr.h>
+#include "config/string_ptr.hpp"
 #include <unordered_map>
 
 

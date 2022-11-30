@@ -22,16 +22,16 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "ers/ers.h"
+#include "ers/ers.hpp"
 
-#include "config/SubscriptionCriteria.h"
-#include "config/ConfigObject.h"
-#include "config/ConfigVersion.h"
-#include "config/Errors.h"
-#include "config/DalFactory.h"
+#include "config/SubscriptionCriteria.hpp"
+#include "config/ConfigObject.hpp"
+#include "config/ConfigVersion.hpp"
+#include "config/Errors.hpp"
+#include "config/DalFactory.hpp"
 
-#include "config/map.h"
-#include "config/set.h"
+#include "config/map.hpp"
+#include "config/set.hpp"
 
 class DalObject;
 class ConfigAction;
@@ -1967,7 +1967,7 @@ Configuration::update(const std::vector<std::string>& modified,
   {
     auto j = m_cache_map.find(&T::s_class_name);
 
-    ERS_DEBUG(4, "call for class \'" << T::s_class_name << '\'');
+    TLOG_DEBUG(4) << "call for class \'" << T::s_class_name << '\'';
 
     if (j != m_cache_map.end())
       {
@@ -2010,7 +2010,7 @@ Configuration::_rename_object(CacheBase* x, const std::string& old_id, const std
   auto it = c->m_cache.find(old_id);
   if (it != c->m_cache.end())
     {
-      ERS_DEBUG(3, " * rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << T::s_class_name << "\')");
+      TLOG_DEBUG(3) << " * rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << T::s_class_name << "\')";
       c->m_cache[new_id] = it->second;
       c->m_cache.erase(it);
 
