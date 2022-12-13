@@ -13,6 +13,8 @@ remove_definitions(-DERS_NO_DEBUG)
 
 daq_add_library(*.cpp LINK_LIBRARIES ers::ers logging::logging)
 
+daq_add_python_bindings(*.cpp LINK_LIBRARIES config)
+
 daq_add_application(config_dump config_dump.cxx                    LINK_LIBRARIES config Boost::program_options)
 daq_add_application(config_export_data config_export_data.cxx      LINK_LIBRARIES config Boost::program_options)
 daq_add_application(config_export_schema config_export_schema.cxx  LINK_LIBRARIES config Boost::program_options)

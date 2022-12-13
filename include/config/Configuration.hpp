@@ -237,6 +237,8 @@ class Configuration {
 
     Configuration(const std::string& spec);
 
+    Configuration() = default;
+  
 
       /** Get implementation plug-in and it's parameter used to build config object */
 
@@ -252,6 +254,42 @@ class Configuration {
 
     const std::string& get_impl_param() const noexcept {return m_impl_param;}
 
+
+
+ConfigObject* get_obj(const std::string& class_name, const std::string& id)
+  {
+    auto co = new ConfigObject;
+    this->get(class_name, id, *co);
+    if (co->is_null()) {
+      delete co;
+      co = nullptr;
+    }
+    return co;
+  }
+
+  std::vector<ConfigObject>* get_objs(const std::string& class_name, const std::string& query="") {
+    auto objs = new std::vector<ConfigObject>;
+    this->get(class_name, *objs, query);
+    return objs;
+  }
+
+  std::list<std::string>* return_includes(const std::string& db_name) {
+    auto l = new std::list<std::string>;
+    this->get_includes(db_name, *l);
+    return l;
+  }
+
+  ConfigObject* create_and_return_obj(const std::string& at, const std::string& class_name, const std::string& id) {
+    auto co = new ConfigObject;
+    this->create(at, class_name, id, *co);
+    return co;
+  }
+
+  ConfigObject* create_and_return_obj(const ConfigObject& at, const std::string& class_name, const std::string& id) {
+    auto co = new ConfigObject;
+    this->create(at, class_name, id, *co);
+    return co;
+  }
 
       /**
        *  \brief Destructor to destroy a configuration object.
