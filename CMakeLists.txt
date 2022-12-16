@@ -23,10 +23,6 @@ daq_add_application(config_time_test config_time_test.cxx  	   TEST       LINK_L
 daq_add_application(config_test_object config_test_object.cxx      TEST       LINK_LIBRARIES config)
 daq_add_application(config_test_rw config_test_rw.cxx              TEST	      LINK_LIBRARIES config)
 
-#tdaq_add_library(pyconfig src/python/config.cpp INCLUDE_DIRECTORIES PythonLibs LINK_LIBRARIES PRIVATE config Boost::python)
-
-#target_compile_options(pyconfig PRIVATE -Wno-unused) 
-
 
 #add_test(NAME config_check_cpp  COMMAND ${TDAQ_RUNNER} ${CMAKE_CURRENT_SOURCE_DIR}/test/test.sh ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -63,7 +63,7 @@
 
 <oks-data>
 
-<info name="" type="" num-of-items="0" oks-format="data" oks-version="JCF, Oct-5-2022: please contact John Freeman at jcfree@fnal.gov or on Slack if you see this message" created-by="jcfree" created-on="mu2edaq13.fnal.gov" creation-time="20221213T202717" last-modified-by="jcfree" last-modified-on="mu2edaq13.fnal.gov" last-modification-time="20221213T202717"/>
+<info name="" type="" num-of-items="0" oks-format="data" oks-version="JCF, Oct-5-2022: please contact John Freeman at jcfree@fnal.gov or on Slack if you see this message" created-by="jcfree" created-on="mu2edaq13.fnal.gov" creation-time="20221215T200940" last-modified-by="jcfree" last-modified-on="mu2edaq13.fnal.gov" last-modification-time="20221215T200940"/>
 
 <include>
  <file path="test.schema.xml"/>

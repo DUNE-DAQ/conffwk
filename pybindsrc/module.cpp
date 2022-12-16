@@ -16,12 +16,16 @@ namespace dunedaq::config::python {
 extern void
 register_config(py::module&);
 
+extern void
+register_configobject(py::module&);
+
 PYBIND11_MODULE(_daq_config_py, m)
 {
 
   m.doc() = "Python interface to the config package"; // optional module docstring
 
   register_config(m);
+  register_configobject(m);
 }
 
 } // namespace dunedaq::config::python

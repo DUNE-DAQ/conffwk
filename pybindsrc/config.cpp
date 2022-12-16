@@ -52,10 +52,25 @@ register_config(py::module& m)
     .def("remove_include",
 	 &Configuration::remove_include, "Remove include file.", py::arg("db_name"), py::arg("include"))
     .def("test_object",
-	 &Configuration::test_object, "Test the existence of the object",py::arg("class_name"), py::arg("id"), py::arg("rlevel") = 0, py::arg("rclasses") = nullptr)
+    	 &Configuration::test_object, "Test the existence of the object", py::arg("class_name"), py::arg("id"), py::arg("rlevel"), py::arg("rclasses"))
     .def("unload",
 	 &Configuration::unload, "Unload previously-loaded database")
     ;
 }
+
+void
+register_configobject(py::module& m)
+{
+
+  py::class_<ConfigObject>(m, "_ConfigObject")
+    .def(py::init<>())
+    .def(py::init<const ConfigObject&>())
+    .def("set_obj",
+	 &ConfigObject::set_obj, "Set relationship single-value", py::arg("name"), py::arg("o"), py::arg("skip_non_null_check") = false)
+    .def("set_objs",
+	 &ConfigObject::set_objs, "Set relationship multi-value.", py::arg("name"), py::arg("o"), py::arg("skip_non_null_check") = false)
+    ;
+}
+
 
 } // namespace dunedaq::config::python
