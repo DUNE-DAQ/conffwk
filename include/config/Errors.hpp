@@ -11,10 +11,10 @@
 #include "ers/Issue.hpp"
 
 
-namespace daq {
+namespace dunedaq {
 
     /**
-     * \class daq::config::Exception
+     * \class dunedaq::config::Exception
      * \brief Base class for all \b config exceptions
      *
      *	This exception normally should be caught when any config method is used.
@@ -23,7 +23,7 @@ try {
   Configuration db(...);
   ... // any user code working with db
 }
-catch (daq::config::Exception & ex) {
+catch (dunedaq::config::Exception & ex) {
     // throw some user-defined exception in case of config exception
   throw ers::error(user::exception(ERS_HERE, "config database problem", ex));
 }
@@ -34,7 +34,7 @@ catch (daq::config::Exception & ex) {
 
 
     /**
-     * \class daq::config::Generic
+     * \class dunedaq::config::Generic
      * \brief Generic configuration exception.
      *
      *	It reports most of the config problems, such as:
@@ -54,7 +54,7 @@ catch (daq::config::Exception & ex) {
 
 
     /**
-     * \class daq::config::NotFound
+     * \class dunedaq::config::NotFound
      * \brief Try to access non-existent object or class.
      *
      *	It is thrown if a config object accessed by ID is not found,
@@ -72,7 +72,7 @@ catch (daq::config::Exception & ex) {
   )
 
     /**
-     * \class daq::config::DeletedObject
+     * \class dunedaq::config::DeletedObject
      * \brief Try to access deleted DAL object.
      *
      *	It is thrown when a deleted DAL template object is accessed.

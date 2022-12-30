@@ -4,7 +4,7 @@
 #include "config/ConfigurationImpl.hpp"
 #include "config/Schema.hpp"
 
-namespace daq {
+namespace dunedaq {
   namespace config {
 
     const char * bool2str(bool value) { return (value ? "yes" : "no"); }
@@ -382,7 +382,7 @@ ConfigurationImpl::rename_impl_object(const std::string * class_name, const std:
 
           if (obj != nullptr)
             {
-              obj->m_state = daq::config::Unknown;
+              obj->m_state = dunedaq::config::Unknown;
               m_tangled_objects.push_back(obj);
             }
 

@@ -5,7 +5,7 @@ class ConfigObjectDefault : public ConfigObjectImpl {
 
   private:
   
-    /// \throw daq::config::Generic
+    /// \throw dunedaq::config::Generic
     static void bad();
     static const std::string s_invalid;
 
@@ -98,7 +98,7 @@ class ConfigObjectDefault : public ConfigObjectImpl {
 
 };
 
-ConfigObjectImpl::ConfigObjectImpl(ConfigurationImpl * impl, const std::string& id, daq::config::ObjectState state) noexcept : m_impl (impl), m_state(state), m_id(id), m_class_name(nullptr)
+ConfigObjectImpl::ConfigObjectImpl(ConfigurationImpl * impl, const std::string& id, dunedaq::config::ObjectState state) noexcept : m_impl (impl), m_state(state), m_id(id), m_class_name(nullptr)
 {
 }
 
@@ -115,5 +115,5 @@ const std::string ConfigObjectDefault::s_invalid = "*INVALID*";
 
 void ConfigObjectDefault::bad()
 {
-  throw daq::config::Generic( ERS_HERE, "access *INVALID* object");
+  throw dunedaq::config::Generic( ERS_HERE, "access *INVALID* object");
 }

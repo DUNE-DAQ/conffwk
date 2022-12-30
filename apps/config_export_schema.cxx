@@ -103,7 +103,7 @@ main(int argc, char *argv[])
 
       return EXIT_SUCCESS;
     }
-  catch (const daq::config::Exception &ex)
+  catch (const dunedaq::config::Exception &ex)
     {
       std::cout << "config error: " << ex << std::endl;
     }

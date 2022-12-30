@@ -107,6 +107,92 @@ class ConfigObject {
 
     bool operator==(const ConfigObject& other) const noexcept;
 
+  ConfigObject* co_get_obj(ConfigObject& co, const std::string& attrname);
+  ConfigObject* co_get_obj2(const std::string& attrname);
+
+  template <typename T>
+  T get_value_in_python(const std::string& attrname) {
+    T attrval;
+    this->get(attrname, attrval);
+    return attrval;
+  }
+
+  // template <typename T>
+  // std::vector<T> get_list_in_python(const std::string& attrname) {
+  //   std::vector<T> attrvals;
+  //   this->get(attrname, attrvals);
+  //   return attrvals;
+  // }
+
+
+  template <typename T>
+  std::vector<T> get_list_in_python(ConfigObject& co, const std::string& attrname) {
+    std::vector<T> attrvals;
+    co.get(attrname, attrvals);
+    return attrvals;
+  }
+
+
+  // Yes, this is hacky, but I want to preserve the function signature
+  // ATLAS TDAQ's Python code expects while also using pybind11 rather
+  // than Boost Python
+
+  template <typename T>
+  void set_list_in_python(ConfigObject& co, const std::string& attrname, std::vector<T> l) {
+    co.set_by_ref(attrname, l);
+  }
+
+  void set_date_list(ConfigObject& co, const std::string& attrname, const std::vector<std::string>& l) {
+    co.set_date(attrname, l);
+  }
+
+  void set_time_list(ConfigObject& co, const std::string& attrname, const std::vector<std::string>& l) {
+    co.set_time(attrname, l);
+  }
+
+  void set_class_list(ConfigObject& co, const std::string& attrname, const std::vector<std::string>& l) {
+    co.set_class(attrname, l);
+  }
+
+  void set_enum_list(ConfigObject& co, const std::string& attrname, const std::vector<std::string>& l) {
+    co.set_enum(attrname, l);
+  }
+
+  
+
+// private:
+//   void set_string_list_generic(ConfigObject& co, const std::string& attrname, std::vector<std::string> data,
+// 			       void (ConfigObject::*f)(const std::string&, const std::vector<std::string>&)) {
+//     (co.*f)(attrname, data);
+//   }
+
+// public:
+
+//   void set_string_list
+//   (ConfigObject& co, const std::string& attrname, boost::python::list& l) {
+//     set_string_list_generic(co, attrname, l,
+// 			    &ConfigObject::set_by_ref<const std::vector<std::string> >);
+//   }
+
+//   void set_enum_list
+//   (ConfigObject& co, const std::string& attrname, boost::python::list& l) {
+//     set_string_list_generic(co, attrname, l, &ConfigObject::set_enum);
+//   }
+
+//   void set_class_list
+//   (ConfigObject& co, const std::string& attrname, boost::python::list& l) {
+//     set_string_list_generic(co, attrname, l, &ConfigObject::set_class);
+//   }
+
+//   void set_date_list
+//   (ConfigObject& co, const std::string& attrname, boost::python::list& l) {
+//     set_string_list_generic(co, attrname, l, &ConfigObject::set_date);
+//   }
+
+//   void set_time_list
+//   (ConfigObject& co, const std::string& attrname, boost::python::list& l) {
+//     set_string_list_generic(co, attrname, l, &ConfigObject::set_time);
+//   }
 
     /**
      *  \brief Check if object's implementation points to null.
@@ -183,7 +269,7 @@ class ConfigObject {
 
      /**
       *  \brief Return the name of the database file this object belongs to.
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     const std::string contained_in() const
@@ -212,7 +298,7 @@ class ConfigObject {
       *  \param name   name of attribute or relationship
       *  \param value  type of attribute or relationship
       *
-      *  \throw daq::config::Exception in case of an error
+      *  \throw dunedaq::config::Exception in case of an error
       */
 
     template<class T> void get(const std::string& name, T& value) {
@@ -230,7 +316,7 @@ class ConfigObject {
       *  \param value  returned value of relationship
       *  \return true if there is such relationship and false otherwise
       *
-      *  \throw daq::config::Exception in case of an error
+      *  \throw dunedaq::config::Exception in case of an error
       */
 
     bool
@@ -261,7 +347,7 @@ class ConfigObject {
       *  \param rlevel                optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache)
       *  \param rclasses              optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void referenced_by(std::vector<ConfigObject>& value,
@@ -283,7 +369,7 @@ class ConfigObject {
       *  \param o                     pointer to object
       *  \param skip_non_null_check   if true, ignore low cardinality constraint
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_obj(const std::string& name, const ::ConfigObject * o, bool skip_non_null_check = false) {
@@ -299,7 +385,7 @@ class ConfigObject {
       *  \param o                     vector of pointers on config object
       *  \param skip_non_null_check   if true, ignore low cardinality constraint
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_objs(const std::string& name, const std::vector<const ::ConfigObject*> & o, bool skip_non_null_check = false) {
@@ -325,7 +411,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  type of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     template<class T> void set_by_val(const std::string& name, T value) {
@@ -346,7 +432,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  type of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     template<class T> void set_by_ref(const std::string& name, T& value) {
@@ -363,7 +449,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_enum(const std::string& name, const std::string& value) {
@@ -380,7 +466,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_class(const std::string& name, const std::string& value) {
@@ -397,7 +483,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_date(const std::string& name, const std::string& value) {
@@ -414,7 +500,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_time(const std::string& name, const std::string& value) {
@@ -431,7 +517,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_enum(const std::string& name, const std::vector<std::string>& value) {
@@ -448,7 +534,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_class(const std::string& name, const std::vector<std::string>& value) {
@@ -465,7 +551,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_date(const std::string& name, const std::vector<std::string>& value) {
@@ -482,7 +568,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw daq::config::Generic in case of an error
+      *  \throw dunedaq::config::Generic in case of an error
       */
 
     void set_time(const std::string& name, const std::vector<std::string>& value) {
@@ -498,7 +584,7 @@ class ConfigObject {
      *
      *  \param at name of database file
      *
-     *  \throw daq::config::Generic in case of an error
+     *  \throw dunedaq::config::Generic in case of an error
      */
 
     void move(const std::string& at) {
@@ -513,7 +599,7 @@ class ConfigObject {
      *
      *  \param new_id new object ID
      *
-     *  \throw daq::config::Generic in case of an error
+     *  \throw dunedaq::config::Generic in case of an error
      */
 
     void

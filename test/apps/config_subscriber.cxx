@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 
     conf.unsubscribe();
   }
-  catch (daq::config::Exception & ex) {
+  catch (dunedaq::config::Exception & ex) {
     std::cerr << "Caught " << ex << std::endl;
     return (EXIT_FAILURE);
   }

@@ -17,7 +17,7 @@ ERS_DECLARE_ISSUE(
 ERS_DECLARE_ISSUE(
   config_test_rw,
   ConfigException,
-  "caught daq::config::Exception exception",
+  "caught dunedaq::config::Exception exception",
 )
 
 static void
@@ -453,7 +453,7 @@ int main(int argc, char *argv[])
 	  std::cout << "OK, object was not removed";
 	}
       }
-      catch(daq::config::NotFound& ex) {
+      catch(dunedaq::config::NotFound& ex) {
 	for(int j = 0; j < 4; ++j) {
 	  if(!strcmp(removed_objects_by_include[j], data[i].id)) {
 	    std::cout << "OK, object was removed"; state = true; break;
@@ -495,7 +495,7 @@ int main(int argc, char *argv[])
 	  std::cout << "OK, object was not removed";
 	}
       }
-      catch(daq::config::NotFound& ex) {
+      catch(dunedaq::config::NotFound& ex) {
 	for(int j = 0; j < 2; ++j) {
 	  if(!strcmp(removed_objects_by_composite_parent[j], existing_objects[i])) {
 	    std::cout << "OK, object was removed"; state = true; break;
@@ -546,7 +546,7 @@ int main(int argc, char *argv[])
 
     return 0;
   }
-  catch (daq::config::Exception & ex) {
+  catch (dunedaq::config::Exception & ex) {
     ers::fatal(config_test_rw::ConfigException(ERS_HERE, ex));
   }
 

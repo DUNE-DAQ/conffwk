@@ -19,7 +19,7 @@ ERS_DECLARE_ISSUE(
 ERS_DECLARE_ISSUE(
   config_dump,
   ConfigException,
-  "caught daq::config::Exception exception",
+  "caught dunedaq::config::Exception exception",
 )
 
 struct SortByName
@@ -50,7 +50,7 @@ print_referenced_by(const ConfigObject &obj, const char *prefix)
 }
 
 static void
-print_versions(const std::vector<daq::config::Version>& versions)
+print_versions(const std::vector<dunedaq::config::Version>& versions)
 {
   const auto len = versions.size();
   unsigned int idx = 1;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
   bool changes = false;
 
   bool skip_irrelevant = true;
-  daq::config::Version::QueryType query_type = daq::config::Version::query_by_tag;
+  dunedaq::config::Version::QueryType query_type = dunedaq::config::Version::query_by_tag;
 
   bool direct_info = false;
   bool objects_details = false;
@@ -183,9 +183,9 @@ int main(int argc, char *argv[])
                 throw std::runtime_error("first parameter of -v has to be \"all\" or \"skip\"");
 
               if (vesrions_str[1] == "date")
-                query_type = daq::config::Version::query_by_date;
+                query_type = dunedaq::config::Version::query_by_date;
               else if (vesrions_str[1] == "id")
-                query_type = daq::config::Version::query_by_id;
+                query_type = dunedaq::config::Version::query_by_id;
               else if (vesrions_str[1] != "tag")
                 throw std::runtime_error("second versions parameter must be \"date\", \"id\" or \"tag\"");
 
@@ -327,7 +327,7 @@ int main(int argc, char *argv[])
             print_referenced_by(obj, prefix2);
         }
     }
-  catch (daq::config::Exception &ex)
+  catch (dunedaq::config::Exception &ex)
     {
       ers::fatal(config_dump::ConfigException(ERS_HERE, ex));
       return EXIT_FAILURE;

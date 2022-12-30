@@ -1,6 +1,6 @@
   /**
 
-   *  \file Configuration.h This file contains Configuration class,
+   *  \file Configuration.hpp This file contains Configuration class,
    *  that is the entry point to access the database information.
    *  \author Igor Soloviev
    *  \brief config entry point
@@ -38,7 +38,7 @@ class ConfigAction;
 class ConfigurationImpl;
 class ConfigurationChange;
 
-namespace daq {
+namespace dunedaq {
   namespace config {
     struct class_t;
   }
@@ -103,11 +103,11 @@ protected:
    *
    *  Methods throw exceptions in case of an error unless \b noexcept is explicitly
    *  used in their specification. The following exceptions can be thrown:
-   *  - daq::config::Generic        is used to report most of the problems (bad DB, wrong parameter, plug-in specific, etc.)
-   *  - daq::config::NotFound       the config object accessed by ID is not found, class accessed by name is not found
-   *  - daq::config::DeletedObject  accessing template object that has been deleted (via notification or by the user's code)
+   *  - dunedaq::config::Generic        is used to report most of the problems (bad DB, wrong parameter, plug-in specific, etc.)
+   *  - dunedaq::config::NotFound       the config object accessed by ID is not found, class accessed by name is not found
+   *  - dunedaq::config::DeletedObject  accessing template object that has been deleted (via notification or by the user's code)
    *
-   *  All above exceptions have common class daq::config::Exception, that can be used to catch all of them.
+   *  All above exceptions have common class dunedaq::config::Exception, that can be used to catch all of them.
    *
 \code   
 try {
@@ -121,14 +121,14 @@ try {
     // print object to the standard output stream
   obj.print_ref(std::cout, db);
 }
-  // the catch of daq::config::NotFound exception is optional:
+  // the catch of dunedaq::config::NotFound exception is optional:
   // it is only used to distinguish NotFound exception from other possible once
-catch (daq::config::NotFound & ex) {
+catch (dunedaq::config::NotFound & ex) {
   std::cerr << "Object foo@bar is not found: " << ex << std::endl;
 }
   // always catch this exception: it can come unexpectedly from DBMS implementation,
   // e.g. because of hardware problems or lack of computer resources
-catch (daq::config::Exception & ex) {
+catch (dunedaq::config::Exception & ex) {
   std::cerr << "ERROR: " << ex << std::endl;
 }
 \endcode   
@@ -165,7 +165,7 @@ try {
   for (const auto& x : objects)
     x.print_ref(std::cout, db);
 }
-catch (daq::config::Exception & ex) {
+catch (dunedaq::config::Exception & ex) {
   std::cerr << "ERROR: " << ex << std::endl;
 }
 \endcode   
@@ -197,7 +197,7 @@ try {
   if (const daq::core::Segment * p = db.get<daq::core::Segment>("online"))
     std::cout << "The segment object is: " << *p << std::endl;
 }
-catch (daq::config::Exception & ex) {
+catch (dunedaq::config::Exception & ex) {
   std::cerr << "ERROR: " << ex << std::endl;
 }
 \endcode
@@ -221,6 +221,20 @@ class Configuration {
 
   public:
 
+  class MyStruct {
+  public:
+    int first_int;
+    int second_int;
+  };
+
+  std::unordered_map<std::string, MyStruct> johnsfunction(int, int); 
+
+  std::vector<std::string> superclasses_in_python(const std::string& class_name, bool all);
+  std::vector<std::string> subclasses_in_python(const std::string& class_name, bool all);
+
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> attributes(const std::string& class_name, bool all);
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> relations(const std::string& class_name, bool all);
+
       /**
        *  \brief Constructor to build a configuration object using implementation plug-in.
        *
@@ -232,7 +246,7 @@ class Configuration {
        *
        *  \param spec         database name to be understood by the database implementation
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     Configuration(const std::string& spec);
@@ -372,7 +386,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \return \b non-null value in case of success (the value to be used for unsubscribe() method).
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     CallbackId subscribe(const ::ConfigurationSubscriptionCriteria& criteria, notify user_cb, void * user_param = nullptr);
@@ -395,7 +409,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \return \b non-null value in case of success (the value to be used for unsubscribe() method).
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     CallbackId subscribe(pre_notify user_cb, void * user_param = nullptr);
@@ -408,7 +422,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  If the parameter is a non-null value, it must be equal to id returned by the add_callback() method.
        *  Otherwise the method stops all subscription.
        *
-       *  \throw daq::config::Generic in case of an error (e.g. bad ID, plugin-specific problems)
+       *  \throw dunedaq::config::Generic in case of an error (e.g. bad ID, plugin-specific problems)
        */
 
     void unsubscribe(CallbackId cb_handler = 0);
@@ -429,7 +443,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
 
   private:
 
-    /// \throw daq::config::Generic in case of an error
+    /// \throw dunedaq::config::Generic in case of an error
     void reset_subscription();
 
 
@@ -567,7 +581,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        */
 
     void
-    unread_implementation_objects(daq::config::ObjectState state) noexcept
+    unread_implementation_objects(dunedaq::config::ObjectState state) noexcept
     {
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       _unread_implementation_objects(state);
@@ -583,7 +597,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
     _unread_template_objects() noexcept;
 
     void
-    _unread_implementation_objects(daq::config::ObjectState state) noexcept;
+    _unread_implementation_objects(dunedaq::config::ObjectState state) noexcept;
 
 
   public:
@@ -599,7 +613,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param id           object identity
        *  \param object       returned value in case of success
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void create(const std::string& at, const std::string& class_name, const std::string& id, ConfigObject& object);
@@ -616,7 +630,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param id           object identity
        *  \param object       returned value in case of success
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void create(const ConfigObject& at, const std::string& class_name, const std::string& id, ConfigObject& object);
@@ -633,7 +647,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \return \b non-null pointer to created object.
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     template<class T> const T * create(const std::string& at, const std::string& id, bool init_object = false);
@@ -650,7 +664,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *       *
        *  \return \b non-null pointer to created object.
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     template<class T> const T * create(const ::DalObject& at, const std::string& id, bool init_object = false);
@@ -663,7 +677,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \param object   the object's reference
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void destroy_obj(ConfigObject& object);
@@ -676,7 +690,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \param  obj  the object's reference
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     template<class T> void destroy(T& obj);
@@ -695,7 +709,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param rlevel       optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache)
        *  \param rclasses     optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
        *
-       *  \throw daq::config::Generic if there is no such class or in case of an error
+       *  \throw dunedaq::config::Generic if there is no such class or in case of an error
        */
 
     bool test_object(const std::string& class_name, const std::string& id, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
@@ -712,7 +726,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param rlevel       optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache)
        *  \param rclasses     optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
        *
-       *  \throw daq::config::NotFound exception if there is no such object or \b daq::config::Generic in case of an error
+       *  \throw dunedaq::config::NotFound exception if there is no such object or \b dunedaq::config::Generic in case of an error
        */
 
     void get(const std::string& class_name, const std::string& id, ConfigObject& object, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
@@ -729,7 +743,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param rlevel       optional references level to optimize performance (defines how many objects referenced by found objects have also to be read to the implementation cache)
        *  \param rclasses     optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
        *
-       *  \throw daq::config::NotFound exception if there is no such class or \b daq::config::Generic in case of an error
+       *  \throw dunedaq::config::NotFound exception if there is no such class or \b dunedaq::config::Generic in case of an error
        */
 
     void get(const std::string& class_name, std::vector<ConfigObject>& objects, const std::string& query = "", unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
@@ -747,7 +761,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param rlevel     optional references level to optimize performance (defines how many objects referenced by found objects have also to be read to the implementation cache)
        *  \param rclasses   optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void get(const ConfigObject& obj_from, const std::string& query, std::vector<ConfigObject>& objects, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
@@ -766,7 +780,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \return  Return 0 if there is no object with such id or pointer to object otherwise.
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
   template<class T>
@@ -790,7 +804,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \return Return pointer to object.
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
   template<class T>
@@ -815,7 +829,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by found objects have also to be read to the implementation cache)
        *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
        *
-       *  \throw daq::config::Generic in case of a problem (e.g. no such class, plug-in specific problem)
+       *  \throw dunedaq::config::Generic in case of a problem (e.g. no such class, plug-in specific problem)
        */
 
   template<class T>
@@ -836,7 +850,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
    *
    *  \return Return pointer to object.
    *
-   *  \throw daq::config::Generic in case of an error
+   *  \throw dunedaq::config::Generic in case of an error
    */
 
   template<class T>
@@ -857,7 +871,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
    *
    *  \return Return pointer to object or nullptr if there is no such object
    *
-   *  \throw daq::config::Generic in case of an error
+   *  \throw dunedaq::config::Generic in case of an error
    */
 
   template<class T>
@@ -882,7 +896,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  relationship with such name exists and it's value is set.
        *  Otherwise the method returns 0.
        *
-       *  \throw daq::config::Generic in case of a problem (e.g. no relationship with such name, plug-in specific problem)
+       *  \throw dunedaq::config::Generic in case of a problem (e.g. no relationship with such name, plug-in specific problem)
        */
 
     template<class T> const T * ref(ConfigObject& obj, const std::string& name, bool init = false) {
@@ -902,7 +916,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param objects   returned value
        *  \param init      if true, the objects and their referenced objects are initialized
        *
-       *  \throw daq::config::Generic in case of a problem (e.g. no relationship with such name, plug-in specific problem)
+       *  \throw dunedaq::config::Generic in case of a problem (e.g. no relationship with such name, plug-in specific problem)
        */
 
     template<class T> void ref(ConfigObject& obj, const std::string& name, std::vector<const T*>& objects, bool init = false) {
@@ -929,7 +943,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param rlevel                optional references level to optimize performance (defines how many objects referenced by found objects have also to be read to the implementation cache)
        *  \param rclasses              optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     template<class T, class V> void referenced_by(const T& obj, std::vector<const V*>& objects, const std::string& relationship_name = "*", bool check_composite_only = true, bool init = false, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
@@ -958,7 +972,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
      *  \param rclasses              optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
      *  \return                      objects referencing given one
      *
-     *  \throw daq::config::Generic in case of an error
+     *  \throw dunedaq::config::Generic in case of an error
      */
 
     std::vector<const DalObject*>
@@ -979,22 +993,22 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
 
   private:
 
-    /// \throw daq::config::Generic or daq::config::NotFound
+    /// \throw dunedaq::config::Generic or dunedaq::config::NotFound
     void _get(const std::string& class_name, const std::string& id, ConfigObject& object, unsigned long rlevel, const std::vector<std::string> * rclasses);
 
-    /// \throw daq::config::Generic
+    /// \throw dunedaq::config::Generic
     template<class T> const T * _get(const std::string& id, bool init_children = false, bool init = true, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
 
-    /// \throw daq::config::Generic
+    /// \throw dunedaq::config::Generic
     template<class T> const T * _get(ConfigObject& obj, bool init_children = false, bool init = true);
 
-    /// \throw daq::config::Generic
+    /// \throw dunedaq::config::Generic
     template<class T> const T * _get(ConfigObject& obj, const std::string& id);
 
-    /// \throw daq::config::Generic
+    /// \throw dunedaq::config::Generic
     template<class T> void _get(std::vector<const T*>& objects, bool init_children = false, bool init = true, const std::string& query = "", unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
 
-    /// \throw daq::config::Generic
+    /// \throw dunedaq::config::Generic
     template<class T> DalObject * _make_instance(ConfigObject& obj, const std::string& uid)
     {
       // note upcast since the _get() returns pointer to T
@@ -1029,7 +1043,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
 
       /**
        *  \brief Multi-thread unsafe version of find(const std::string&) method
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     template<class T> const T * _find(const std::string& id);
@@ -1038,7 +1052,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
       /**
        *  \brief Multi-thread unsafe version of ref(ConfigObject&, const std::string&, bool);
        *  The method should not be used by user.
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     template<class T> const T * _ref(ConfigObject& obj, const std::string& name, bool read_children);
@@ -1047,7 +1061,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
       /**
        *  \brief Multi-thread unsafe version of ref(ConfigObject&, const std::string&, std::vector<const T*>&, bool);
        *  The method should not be used by user.
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     template<class T> void _ref(ConfigObject& obj, const std::string& name, std::vector<const T*>& results, bool read_children);
@@ -1099,7 +1113,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  If name is empty, take it from TDAQ_DB_NAME and TDAQ_DB_DATA
        *  environment variables.
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void load(const std::string& db_name);
@@ -1113,7 +1127,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  via config and template get methods) and frees all DB resources
        *  allocated by the implementation plug-in.
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void unload();
@@ -1128,7 +1142,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param db_name       name of new database file (must be an absolute path to non-existing file)
        *  \param includes      optional list of others database files to be included
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void create(const std::string& db_name, const std::list<std::string>& includes);
@@ -1143,7 +1157,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \return \b true, if database file is writable and \b false otherwise.
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     bool is_writable(const std::string& db_name) const;
@@ -1157,7 +1171,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param db_name       name of database file to be included
        *  \param include       file to be included
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void add_include(const std::string& db_name, const std::string& include);
@@ -1171,7 +1185,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param db_name       name of database file from which the include to be removed
        *  \param include       file to be removed from includes
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void remove_include(const std::string& db_name, const std::string& include);
@@ -1185,7 +1199,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param db_name       name of database file
        *  \param includes      returned list of include files
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void get_includes(const std::string& db_name, std::list<std::string>& includes) const;
@@ -1198,7 +1212,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \param dbs           returned list of uncommitted database files
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void get_updated_dbs(std::list<std::string>& dbs) const;
@@ -1212,7 +1226,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param user       user name
        *  \param password   user password
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void set_commit_credentials(const std::string& user, const std::string& password);
@@ -1225,7 +1239,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  \param log_message   log information
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void commit(const std::string& log_message = "");
@@ -1236,7 +1250,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *
        *  The method rolls back non-committed database modifications.
        *
-       *  \throw daq::config::Generic in case of an error
+       *  \throw dunedaq::config::Generic in case of an error
        */
 
     void abort();
@@ -1247,7 +1261,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
      *
      *  The method reads all objects defined in database into client cache.
      *
-     *  \throw daq::config::Generic in case of an error
+     *  \throw dunedaq::config::Generic in case of an error
      */
 
     void prefetch_all_data();
@@ -1260,10 +1274,10 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
     /**
      *  \brief Get new config versions.
      *  \return repository changes: new versions created on remote origin after current HEAD version, or externally modified files
-     *  \throw daq::config::Generic in case of an error
+     *  \throw dunedaq::config::Generic in case of an error
      */
 
-    std::vector<daq::config::Version>
+    std::vector<dunedaq::config::Version>
     get_changes();
 
 
@@ -1279,11 +1293,11 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
      *  \param type define query type
      *  \param skip_irrelevant if true, ignore changes not affecting loaded configuration
      *  \return repository versions satisfying query
-     *  \throw daq::config::Generic in case of an error
+     *  \throw dunedaq::config::Generic in case of an error
      */
 
-    std::vector<daq::config::Version>
-    get_versions(const std::string& since, const std::string& until, daq::config::Version::QueryType type = daq::config::Version::query_by_date, bool skip_irrelevant = true);
+    std::vector<dunedaq::config::Version>
+    get_versions(const std::string& since, const std::string& until, dunedaq::config::Version::QueryType type = dunedaq::config::Version::query_by_date, bool skip_irrelevant = true);
 
 
 
@@ -1298,18 +1312,18 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
        *  \param  direct_only  if true is set explicitly, return descriptions of direct attributes, relationships, super- and subclasses; by default return all descriptions taking into account inheritance
        *  \return              Return pointer to class description object.
        *
-       *  \throw daq::config::NotFound exception if there is no class with such name or \b daq::config::Generic in case of a problem
+       *  \throw dunedaq::config::NotFound exception if there is no class with such name or \b dunedaq::config::Generic in case of a problem
        */
 
-    const daq::config::class_t& get_class_info(const std::string& class_name, bool direct_only = false);
+    const dunedaq::config::class_t& get_class_info(const std::string& class_name, bool direct_only = false);
 
 
   private:
 
       // cache, storing descriptions of schema
 
-    config::map<daq::config::class_t *> p_direct_classes_desc_cache;
-    config::map<daq::config::class_t *> p_all_classes_desc_cache;
+    config::map<dunedaq::config::class_t *> p_direct_classes_desc_cache;
+    config::map<dunedaq::config::class_t *> p_all_classes_desc_cache;
 
   public:
 
@@ -1320,7 +1334,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
      *  \param  classes      regex defining class names; all classes if empty
      *  \param  direct_only  if true is set explicitly, return descriptions of direct attributes, relationships, super- and subclasses; by default return all descriptions taking into account inheritance
      *
-     *  \throw daq::config::Generic in case of a problem
+     *  \throw dunedaq::config::Generic in case of a problem
      */
 
     void
@@ -1336,7 +1350,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
      *  \param  files              regex defining data file names; ignore if empty
      *  \param  empty_array_item   if provided, add this item to mark empty arrays
      *
-     *  \throw daq::config::Generic in case of a problem
+     *  \throw dunedaq::config::Generic in case of a problem
      */
 
     void
@@ -1461,7 +1475,9 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
 
     const config::fmap<config::fset>& subclasses() const {return p_subclasses;}
 
-
+  std::vector<std::string> classes_in_python() const;
+  
+  
   private:
 
     config::map<std::list<AttributeConverterBase*> * > m_convert_map;
@@ -1517,7 +1533,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
             *
             *  \return Return pointer to object.
             *
-            *  \throw daq::config::Generic is no such class for loaded configuration DB schema or in case of an error
+            *  \throw dunedaq::config::Generic is no such class for loaded configuration DB schema or in case of an error
             */
 
         T * get(Configuration& config, ConfigObject& obj, bool init_children, bool init_object);
@@ -1541,7 +1557,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
             *
             *  \return Return pointer to object. It can be \b null, if there is no such object found.
             *
-            *  \throw daq::config::Generic is no such class for loaded configuration DB schema or in case of an error
+            *  \throw dunedaq::config::Generic is no such class for loaded configuration DB schema or in case of an error
             */
 
           T * get(Configuration& config, const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses);
@@ -1559,7 +1575,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
             *
             *  \return Return pointer to object.
             *
-            *  \throw daq::config::Generic is no such class for loaded configuration DB schema or in case of an error
+            *  \throw dunedaq::config::Generic is no such class for loaded configuration DB schema or in case of an error
             */
 
 
@@ -1584,7 +1600,7 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
             *
             *  \return Return pointer to object.
             *
-            *  \throw daq::config::Generic is no such class for loaded configuration DB schema or in case of an error
+            *  \throw dunedaq::config::Generic is no such class for loaded configuration DB schema or in case of an error
             */
 
           T *
@@ -1784,11 +1800,11 @@ template<class T>
       {
         get(T::s_class_name, objs, query, rlevel, rclasses);
       }
-    catch (daq::config::NotFound & ex)
+    catch (dunedaq::config::NotFound & ex)
       {
         std::ostringstream text;
         text << "wrong database schema, cannot find class \'" << ex.get_data() << '\'';
-        throw daq::config::Generic(ERS_HERE, text.str().c_str());
+        throw dunedaq::config::Generic(ERS_HERE, text.str().c_str());
       }
 
     if (!objs.empty())
@@ -1815,9 +1831,9 @@ template<class T>
       {
         obj.get(name, res);
       }
-    catch (daq::config::Generic & ex)
+    catch (dunedaq::config::Generic & ex)
       {
-        throw(daq::config::Generic( ERS_HERE, mk_ref_ex_text("an object", T::s_class_name, name, obj).c_str(), ex ) );
+        throw(dunedaq::config::Generic( ERS_HERE, mk_ref_ex_text("an object", T::s_class_name, name, obj).c_str(), ex ) );
       }
 
     return ((!res.is_null()) ? get_cache<T>()->get(*this, res, read_children, read_children) : nullptr);
@@ -1843,9 +1859,9 @@ template<class T>
             results.push_back(get_cache<T>()->get(*this, i, read_children, read_children));
           }
       }
-    catch (daq::config::Generic & ex)
+    catch (dunedaq::config::Generic & ex)
       {
-        throw(daq::config::Generic( ERS_HERE, mk_ref_ex_text("objects", T::s_class_name, name, obj).c_str(), ex ) );
+        throw(dunedaq::config::Generic( ERS_HERE, mk_ref_ex_text("objects", T::s_class_name, name, obj).c_str(), ex ) );
       }
   }
 
@@ -1874,9 +1890,9 @@ template<class T, class V>
               }
           }
       }
-    catch (daq::config::Generic & ex)
+    catch (dunedaq::config::Generic & ex)
       {
-        throw(daq::config::Generic( ERS_HERE, mk_ref_by_ex_text(V::s_class_name, relationship_name, obj.p_obj).c_str(), ex ) );
+        throw(dunedaq::config::Generic( ERS_HERE, mk_ref_by_ex_text(V::s_class_name, relationship_name, obj.p_obj).c_str(), ex ) );
       }
   }
 
@@ -1959,11 +1975,11 @@ Configuration::Cache<T>::get(Configuration& config, const std::string& name, boo
       config._get(T::s_class_name, name, obj, rlevel, rclasses);
       return get(config, obj, init_children, init_object);
     }
-    catch(daq::config::NotFound & ex) {
+    catch(dunedaq::config::NotFound & ex) {
       if(!strcmp(ex.get_type(), "class")) {
         std::ostringstream text;
 	text << "wrong database schema, cannot find class \"" << ex.get_data() << '\"';
-	throw daq::config::Generic(ERS_HERE, text.str().c_str());
+	throw dunedaq::config::Generic(ERS_HERE, text.str().c_str());
       }
       else {
         return 0;

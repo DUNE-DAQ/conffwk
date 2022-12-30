@@ -2,6 +2,7 @@
 #include <iostream>
 #include <regex>
 #include <sstream>
+#include <unordered_map>
 
 #include <dlfcn.h>
 
@@ -18,7 +19,7 @@
 #include "config/ConfigurationImpl.hpp"
 #include "config/Schema.hpp"
 
-namespace daq {
+namespace dunedaq {
 
   ERS_DEFINE_ISSUE_CXX( config, Exception, , )
 
@@ -54,6 +55,108 @@ namespace daq {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+// This conversion being done for the sake of pybind11 bindings
+
+std::vector<std::string> 
+Configuration::classes_in_python() const {
+  std::vector<std::string> classes;
+  for (const auto& it : this->superclasses()) {
+    classes.push_back(*it.first);
+  }
+  
+  return classes;
+}
+
+std::unordered_map<std::string, Configuration::MyStruct> 
+Configuration::johnsfunction(int first, int second) {
+
+  std::unordered_map<std::string, Configuration::MyStruct> mymap;
+
+  mymap["anentry"] = { first, second };
+  mymap["anotherentry"] = { first + 3, second + 3};
+
+  return mymap;
+}
+
+std::vector<std::string>
+Configuration::superclasses_in_python(const std::string& class_name, bool all) {
+    
+    const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+    return c.p_superclasses;
+}
+
+std::vector<std::string>
+Configuration::subclasses_in_python(const std::string& class_name, bool all) {
+    
+    const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+    return c.p_subclasses;
+}
+
+std::unordered_map<std::string, std::unordered_map<std::string, std::string>> 
+Configuration::attributes(const std::string& class_name, bool all) {
+
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> all_attributes_properties;
+
+  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+
+  for (const auto& ap : c.p_attributes) {
+    std::unordered_map<std::string, std::string> attribute_properties;
+    attribute_properties["type"] = dunedaq::config::attribute_t::type(ap.p_type);
+    
+    attribute_properties["range"] = ap.p_range.empty() ? "None" : ap.p_range;
+
+    attribute_properties["description"] = ap.p_description;
+    
+    attribute_properties["multivalue"] = ap.p_is_multi_value ? "True" : "False";
+
+    attribute_properties["not-null"] = ap.p_is_not_null ? "True" : "False";
+    
+    attribute_properties["init-value"] = ap.p_default_value.empty() ? "None" : ap.p_default_value;
+
+    all_attributes_properties[ap.p_name] = attribute_properties;
+  }
+
+  return all_attributes_properties;
+}
+
+std::unordered_map<std::string, std::unordered_map<std::string, std::string>> 
+Configuration::relations(const std::string& class_name, bool all) {
+
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> all_relationships_properties;
+
+  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+
+  for (const auto& rp : c.p_relationships) {
+    std::unordered_map<std::string, std::string> relationship_properties;
+
+    relationship_properties["type"] = rp.p_type;
+    relationship_properties["description"] = rp.p_description;
+    relationship_properties["multivalue"] = (rp.p_cardinality == dunedaq::config::zero_or_many || rp.p_cardinality == dunedaq::config::one_or_many) ? "True" : "False";
+    relationship_properties["aggregation"] = rp.p_is_aggregation ? "True" : "False";
+    relationship_properties["not-null"] = (rp.p_cardinality == dunedaq::config::only_one || rp.p_cardinality == dunedaq::config::one_or_many) ? "True" : "False";
+    
+    all_relationships_properties[rp.p_name] = relationship_properties;
+  }
+
+  return all_relationships_properties;
+}
+
+template <typename T> static T* get_new(ConfigObject& co,
+					const std::string& attrname) {
+  T* retval = new T;
+  co.get(attrname, *retval);
+  return retval;
+}
+
+static ConfigObject* co_get_obj(ConfigObject& co, const std::string& attrname) {
+  ConfigObject* obj = get_new<ConfigObject>(co, attrname);
+  if (obj->is_null()) {
+    delete obj;
+    return 0;
+  }
+  return obj;
+}
 
 void
 Configuration::add_action(ConfigAction * ac)
@@ -104,7 +207,7 @@ Configuration::Configuration(const std::string& spec) :
     }
 
   if (m_impl_spec.empty())
-    throw daq::config::Generic(ERS_HERE, "no database parameter found (check parameter of the constructor or value of TDAQ_DB environment variable)");
+    throw dunedaq::config::Generic(ERS_HERE, "no database parameter found (check parameter of the constructor or value of TDAQ_DB environment variable)");
 
   std::string::size_type idx = m_impl_spec.find_first_of(':');
 
@@ -129,7 +232,7 @@ Configuration::Configuration(const std::string& spec) :
     {
       std::ostringstream text;
       text << "failed to load implementation plug-in \'" << plugin_name << "\': \"" << dlerror() << '\"';
-      throw(daq::config::Generic( ERS_HERE, text.str().c_str() ) );
+      throw(dunedaq::config::Generic( ERS_HERE, text.str().c_str() ) );
     }
 
   // search in plug-in implementation creator function
@@ -146,7 +249,7 @@ Configuration::Configuration(const std::string& spec) :
     {
       std::ostringstream text;
       text << "failed to find implementation creator function \'" << impl_creator << "\' in plug-in \'" << plugin_name << "\': \"" << error << '\"';
-      throw(daq::config::Generic( ERS_HERE, text.str().c_str() ) );
+      throw(dunedaq::config::Generic( ERS_HERE, text.str().c_str() ) );
     }
 
 
@@ -218,7 +321,7 @@ Configuration::~Configuration() noexcept
           m_shlib_h = 0;
         }
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       ers::error(ex);
     }
@@ -238,11 +341,11 @@ Configuration::_get(const std::string& class_name, const std::string& name, Conf
     {
       m_impl->get(class_name, name, object, rlevel, rclasses);
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to get object \'" << name << '@' << class_name << '\'';
-      throw daq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -254,7 +357,7 @@ Configuration::get(const std::string& class_name, std::vector<ConfigObject>& obj
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       m_impl->get(class_name, objects, query, rlevel, rclasses);
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to get objects of class \'" << class_name << '\'';
@@ -262,7 +365,7 @@ Configuration::get(const std::string& class_name, std::vector<ConfigObject>& obj
         {
           text << " with query \'" << query << '\'';
         }
-      throw daq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -274,11 +377,11 @@ Configuration::get(const ConfigObject& obj_from, const std::string& query, std::
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       m_impl->get(obj_from, query, objects, rlevel, rclasses);
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to get path \'" << query << "\' from object \'" << obj_from << '\'';
-      throw daq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -311,7 +414,7 @@ Configuration::load(const std::string& db_name)
             }
           else
             {
-              throw(daq::config::Generic( ERS_HERE, "no database name was provided" ) );
+              throw(dunedaq::config::Generic( ERS_HERE, "no database name was provided" ) );
             }
         }
     }
@@ -347,7 +450,7 @@ Configuration::load(const std::string& db_name)
     }
   else
     {
-      throw daq::config::Generic( ERS_HERE, "no implementation loaded" );
+      throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
     }
 }
 
@@ -355,7 +458,7 @@ void
 Configuration::unload()
 {
   if (m_impl == nullptr)
-    throw daq::config::Generic( ERS_HERE, "nothing to unload" );
+    throw dunedaq::config::Generic( ERS_HERE, "nothing to unload" );
 
   std::lock_guard<std::mutex> scoped_lock1(m_tmpl_mutex);  // always lock template objects mutex first
   std::lock_guard<std::mutex> scoped_lock2(m_impl_mutex);
@@ -419,7 +522,7 @@ void
 Configuration::create(const std::string& db_name, const std::list<std::string>& includes)
 {
   if (m_impl == nullptr)
-    throw daq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -429,11 +532,11 @@ Configuration::create(const std::string& db_name, const std::list<std::string>& 
       m_impl->get_superclasses(p_superclasses);
       set_subclasses();
     }
-  catch(daq::config::Generic & ex)
+  catch(dunedaq::config::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to create database \'" << db_name << '\'';
-      throw ( daq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -442,7 +545,7 @@ bool
 Configuration::is_writable(const std::string& db_name) const
 {
   if (m_impl == nullptr)
-    throw(daq::config::Generic(ERS_HERE, "no implementation loaded" ) );
+    throw(dunedaq::config::Generic(ERS_HERE, "no implementation loaded" ) );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -450,11 +553,11 @@ Configuration::is_writable(const std::string& db_name) const
     {
       return m_impl->is_writable(db_name);
     }
-  catch(daq::config::Generic & ex)
+  catch(dunedaq::config::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to get write access status for database \'" << db_name<< '\'';
-      throw ( daq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -463,7 +566,7 @@ void
 Configuration::add_include(const std::string& db_name, const std::string& include)
 {
   if (m_impl == nullptr)
-    throw daq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -473,11 +576,11 @@ Configuration::add_include(const std::string& db_name, const std::string& includ
       m_impl->get_superclasses(p_superclasses);
       set_subclasses();
     }
-  catch(daq::config::Generic & ex)
+  catch(dunedaq::config::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to add include \'" << include << "\' to database \'" << db_name<< '\'';
-      throw ( daq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -485,7 +588,7 @@ void
 Configuration::remove_include(const std::string& db_name, const std::string& include)
 {
   if (m_impl == nullptr)
-    throw daq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
   std::lock_guard<std::mutex> scoped_lock2(m_tmpl_mutex);
@@ -496,11 +599,11 @@ Configuration::remove_include(const std::string& db_name, const std::string& inc
       m_impl->get_superclasses(p_superclasses);
       set_subclasses();
     }
-  catch(daq::config::Generic & ex)
+  catch(dunedaq::config::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to remove include \'" << include << "\' from database \'" << db_name<< '\'';
-      throw ( daq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -508,7 +611,7 @@ void
 Configuration::get_includes(const std::string& db_name, std::list<std::string>& includes) const
 {
   if (m_impl == nullptr)
-    throw daq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -516,11 +619,11 @@ Configuration::get_includes(const std::string& db_name, std::list<std::string>& 
     {
       m_impl->get_includes(db_name, includes);
     }
-  catch(daq::config::Generic & ex)
+  catch(dunedaq::config::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to get includes of database \'" << db_name<< '\'';
-      throw ( daq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -529,7 +632,7 @@ void
 Configuration::get_updated_dbs(std::list<std::string>& dbs) const
 {
   if (m_impl == nullptr)
-    throw daq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -537,9 +640,9 @@ Configuration::get_updated_dbs(std::list<std::string>& dbs) const
     {
       m_impl->get_updated_dbs(dbs);
     }
-  catch(daq::config::Generic & ex)
+  catch(dunedaq::config::Generic & ex)
     {
-      throw ( daq::config::Generic( ERS_HERE, "get_updated_dbs failed", ex ) );
+      throw ( dunedaq::config::Generic( ERS_HERE, "get_updated_dbs failed", ex ) );
     }
 }
 
@@ -548,7 +651,7 @@ void
 Configuration::set_commit_credentials(const std::string& user, const std::string& password)
 {
   if (m_impl == nullptr)
-    throw daq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -556,9 +659,9 @@ Configuration::set_commit_credentials(const std::string& user, const std::string
     {
       m_impl->set_commit_credentials(user, password);
     }
-  catch(daq::config::Generic & ex)
+  catch(dunedaq::config::Generic & ex)
     {
-      throw ( daq::config::Generic( ERS_HERE, "set_commit_credentials failed", ex ) );
+      throw ( dunedaq::config::Generic( ERS_HERE, "set_commit_credentials failed", ex ) );
     }
 }
 
@@ -569,7 +672,7 @@ Configuration::commit(const std::string& log_message)
   TLOG_DEBUG(1) << "call commit";
 
   if (m_impl == nullptr)
-    throw daq::config::Generic( ERS_HERE, "no implementation loaded");
+    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded");
 
   std::lock_guard<std::mutex> scoped_lock1(m_tmpl_mutex);  // always lock template objects mutex first
   std::lock_guard<std::mutex> scoped_lock2(m_impl_mutex);
@@ -578,9 +681,9 @@ Configuration::commit(const std::string& log_message)
     {
       m_impl->commit(log_message);
     }
-  catch (daq::config::Generic & ex)
+  catch (dunedaq::config::Generic & ex)
     {
-      throw(daq::config::Generic( ERS_HERE, "commit failed", ex ) );
+      throw(dunedaq::config::Generic( ERS_HERE, "commit failed", ex ) );
     }
 }
 
@@ -590,7 +693,7 @@ Configuration::abort()
   TLOG_DEBUG(1) << "call abort";
 
   if (m_impl == nullptr)
-    throw daq::config::Generic( ERS_HERE, "no implementation loaded");
+    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded");
 
   std::lock_guard<std::mutex> scoped_lock1(m_tmpl_mutex);  // always lock template objects mutex first
   std::lock_guard<std::mutex> scoped_lock2(m_impl_mutex);
@@ -598,14 +701,14 @@ Configuration::abort()
   try
     {
       m_impl->abort();
-      _unread_implementation_objects(daq::config::Unknown);
+      _unread_implementation_objects(dunedaq::config::Unknown);
       _unread_template_objects();
       m_impl->get_superclasses(p_superclasses);
       set_subclasses();
     }
-  catch (daq::config::Generic & ex)
+  catch (dunedaq::config::Generic & ex)
     {
-      throw(daq::config::Generic( ERS_HERE, "abort failed", ex));
+      throw(dunedaq::config::Generic( ERS_HERE, "abort failed", ex));
     }
 }
 
@@ -619,9 +722,9 @@ Configuration::prefetch_all_data()
     {
       m_impl->prefetch_all_data();
     }
-  catch (daq::config::Generic & ex)
+  catch (dunedaq::config::Generic & ex)
     {
-      throw(daq::config::Generic( ERS_HERE, "prefetch all data failed", ex));
+      throw(dunedaq::config::Generic( ERS_HERE, "prefetch all data failed", ex));
     }
 }
 
@@ -629,7 +732,7 @@ void
 Configuration::unread_all_objects(bool unread_implementation_objs) noexcept
 {
   if (unread_implementation_objs)
-    unread_implementation_objects(daq::config::Unknown);
+    unread_implementation_objects(dunedaq::config::Unknown);
 
   unread_template_objects();
 }
@@ -643,7 +746,7 @@ Configuration::_unread_template_objects() noexcept
 }
 
 void
-Configuration::_unread_implementation_objects(daq::config::ObjectState state) noexcept
+Configuration::_unread_implementation_objects(dunedaq::config::ObjectState state) noexcept
 {
   for (auto &i : m_impl->m_impl_objects)
     for (auto &j : *i.second)
@@ -689,11 +792,11 @@ Configuration::test_object(const std::string& class_name, const std::string& id,
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       return m_impl->test_object(class_name, id, rlevel, rclasses);
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to test existence of object \'" << id << '@' << class_name << '\'';
-      throw daq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -705,11 +808,11 @@ Configuration::create(const std::string& at, const std::string& class_name, cons
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       m_impl->create(at, class_name, id, object);
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to create object \'" << id << '@' << class_name << '\'';
-      throw daq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -721,11 +824,11 @@ Configuration::create(const ConfigObject& at, const std::string& class_name, con
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       m_impl->create(at, class_name, id, object);
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to create object \'" << id << '@' << class_name << '\'';
-      throw daq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -739,11 +842,11 @@ Configuration::destroy_obj(ConfigObject& object)
       std::lock_guard<std::mutex> scoped_lock2(m_tmpl_mutex);
       m_impl->destroy(object);
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to destroy object \'" << object << '\'';
-      throw daq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -791,30 +894,30 @@ Configuration::rename_object(ConfigObject& obj, const std::string& new_id)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-const daq::config::class_t&
+const dunedaq::config::class_t&
 Configuration::get_class_info(const std::string& class_name, bool direct_only)
 {
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
-  config::map<daq::config::class_t *>& d_cache(direct_only ? p_direct_classes_desc_cache : p_all_classes_desc_cache);
+  config::map<dunedaq::config::class_t *>& d_cache(direct_only ? p_direct_classes_desc_cache : p_all_classes_desc_cache);
 
-  config::map<daq::config::class_t *>::const_iterator i = d_cache.find(class_name);
+  config::map<dunedaq::config::class_t *>::const_iterator i = d_cache.find(class_name);
 
   if (i != d_cache.end())
     return *(i->second);
 
   try
     {
-      daq::config::class_t * d = m_impl->get(class_name, direct_only);
+      dunedaq::config::class_t * d = m_impl->get(class_name, direct_only);
       d_cache[class_name] = d;
       return *d;
     }
   // catch Generic exception only; the NotFound is forwarded from implementation
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to get description of class \'" << class_name << '\'';
-      throw daq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -832,7 +935,7 @@ init_regex(std::unique_ptr<std::regex>& ptr, const std::string& str, const char 
       {
         std::ostringstream text;
         text << "failed to create " << what << " regex \"" << str << "\": " << ex.what();
-        throw daq::config::Generic( ERS_HERE, text.str().c_str());
+        throw dunedaq::config::Generic( ERS_HERE, text.str().c_str());
       }
 }
 
@@ -863,7 +966,7 @@ Configuration::export_schema(boost::property_tree::ptree& pt, const std::string&
   for (const auto &c : sorted_classes)
     if (classes_str.empty() || std::regex_match(*c, *classes_regex.get()))
       {
-        const daq::config::class_t& info(get_class_info(*c, direct_only));
+        const dunedaq::config::class_t& info(get_class_info(*c, direct_only));
 
         boost::property_tree::ptree class_pt;
 
@@ -889,11 +992,11 @@ Configuration::export_schema(boost::property_tree::ptree& pt, const std::string&
               {
                 boost::property_tree::ptree attribute;
 
-                attribute.put("type", daq::config::attribute_t::type(x.p_type));
+                attribute.put("type", dunedaq::config::attribute_t::type(x.p_type));
                 if (!x.p_range.empty())
                   attribute.put("range", x.p_range);
-                if (x.p_int_format != daq::config::na_int_format)
-                  attribute.put("format", daq::config::attribute_t::format2str(x.p_int_format));
+                if (x.p_int_format != dunedaq::config::na_int_format)
+                  attribute.put("format", dunedaq::config::attribute_t::format2str(x.p_int_format));
                 if (x.p_is_not_null)
                   attribute.put("is-not-null", x.p_is_not_null);
                 if (x.p_is_multi_value)
@@ -918,7 +1021,7 @@ Configuration::export_schema(boost::property_tree::ptree& pt, const std::string&
                 boost::property_tree::ptree relationship;
 
                 relationship.put("type", x.p_type);
-                relationship.put("cardinality", daq::config::relationship_t::card2str(x.p_cardinality));
+                relationship.put("cardinality", dunedaq::config::relationship_t::card2str(x.p_cardinality));
                 if (!x.p_is_aggregation)
                   relationship.put("is-aggregation", x.p_is_aggregation);
                 if (!x.p_description.empty())
@@ -936,7 +1039,7 @@ Configuration::export_schema(boost::property_tree::ptree& pt, const std::string&
 
 template<class T>
 static void
-add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const daq::config::attribute_t &attribute, const std::string &empty_array_item)
+add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const dunedaq::config::attribute_t &attribute, const std::string &empty_array_item)
 {
   auto &o = const_cast<ConfigObject&>(obj);
   if (!attribute.p_is_multi_value)
@@ -964,9 +1067,9 @@ add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const daq::co
 }
 
 static void
-add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const daq::config::relationship_t &relationship, const std::string &empty_array_item)
+add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const dunedaq::config::relationship_t &relationship, const std::string &empty_array_item)
 {
-  if (relationship.p_cardinality == daq::config::zero_or_many || relationship.p_cardinality == daq::config::one_or_many)
+  if (relationship.p_cardinality == dunedaq::config::zero_or_many || relationship.p_cardinality == dunedaq::config::one_or_many)
     {
       std::vector<ConfigObject> values;
       const_cast<ConfigObject&>(obj).get(relationship.p_name, values);
@@ -1009,7 +1112,7 @@ Configuration::export_data(boost::property_tree::ptree& pt, const std::string& c
   for (const auto &c : sorted_classes)
     if (classes_str.empty() || std::regex_match(*c, *classes_regex.get()))
       {
-        const daq::config::class_t& info(get_class_info(*c));
+        const dunedaq::config::class_t& info(get_class_info(*c));
 
         boost::property_tree::ptree pt_objects;
 
@@ -1036,44 +1139,44 @@ Configuration::export_data(boost::property_tree::ptree& pt, const std::string& c
                 for (const auto &a : info.p_attributes)
                   switch (a.p_type)
                     {
-                      case daq::config::bool_type:
+                      case dunedaq::config::bool_type:
                               add_data<bool>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::s8_type:
+                      case dunedaq::config::s8_type:
                               add_data<int8_t>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::u8_type:
+                      case dunedaq::config::u8_type:
                               add_data<uint8_t>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::s16_type:
+                      case dunedaq::config::s16_type:
                               add_data<int16_t>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::u16_type:
+                      case dunedaq::config::u16_type:
                               add_data<uint16_t>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::s32_type:
+                      case dunedaq::config::s32_type:
                               add_data<int32_t>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::u32_type:
+                      case dunedaq::config::u32_type:
                               add_data<uint32_t>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::s64_type:
+                      case dunedaq::config::s64_type:
                               add_data<int64_t>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::u64_type:
+                      case dunedaq::config::u64_type:
                               add_data<uint64_t>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::float_type:
+                      case dunedaq::config::float_type:
                               add_data<float>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::double_type:
+                      case dunedaq::config::double_type:
                               add_data<double>(data, *x, a, empty_array_item);
                               break;
-                      case daq::config::date_type:
-                      case daq::config::time_type:
-                      case daq::config::enum_type:
-                      case daq::config::class_type:
-                      case daq::config::string_type:
+                      case dunedaq::config::date_type:
+                      case dunedaq::config::time_type:
+                      case dunedaq::config::enum_type:
+                      case dunedaq::config::class_type:
+                      case dunedaq::config::string_type:
                               add_data<std::string>(data, *x, a, empty_array_item);
                               break;
                       default:
@@ -1101,7 +1204,7 @@ Configuration::export_data(boost::property_tree::ptree& pt, const std::string& c
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
-std::vector<daq::config::Version>
+std::vector<dunedaq::config::Version>
 Configuration::get_changes()
 {
   try
@@ -1109,24 +1212,24 @@ Configuration::get_changes()
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       return m_impl->get_changes();
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
-      throw daq::config::Generic( ERS_HERE, "failed to get new versions", ex );
+      throw dunedaq::config::Generic( ERS_HERE, "failed to get new versions", ex );
     }
 }
 
 
-std::vector<daq::config::Version>
-Configuration::get_versions(const std::string& since, const std::string& until, daq::config::Version::QueryType type, bool skip_irrelevant)
+std::vector<dunedaq::config::Version>
+Configuration::get_versions(const std::string& since, const std::string& until, dunedaq::config::Version::QueryType type, bool skip_irrelevant)
 {
   try
     {
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       return m_impl->get_versions(since, until, type, skip_irrelevant);
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
-      throw daq::config::Generic( ERS_HERE, "failed to get versions", ex );
+      throw dunedaq::config::Generic( ERS_HERE, "failed to get versions", ex );
     }
 }
 
@@ -1155,7 +1258,7 @@ Configuration::subscribe(const ::ConfigurationSubscriptionCriteria& criteria, no
 
   if (!user_cb)
     {
-      throw daq::config::Generic( ERS_HERE, "callback function is not defined" );
+      throw dunedaq::config::Generic( ERS_HERE, "callback function is not defined" );
     }
 
   // create callback subscription structure
@@ -1176,11 +1279,11 @@ Configuration::subscribe(const ::ConfigurationSubscriptionCriteria& criteria, no
       reset_subscription();
       return cs;
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
       m_callbacks.erase(cs);
       delete cs;
-      throw daq::config::Generic( ERS_HERE, "subscription failed", ex );
+      throw dunedaq::config::Generic( ERS_HERE, "subscription failed", ex );
     }
 }
 
@@ -1190,7 +1293,7 @@ Configuration::subscribe(pre_notify user_cb, void * parameter)
   // check if there is no subscription function provided
 
   if (!user_cb)
-    throw(daq::config::Generic( ERS_HERE, "callback function is not defined" ) );
+    throw(dunedaq::config::Generic( ERS_HERE, "callback function is not defined" ) );
 
   // create callback subscription structure
 
@@ -1232,7 +1335,7 @@ Configuration::unsubscribe(CallbackId id)
         {
           std::ostringstream text;
           text << "unsubscription failed for CallbackId = " << (void *) id << " (no such callback id found)";
-          throw(daq::config::Generic( ERS_HERE, text.str().c_str() ) );
+          throw(dunedaq::config::Generic( ERS_HERE, text.str().c_str() ) );
         }
     }
   else
@@ -1251,9 +1354,9 @@ Configuration::unsubscribe(CallbackId id)
     {
       reset_subscription();
     }
-  catch (daq::config::Generic& ex)
+  catch (dunedaq::config::Generic& ex)
     {
-      throw daq::config::Generic( ERS_HERE, "unsubscription failed", ex );
+      throw dunedaq::config::Generic( ERS_HERE, "unsubscription failed", ex );
     }
 }
 
@@ -1324,7 +1427,7 @@ Configuration::update_impl_objects(config::pmap<config::map<ConfigObjectImpl *> 
                   TLOG_DEBUG( 2 ) << "set implementation object " << x << '@' << *class_name << " [" << (void *)j->second << "] deleted";
 
                   std::lock_guard<std::mutex> scoped_lock(j->second->m_mutex);
-                  j->second->m_state = daq::config::Deleted;
+                  j->second->m_state = dunedaq::config::Deleted;
                   j->second->clear();
                 }
             }
@@ -1366,7 +1469,7 @@ Configuration::update_impl_objects(config::pmap<config::map<ConfigObjectImpl *> 
 
                   std::lock_guard<std::mutex> scoped_lock(j->second->m_mutex);
 
-                  if(j->second->m_state != daq::config::Valid)
+                  if(j->second->m_state != dunedaq::config::Valid)
                     j->second->reset();
                   else
                     j->second->clear();
@@ -1547,15 +1650,15 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
                 }
               catch (const ers::Issue &ex)
                 {
-                  ers::error(daq::config::Generic( ERS_HERE, "user callback thrown ers exception", ex));
+                  ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown ers exception", ex));
                 }
               catch (const std::exception &ex)
                 {
-                  ers::error(daq::config::Generic( ERS_HERE, "user callback thrown std exception", ex));
+                  ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown std exception", ex));
                 }
               catch (...)
                 {
-                  ers::error(daq::config::Generic( ERS_HERE, "user callback thrown unknown exception"));
+                  ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown unknown exception"));
                 }
             }
           else
@@ -1617,15 +1720,15 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
                     }
                   catch (const ers::Issue &ex)
                     {
-                      ers::error(daq::config::Generic( ERS_HERE, "user callback thrown ers exception", ex));
+                      ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown ers exception", ex));
                     }
                   catch (const std::exception &ex)
                     {
-                      ers::error(daq::config::Generic( ERS_HERE, "user callback thrown std exception", ex));
+                      ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown std exception", ex));
                     }
                   catch (...)
                     {
-                      ers::error(daq::config::Generic( ERS_HERE, "user callback thrown unknown exception"));
+                      ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown unknown exception"));
                     }
 
                   for (const auto &i : changes1)
@@ -1856,9 +1959,9 @@ Configuration::referenced_by(const DalObject& obj, const std::string& relationsh
       obj.p_obj.referenced_by(objs, relationship_name, check_composite_only, rlevel, rclasses);
       return make_dal_objects(objs, upcast_unregistered);
     }
-  catch (daq::config::Generic & ex)
+  catch (dunedaq::config::Generic & ex)
     {
-      throw(daq::config::Generic( ERS_HERE, mk_ref_by_ex_text("DalObject", relationship_name, obj.p_obj).c_str(), ex ) );
+      throw(dunedaq::config::Generic( ERS_HERE, mk_ref_by_ex_text("DalObject", relationship_name, obj.p_obj).c_str(), ex ) );
     }
 }
 
@@ -1912,7 +2015,7 @@ DalObject::p_rm(std::ostream &s)
 }
 
 void
-DalObject::p_error(std::ostream &s, daq::config::Exception &ex)
+DalObject::p_error(std::ostream &s, dunedaq::config::Exception &ex)
 {
   s << "ERROR in generated DAL print method:\n\twas caused by: " << ex << std::endl;
 }
@@ -1937,19 +2040,19 @@ namespace config
 }
 
 
-void DalObject::throw_init_ex(daq::config::Exception& ex)
+void DalObject::throw_init_ex(dunedaq::config::Exception& ex)
 {
   std::ostringstream text;
   text << "failed to init " << this << ":\n\twas caused by: " << ex << std::endl;
   p_was_read = false;
-  throw daq::config::Generic (ERS_HERE, text.str().c_str());
+  throw dunedaq::config::Generic (ERS_HERE, text.str().c_str());
 }
 
 void DalObject::throw_get_ex(const std::string& what, const std::string& class_name, const DalObject * obj)
 {
   std::ostringstream text;
   text << "cannot find relationship or algorithm \"" << what << "\" in c++ class \"" << class_name << "\" for object " << obj;
-  throw daq::config::Generic(ERS_HERE, text.str().c_str());
+  throw dunedaq::config::Generic(ERS_HERE, text.str().c_str());
 }
 
 
@@ -1999,7 +2102,7 @@ DalFactory::functions(const Configuration& db, const std::string& name, bool upc
         }
 
       std::string text(std::string("DAL class ") + name + " was not registered");
-      throw daq::config::Generic(ERS_HERE, text.c_str());
+      throw dunedaq::config::Generic(ERS_HERE, text.c_str());
     }
 
   return it->second;

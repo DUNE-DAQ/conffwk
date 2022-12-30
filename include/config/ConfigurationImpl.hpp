@@ -22,7 +22,7 @@ class ConfigurationChange;
 class ConfigObject;
 class ConfigObjectImpl;
 
-namespace daq {
+namespace dunedaq {
   namespace config {
     struct class_t;
   }
@@ -36,7 +36,7 @@ namespace daq {
    *  access database information, subscribe and receive notification on data changes.
    *  Any database implementation inherits from this class and implements it's methods. 
 
-   *  The methods may throw daq::config::Exception exception (like Generic, NotFound) in
+   *  The methods may throw dunedaq::config::Exception exception (like Generic, NotFound) in
    *  case of an error unless \b noexcept is explicitly used in their specification.
    */
 
@@ -115,11 +115,11 @@ class ConfigurationImpl {
 
       /// Get newly available versions
 
-    virtual std::vector<daq::config::Version> get_changes() = 0;
+    virtual std::vector<dunedaq::config::Version> get_changes() = 0;
 
       /// Get archived versions
 
-    virtual std::vector<daq::config::Version> get_versions(const std::string& since, const std::string& until, daq::config::Version::QueryType type, bool skip_irrelevant) = 0;
+    virtual std::vector<dunedaq::config::Version> get_versions(const std::string& since, const std::string& until, dunedaq::config::Version::QueryType type, bool skip_irrelevant) = 0;
 
 
     // methods to get data from database
@@ -166,7 +166,7 @@ class ConfigurationImpl {
 
       /// Get description of class in accordance with parameters.
 
-    virtual daq::config::class_t * get(const std::string& class_name, bool direct_only) = 0;
+    virtual dunedaq::config::class_t * get(const std::string& class_name, bool direct_only) = 0;
 
       /// Get inheritance hierarchy
 
@@ -241,7 +241,7 @@ class ConfigurationImpl {
           else
             {
               static_cast<T *>(p)->set(obj);
-              p->m_state = daq::config::Valid;
+              p->m_state = dunedaq::config::Valid;
             }
 
           return static_cast<T *>(p);

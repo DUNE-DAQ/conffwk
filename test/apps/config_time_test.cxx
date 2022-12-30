@@ -21,7 +21,7 @@ ERS_DECLARE_ISSUE(
 ERS_DECLARE_ISSUE(
   config_time_test,
   ConfigException,
-  "caught daq::config::Exception exception",
+  "caught dunedaq::config::Exception exception",
 )
 
 static void
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     }
 
     for(std::set<std::string>::const_iterator i = classes.begin(); i != classes.end(); ++i) {
-      const daq::config::class_t& d(conf.get_class_info(*i));
+      const dunedaq::config::class_t& d(conf.get_class_info(*i));
       if(verbose) {
         d.print(std::cout, "  ");
       }
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 
     return 0;
   }
-  catch (daq::config::Exception & ex) {
+  catch (dunedaq::config::Exception & ex) {
     ers::fatal(config_time_test::ConfigException(ERS_HERE, ex));
   }
 

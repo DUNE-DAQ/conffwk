@@ -75,7 +75,7 @@ protected:
   /**
    *  The method checks state of object and throws exception if it was deleted.
    *
-   *  \throw daq::config::DeletedObject if object was deleted
+   *  \throw dunedaq::config::DeletedObject if object was deleted
    */
 
   void check() const
@@ -87,7 +87,7 @@ protected:
   /**
    *  The method checks state of object and throws exception if it was deleted.
    *
-   *  \throw daq::config::Exception in case of problems
+   *  \throw dunedaq::config::Exception in case of problems
    */
 
   bool is_deleted() const
@@ -185,7 +185,7 @@ public:
   /**
    *  Returns reference on the ConfigObject used by this template object.
    *
-   *  \throw daq::config::DeletedObject if object was deleted
+   *  \throw dunedaq::config::DeletedObject if object was deleted
    */
 
   const ::ConfigObject&
@@ -209,7 +209,7 @@ public:
    *  Is used to mark template object as non-read,
    *  i.e. it's attributes will be read from the implementation object during next access of an attribute
    *
-   *  \throw daq::config::DeletedObject if object was deleted
+   *  \throw dunedaq::config::DeletedObject if object was deleted
    */
 
   void unread()
@@ -276,7 +276,7 @@ public:
   static void p_rm(std::ostream& s);
 
   /// print error text
-  static void p_error(std::ostream& s, daq::config::Exception& ex);
+  static void p_error(std::ostream& s, dunedaq::config::Exception& ex);
 
   /// print object headers
   void p_hdr(std::ostream& s, unsigned int indent, const std::string& cl, const char * nm = nullptr) const;
@@ -288,7 +288,7 @@ public:
         {
           DalObject::p_null(s);
         }
-      else if(p_obj.m_impl->m_state != daq::config::Valid)
+      else if(p_obj.m_impl->m_state != dunedaq::config::Valid)
         {
           DalObject::p_rm(s);
         }
@@ -300,10 +300,10 @@ public:
       return s;
     }
 
-  /// throw object initialisation exception (i.e. \throw daq::config::Generic)
-  void throw_init_ex(daq::config::Exception& ex);
+  /// throw object initialisation exception (i.e. \throw dunedaq::config::Generic)
+  void throw_init_ex(dunedaq::config::Exception& ex);
 
-  /// throw exception in generated get method (i.e. \throw daq::config::Generic)
+  /// throw exception in generated get method (i.e. \throw dunedaq::config::Generic)
   static void throw_get_ex(const std::string& what, const std::string& class_name, const DalObject * obj);
 
   /// check a pointer on DAL object is null
@@ -474,7 +474,7 @@ template<class TARGET, class SOURCE>
         if (try_cast(&TARGET::s_class_name, obj->m_class_name) == true)
           {
             std::lock_guard<std::mutex> scoped_lock(obj->m_mutex);
-            if (obj->m_state == daq::config::Valid)
+            if (obj->m_state == dunedaq::config::Valid)
               return _get<TARGET>(*const_cast<ConfigObject *>(&s->p_obj), s->UID());
           }
       }

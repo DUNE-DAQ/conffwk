@@ -20,7 +20,7 @@ class Configuration;
 class ConfigurationImpl;
 class DalObject;
 
-namespace daq
+namespace dunedaq
 {
   namespace config
   {
@@ -45,7 +45,7 @@ namespace daq
    *  it is necessary to derive new class from ConfigObjectImpl
    *  and to implement all virtual methods.
    *
-   *  The methods may throw daq::config::Generic exception in case of an error
+   *  The methods may throw dunedaq::config::Generic exception in case of an error
    *  unless \b noexcept is explicitly used in their specification.
    */
 
@@ -60,7 +60,7 @@ class ConfigObjectImpl {
   public:
 
       /// The constructor stores configuration implementation pointer
-    ConfigObjectImpl(ConfigurationImpl * impl, const std::string& id, daq::config::ObjectState state = daq::config::Valid) noexcept;
+    ConfigObjectImpl(ConfigurationImpl * impl, const std::string& id, dunedaq::config::ObjectState state = dunedaq::config::Valid) noexcept;
 
       /// The virtual destructor
     virtual ~ConfigObjectImpl() noexcept;
@@ -313,19 +313,19 @@ class ConfigObjectImpl {
     bool
     is_deleted() const
     {
-      if (m_state == daq::config::Unknown)
+      if (m_state == dunedaq::config::Unknown)
         {
           const_cast<ConfigObjectImpl *>(this)->reset();
         }
 
-      return (m_state == daq::config::Deleted);
+      return (m_state == dunedaq::config::Deleted);
     }
 
 
   protected:
 
     ConfigurationImpl * m_impl;               /*!< Pointer to configuration implementation object */
-    daq::config::ObjectState m_state;         /*!< State of the object */
+    dunedaq::config::ObjectState m_state;         /*!< State of the object */
     std::string m_id;                         /*!< Object ID */
     const std::string * m_class_name;         /*!< Name of object's class */
     mutable std::mutex m_mutex;               /*!< Mutex protecting concurrent access to this object */
@@ -335,14 +335,14 @@ class ConfigObjectImpl {
 
     /**
      * Check state of object and throw exception if it has been deleted
-     * \throw daq::config::DeletedObject if the object has been deleted
+     * \throw dunedaq::config::DeletedObject if the object has been deleted
      */
     void
     throw_if_deleted() const
     {
       if (is_deleted())
         {
-          throw daq::config::DeletedObject(ERS_HERE, m_class_name->c_str(), m_id.c_str());
+          throw dunedaq::config::DeletedObject(ERS_HERE, m_class_name->c_str(), m_id.c_str());
         }
     }
 

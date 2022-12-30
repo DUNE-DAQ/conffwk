@@ -12,7 +12,7 @@
 #include <vector>
 #include <iostream>
 
-namespace daq {
+namespace dunedaq {
   namespace config {
 
       /** The supported attribute types. */

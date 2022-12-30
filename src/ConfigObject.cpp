@@ -209,7 +209,7 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
 
   try
     {
-      const daq::config::class_t& cd(config.get_class_info(class_name()));
+      const dunedaq::config::class_t& cd(config.get_class_info(class_name()));
 
       // print attributes
       for (const auto& i : cd.p_attributes)
@@ -221,23 +221,23 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
 
           switch (i.p_type)
             {
-              case daq::config::string_type :
-              case daq::config::enum_type :
-              case daq::config::date_type :
-              case daq::config::time_type :
-              case daq::config::class_type :
+              case dunedaq::config::string_type :
+              case dunedaq::config::enum_type :
+              case dunedaq::config::date_type :
+              case dunedaq::config::time_type :
+              case dunedaq::config::class_type :
                                              print_value<std::string>(*this, aname, ismv, '\"', s); break;
-              case daq::config::bool_type:   print_value<bool>(*this, aname, ismv, 0, s);           break;
-              case daq::config::u8_type:     print_value<uint8_t>(*this, aname, ismv, 0, s);        break;
-              case daq::config::s8_type:     print_value<int8_t>(*this, aname, ismv, 0, s);         break;
-              case daq::config::u16_type:    print_value<uint16_t>(*this, aname, ismv, 0, s);       break;
-              case daq::config::s16_type:    print_value<int16_t>(*this, aname, ismv, 0, s);        break;
-              case daq::config::u32_type:    print_value<uint32_t>(*this, aname, ismv, 0, s);       break;
-              case daq::config::s32_type:    print_value<int32_t>(*this, aname, ismv, 0, s);        break;
-              case daq::config::u64_type:    print_value<uint64_t>(*this, aname, ismv, 0, s);       break;
-              case daq::config::s64_type:    print_value<int64_t>(*this, aname, ismv, 0, s);        break;
-              case daq::config::float_type:  print_value<float>(*this, aname, ismv, 0, s);          break;
-              case daq::config::double_type: print_value<double>(*this, aname, ismv, 0, s);         break;
+              case dunedaq::config::bool_type:   print_value<bool>(*this, aname, ismv, 0, s);           break;
+              case dunedaq::config::u8_type:     print_value<uint8_t>(*this, aname, ismv, 0, s);        break;
+              case dunedaq::config::s8_type:     print_value<int8_t>(*this, aname, ismv, 0, s);         break;
+              case dunedaq::config::u16_type:    print_value<uint16_t>(*this, aname, ismv, 0, s);       break;
+              case dunedaq::config::s16_type:    print_value<int16_t>(*this, aname, ismv, 0, s);        break;
+              case dunedaq::config::u32_type:    print_value<uint32_t>(*this, aname, ismv, 0, s);       break;
+              case dunedaq::config::s32_type:    print_value<int32_t>(*this, aname, ismv, 0, s);        break;
+              case dunedaq::config::u64_type:    print_value<uint64_t>(*this, aname, ismv, 0, s);       break;
+              case dunedaq::config::s64_type:    print_value<int64_t>(*this, aname, ismv, 0, s);        break;
+              case dunedaq::config::float_type:  print_value<float>(*this, aname, ismv, 0, s);          break;
+              case dunedaq::config::double_type: print_value<double>(*this, aname, ismv, 0, s);         break;
               default:                       s << "*** bad type ***";
             }
 
@@ -251,7 +251,7 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
           if (expand_aggregation == false || i.p_is_aggregation == false)
             {
               s << ' ';
-              print_value<ConfigObject>(*this, i.p_name, (i.p_cardinality == daq::config::zero_or_many) || (i.p_cardinality == daq::config::one_or_many), '\"', s);
+              print_value<ConfigObject>(*this, i.p_name, (i.p_cardinality == dunedaq::config::zero_or_many) || (i.p_cardinality == dunedaq::config::one_or_many), '\"', s);
               s << std::endl;
             }
           else
@@ -259,7 +259,7 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
               s << std::endl;
               std::string prefix2(prefix + "    ");
               ConfigObject& obj = const_cast<ConfigObject&>(*this);
-              if ((i.p_cardinality == daq::config::zero_or_many) || (i.p_cardinality == daq::config::one_or_many))
+              if ((i.p_cardinality == dunedaq::config::zero_or_many) || (i.p_cardinality == dunedaq::config::one_or_many))
                 {
                   std::vector<ConfigObject> value;
                   obj.get(i.p_name, value);
@@ -281,10 +281,45 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
             }
         }
     }
-  catch (daq::config::Exception& ex)
+  catch (dunedaq::config::Exception& ex)
     {
-      s << "cannot get schema description: caught daq::config::Exception exception" << std::endl;
+      s << "cannot get schema description: caught dunedaq::config::Exception exception" << std::endl;
       std::cerr << "ERROR: " << ex << std::endl;
     }
 
+}
+
+
+ConfigObject* 
+ConfigObject::co_get_obj(ConfigObject& co, const std::string& attrname) {
+  
+  ConfigObject* newobject = new ConfigObject;
+
+  if (newobject) {
+    co.get(attrname, *newobject);
+
+    if (newobject->is_null()) {
+      delete newobject;
+      return nullptr;
+    }
+  } 
+  
+  return newobject;
+}
+
+ConfigObject* 
+ConfigObject::co_get_obj2(const std::string& attrname) {
+  
+  ConfigObject* newobject = new ConfigObject;
+
+  if (newobject) {
+    this->get(attrname, *newobject);
+
+    if (newobject->is_null()) {
+      delete newobject;
+      return nullptr;
+    }
+  } 
+  
+  return newobject;
 }

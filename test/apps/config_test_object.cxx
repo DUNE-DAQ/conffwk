@@ -16,7 +16,7 @@ ERS_DECLARE_ISSUE(
 ERS_DECLARE_ISSUE(
   config_test_object,
   ConfigException,
-  "caught daq::config::Exception exception",
+  "caught dunedaq::config::Exception exception",
 )
 
 static void
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 
     return 0;
   }
-  catch (daq::config::Exception & ex) {
+  catch (dunedaq::config::Exception & ex) {
     ers::fatal(config_test_object::ConfigException(ERS_HERE, ex));
   }
 

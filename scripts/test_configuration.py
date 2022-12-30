@@ -28,8 +28,9 @@ class Configuration(unittest.TestCase):
 
     def test03_CanAddIncludes(self):
         db = config.Configuration("oksconfig:test.data.xml")
-        db.add_include("test.data.xml", f'{scriptsdir}/core.schema.xml')
+        db.add_include(f'{scriptsdir}/core.schema.xml')
         includes = db.get_includes("test.data.xml")
+        print(includes)
         self.assertEqual(len(includes), 2)
         db.commit()
         includes = db.get_includes("test.data.xml")
@@ -37,24 +38,24 @@ class Configuration(unittest.TestCase):
 
     def test04_CanRemoveIncludes(self):
         db = config.Configuration("oksconfig:test.data.xml")
-        includes = db.get_includes("test.data.xml")
+        includes = db.get_includes()
         self.assertEqual(len(includes), 2)
-        db.remove_include("test.data.xml", includes[1])
+        db.remove_include(includes[1])
         db.commit()
-        includes = db.get_includes("test.data.xml")
+        includes = db.get_includes()
         self.assertEqual(len(includes), 1)
 
     def test05_CanCreateObject(self):
         db = config.Configuration("oksconfig:test.data.xml")
         for i in range(10):
-            obj = db.create_obj("test.data.xml", "Dummy", "TestDummy-%d" % i)
+            obj = db.create_obj("Dummy", "TestDummy-%d" % i)
         db.commit()
 
     def test05a_CanCreateObjectFromOtherObject(self):
         db = config.Configuration("oksconfig:test.data.xml")
-        master = db.create_obj("test.data.xml", "Dummy", "MasterDummy")
+        master = db.create_obj("Dummy", "MasterDummy")
         for i in range(100, 110):
-            obj = db.create_obj("test.data.xml", "Dummy", "TestDummy-%d" % i)
+            obj = db.create_obj("Dummy", "TestDummy-%d" % i)
         db.commit()
 
     def test06_CanTestForObjects(self):
@@ -66,7 +67,7 @@ class Configuration(unittest.TestCase):
 
     def test07_DetectsExistingObjects(self):
         db = config.Configuration("oksconfig:test.data.xml")
-        self.assertRaises(RuntimeError, db.create_obj, "test.data.xml", "Dummy", "TestDummy-3")
+        self.assertRaises(RuntimeError, db.create_obj, "Dummy", "TestDummy-3")
 
     def test08_CanGetObject(self):
         db = config.Configuration("oksconfig:test.data.xml")
@@ -103,7 +104,7 @@ class Configuration(unittest.TestCase):
         db = config.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         for i in range(amount):
-            db.create_obj("test.data.xml", "Dummy", "TestDummy-%d" % i)
+            db.create_obj("Dummy", "TestDummy-%d" % i)
         db.commit()
 
     def test13_CanCommitDeepRelations(self):
@@ -115,7 +116,7 @@ class Configuration(unittest.TestCase):
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         previous = None
         for i in range(depth):
-            obj = db.create_obj("test.data.xml", "Second", "Object-%d" % i)
+            obj = db.create_obj("Second", "Object-%d" % i)
             if previous:
                 obj['Another'] = previous
             previous = obj
@@ -134,6 +135,7 @@ class Configuration(unittest.TestCase):
         # gets the topmost obj.
         obj = db.get_obj('Second', 'Object-%d' % (depth-1))
         counter = 1
+
         while obj['Another']:
             counter += 1
             obj = obj['Another']  # go deep in the relationship
