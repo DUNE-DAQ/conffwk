@@ -142,10 +142,6 @@ class Configuration(_ConfigurationProxy):
         attribute_properties_as_strings = super(Configuration, self).attributes(class_name, all)
         attribute_properties_to_return = {}
         for attribute, properties in attribute_properties_as_strings.items():
-            #print([k, v])
-            #attribute_properties_to_return[attribute] = {}
-            #print(f"Properties of {attribute}:")
-            #print(properties)
 
             for k, v in properties.items():
                 if v == "None":
@@ -156,10 +152,6 @@ class Configuration(_ConfigurationProxy):
                     properties[k] = False
 
             attribute_properties_to_return[attribute] = properties
-
-
-        #for k,v in attribute_properties_to_return.items():
-        #    print([k, v])
 
         return attribute_properties_to_return
 

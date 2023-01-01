@@ -221,19 +221,6 @@ class Configuration {
 
   public:
 
-  class MyStruct {
-  public:
-    int first_int;
-    int second_int;
-  };
-
-  std::unordered_map<std::string, MyStruct> johnsfunction(int, int); 
-
-  std::vector<std::string> superclasses_in_python(const std::string& class_name, bool all);
-  std::vector<std::string> subclasses_in_python(const std::string& class_name, bool all);
-
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> attributes(const std::string& class_name, bool all);
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> relations(const std::string& class_name, bool all);
 
       /**
        *  \brief Constructor to build a configuration object using implementation plug-in.
@@ -268,42 +255,6 @@ class Configuration {
 
     const std::string& get_impl_param() const noexcept {return m_impl_param;}
 
-
-
-ConfigObject* get_obj(const std::string& class_name, const std::string& id)
-  {
-    auto co = new ConfigObject;
-    this->get(class_name, id, *co);
-    if (co->is_null()) {
-      delete co;
-      co = nullptr;
-    }
-    return co;
-  }
-
-  std::vector<ConfigObject>* get_objs(const std::string& class_name, const std::string& query="") {
-    auto objs = new std::vector<ConfigObject>;
-    this->get(class_name, *objs, query);
-    return objs;
-  }
-
-  std::list<std::string>* return_includes(const std::string& db_name) {
-    auto l = new std::list<std::string>;
-    this->get_includes(db_name, *l);
-    return l;
-  }
-
-  ConfigObject* create_and_return_obj(const std::string& at, const std::string& class_name, const std::string& id) {
-    auto co = new ConfigObject;
-    this->create(at, class_name, id, *co);
-    return co;
-  }
-
-  ConfigObject* create_and_return_obj(const ConfigObject& at, const std::string& class_name, const std::string& id) {
-    auto co = new ConfigObject;
-    this->create(at, class_name, id, *co);
-    return co;
-  }
 
       /**
        *  \brief Destructor to destroy a configuration object.
@@ -1725,6 +1676,20 @@ ConfigObject* get_obj(const std::string& class_name, const std::string& id)
     Configuration(const Configuration&);
     Configuration& operator=(const Configuration&);
 
+  public:
+
+  // JCF, Jan-1-2023: a set of functions written specifically for Python bindings
+
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> attributes_pybind(const std::string& class_name, bool all);
+  std::vector<std::string> classes_pybind() const;
+  ConfigObject* create_and_return_obj_pybind(const std::string& at, const std::string& class_name, const std::string& id);
+  ConfigObject* create_and_return_obj_pybind(const ConfigObject& at, const std::string& class_name, const std::string& id);
+  ConfigObject* get_obj_pybind(const std::string& class_name, const std::string& id);
+  std::vector<ConfigObject>* get_objs_pybind(const std::string& class_name, const std::string& query="");
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> relations_pybind(const std::string& class_name, bool all);
+  std::list<std::string>* return_includes_pybind(const std::string& db_name);
+  std::vector<std::string> subclasses_pybind(const std::string& class_name, bool all);
+  std::vector<std::string> superclasses_pybind(const std::string& class_name, bool all);
 };
 
   /**

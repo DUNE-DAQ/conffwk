@@ -19,9 +19,6 @@ register_config(py::module&);
 extern void
 register_configobject(py::module&);
 
-extern void
-register_mystruct(py::module&);
-
 PYBIND11_MODULE(_daq_config_py, m)
 {
 
@@ -29,7 +26,6 @@ PYBIND11_MODULE(_daq_config_py, m)
 
   register_config(m);
   register_configobject(m);
-  register_mystruct(m);
 }
 
 } // namespace dunedaq::config::python

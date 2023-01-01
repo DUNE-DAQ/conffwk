@@ -54,93 +54,6 @@ namespace dunedaq {
 
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-// This conversion being done for the sake of pybind11 bindings
-
-std::vector<std::string> 
-Configuration::classes_in_python() const {
-  std::vector<std::string> classes;
-  for (const auto& it : this->superclasses()) {
-    classes.push_back(*it.first);
-  }
-  
-  return classes;
-}
-
-std::unordered_map<std::string, Configuration::MyStruct> 
-Configuration::johnsfunction(int first, int second) {
-
-  std::unordered_map<std::string, Configuration::MyStruct> mymap;
-
-  mymap["anentry"] = { first, second };
-  mymap["anotherentry"] = { first + 3, second + 3};
-
-  return mymap;
-}
-
-std::vector<std::string>
-Configuration::superclasses_in_python(const std::string& class_name, bool all) {
-    
-    const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
-    return c.p_superclasses;
-}
-
-std::vector<std::string>
-Configuration::subclasses_in_python(const std::string& class_name, bool all) {
-    
-    const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
-    return c.p_subclasses;
-}
-
-std::unordered_map<std::string, std::unordered_map<std::string, std::string>> 
-Configuration::attributes(const std::string& class_name, bool all) {
-
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> all_attributes_properties;
-
-  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
-
-  for (const auto& ap : c.p_attributes) {
-    std::unordered_map<std::string, std::string> attribute_properties;
-    attribute_properties["type"] = dunedaq::config::attribute_t::type(ap.p_type);
-    
-    attribute_properties["range"] = ap.p_range.empty() ? "None" : ap.p_range;
-
-    attribute_properties["description"] = ap.p_description;
-    
-    attribute_properties["multivalue"] = ap.p_is_multi_value ? "True" : "False";
-
-    attribute_properties["not-null"] = ap.p_is_not_null ? "True" : "False";
-    
-    attribute_properties["init-value"] = ap.p_default_value.empty() ? "None" : ap.p_default_value;
-
-    all_attributes_properties[ap.p_name] = attribute_properties;
-  }
-
-  return all_attributes_properties;
-}
-
-std::unordered_map<std::string, std::unordered_map<std::string, std::string>> 
-Configuration::relations(const std::string& class_name, bool all) {
-
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> all_relationships_properties;
-
-  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
-
-  for (const auto& rp : c.p_relationships) {
-    std::unordered_map<std::string, std::string> relationship_properties;
-
-    relationship_properties["type"] = rp.p_type;
-    relationship_properties["description"] = rp.p_description;
-    relationship_properties["multivalue"] = (rp.p_cardinality == dunedaq::config::zero_or_many || rp.p_cardinality == dunedaq::config::one_or_many) ? "True" : "False";
-    relationship_properties["aggregation"] = rp.p_is_aggregation ? "True" : "False";
-    relationship_properties["not-null"] = (rp.p_cardinality == dunedaq::config::only_one || rp.p_cardinality == dunedaq::config::one_or_many) ? "True" : "False";
-    
-    all_relationships_properties[rp.p_name] = relationship_properties;
-  }
-
-  return all_relationships_properties;
-}
 
 template <typename T> static T* get_new(ConfigObject& co,
 					const std::string& attrname) {
@@ -1963,6 +1876,121 @@ Configuration::referenced_by(const DalObject& obj, const std::string& relationsh
     {
       throw(dunedaq::config::Generic( ERS_HERE, mk_ref_by_ex_text("DalObject", relationship_name, obj.p_obj).c_str(), ex ) );
     }
+}
+
+std::unordered_map<std::string, std::unordered_map<std::string, std::string>> 
+Configuration::attributes_pybind(const std::string& class_name, bool all) {
+
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> all_attributes_properties;
+
+  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+
+  for (const auto& ap : c.p_attributes) {
+    std::unordered_map<std::string, std::string> attribute_properties;
+    attribute_properties["type"] = dunedaq::config::attribute_t::type(ap.p_type);
+    
+    attribute_properties["range"] = ap.p_range.empty() ? "None" : ap.p_range;
+
+    attribute_properties["description"] = ap.p_description;
+    
+    attribute_properties["multivalue"] = ap.p_is_multi_value ? "True" : "False";
+
+    attribute_properties["not-null"] = ap.p_is_not_null ? "True" : "False";
+    
+    attribute_properties["init-value"] = ap.p_default_value.empty() ? "None" : ap.p_default_value;
+
+    all_attributes_properties[ap.p_name] = attribute_properties;
+  }
+
+  return all_attributes_properties;
+}
+
+std::vector<std::string> 
+Configuration::classes_pybind() const {
+  std::vector<std::string> classes;
+  for (const auto& it : this->superclasses()) {
+    classes.push_back(*it.first);
+  }
+
+  return classes;
+}
+
+ConfigObject* 
+Configuration::create_and_return_obj_pybind(const std::string& at, const std::string& class_name, const std::string& id) {
+  auto co = new ConfigObject;
+  this->create(at, class_name, id, *co);
+  return co;
+}
+
+ConfigObject* 
+Configuration::create_and_return_obj_pybind(const ConfigObject& at, const std::string& class_name, const std::string& id) \
+{
+  auto co = new ConfigObject;
+  this->create(at, class_name, id, *co);
+  return co;
+}
+
+ConfigObject* 
+Configuration::get_obj_pybind(const std::string& class_name, const std::string& id)
+{
+  auto co = new ConfigObject;
+  this->get(class_name, id, *co);
+  if (co->is_null()) {
+    delete co;
+    co = nullptr;
+  }
+  return co;
+}
+
+std::vector<ConfigObject>* 
+Configuration::get_objs_pybind(const std::string& class_name, const std::string& query) {
+  auto objs = new std::vector<ConfigObject>;
+  this->get(class_name, *objs, query);
+  return objs;
+}
+
+
+std::unordered_map<std::string, std::unordered_map<std::string, std::string>> 
+Configuration::relations_pybind(const std::string& class_name, bool all) {
+
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> all_relationships_properties;
+
+  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+
+  for (const auto& rp : c.p_relationships) {
+    std::unordered_map<std::string, std::string> relationship_properties;
+
+    relationship_properties["type"] = rp.p_type;
+    relationship_properties["description"] = rp.p_description;
+    relationship_properties["multivalue"] = (rp.p_cardinality == dunedaq::config::zero_or_many || rp.p_cardinality == dunedaq::config::one_or_many) ? "True" : "False";
+    relationship_properties["aggregation"] = rp.p_is_aggregation ? "True" : "False";
+    relationship_properties["not-null"] = (rp.p_cardinality == dunedaq::config::only_one || rp.p_cardinality == dunedaq::config::one_or_many) ? "True" : "False";
+    
+    all_relationships_properties[rp.p_name] = relationship_properties;
+  }
+
+  return all_relationships_properties;
+}
+
+std::list<std::string>* 
+Configuration::return_includes_pybind(const std::string& db_name) {
+  auto l = new std::list<std::string>;
+  this->get_includes(db_name, *l);
+  return l;
+}
+
+std::vector<std::string> 
+Configuration::subclasses_pybind(const std::string& class_name, bool all) {
+
+  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+  return c.p_subclasses;
+}
+
+std::vector<std::string> 
+Configuration::superclasses_pybind(const std::string& class_name, bool all) {
+
+  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+  return c.p_superclasses;
 }
 
 bool

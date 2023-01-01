@@ -291,24 +291,7 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
 
 
 ConfigObject* 
-ConfigObject::co_get_obj(ConfigObject& co, const std::string& attrname) {
-  
-  ConfigObject* newobject = new ConfigObject;
-
-  if (newobject) {
-    co.get(attrname, *newobject);
-
-    if (newobject->is_null()) {
-      delete newobject;
-      return nullptr;
-    }
-  } 
-  
-  return newobject;
-}
-
-ConfigObject* 
-ConfigObject::co_get_obj2(const std::string& attrname) {
+ConfigObject::get_obj_pybind(const std::string& attrname) {
   
   ConfigObject* newobject = new ConfigObject;
 

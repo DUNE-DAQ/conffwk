@@ -107,39 +107,25 @@ class ConfigObject {
 
     bool operator==(const ConfigObject& other) const noexcept;
 
-  ConfigObject* co_get_obj(ConfigObject& co, const std::string& attrname);
-  ConfigObject* co_get_obj2(const std::string& attrname);
+  ConfigObject* get_obj_pybind(const std::string& attrname);
 
   template <typename T>
-  T get_value_in_python(const std::string& attrname) {
+  T get_value_pybind(const std::string& attrname) {
     T attrval;
     this->get(attrname, attrval);
     return attrval;
   }
 
-  // template <typename T>
-  // std::vector<T> get_list_in_python(const std::string& attrname) {
-  //   std::vector<T> attrvals;
-  //   this->get(attrname, attrvals);
-  //   return attrvals;
-  // }
-
-
   template <typename T>
-  std::vector<T> get_list_in_python(ConfigObject& co, const std::string& attrname) {
+  std::vector<T> get_list_pybind(const std::string& attrname) {
     std::vector<T> attrvals;
-    co.get(attrname, attrvals);
+    this->get(attrname, attrvals);
     return attrvals;
   }
 
-
-  // Yes, this is hacky, but I want to preserve the function signature
-  // ATLAS TDAQ's Python code expects while also using pybind11 rather
-  // than Boost Python
-
   template <typename T>
-  void set_list_in_python(ConfigObject& co, const std::string& attrname, std::vector<T> l) {
-    co.set_by_ref(attrname, l);
+  void set_list_pybind(const std::string& attrname, std::vector<T> l) {
+    this->set_by_ref(attrname, l);
   }
 
   void set_date_list(ConfigObject& co, const std::string& attrname, const std::vector<std::string>& l) {
