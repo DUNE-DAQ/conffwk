@@ -396,7 +396,7 @@ class Configuration(_ConfigurationProxy):
         if not cache:
             cache = {}
 
-        if self.test_object(dal_obj.className(), dal_obj.id):
+        if self.test_object(dal_obj.className(), dal_obj.id, 0, []):
             obj = super(Configuration, self).get_obj(
                 dal_obj.className(), dal_obj.id)
             co = ConfigObject.ConfigObject(obj, self.__schema__, self)
@@ -473,7 +473,7 @@ class Configuration(_ConfigurationProxy):
                     old.rename(dal_obj.id)
                     delattr(dal_obj, '__old_id')
 
-        if self.test_object(dal_obj.className(), dal_obj.id):
+        if self.test_object(dal_obj.className(), dal_obj.id, 0, []):
             obj = super(Configuration, self).get_obj(
                 dal_obj.className(), dal_obj.id)
             co = ConfigObject.ConfigObject(obj, self.__schema__, self)
@@ -601,7 +601,7 @@ class Configuration(_ConfigurationProxy):
         dal_obj -- This is the DAL reflection of the object you want to delete.
 
         """
-        if self.test_object(dal_obj.className(), dal_obj.id):
+        if self.test_object(dal_obj.className(), dal_obj.id, 0, []):
             obj = self.get_obj(dal_obj.className(), dal_obj.id)
             self.destroy_obj(obj)
         self.__delete_cache__((dal_obj,))
