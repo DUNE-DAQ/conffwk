@@ -62,15 +62,6 @@ template <typename T> static T* get_new(ConfigObject& co,
   return retval;
 }
 
-static ConfigObject* co_get_obj(ConfigObject& co, const std::string& attrname) {
-  ConfigObject* obj = get_new<ConfigObject>(co, attrname);
-  if (obj->is_null()) {
-    delete obj;
-    return 0;
-  }
-  return obj;
-}
-
 void
 Configuration::add_action(ConfigAction * ac)
 {

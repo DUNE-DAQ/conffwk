@@ -48,14 +48,14 @@ class Configuration(unittest.TestCase):
     def test05_CanCreateObject(self):
         db = config.Configuration("oksconfig:test.data.xml")
         for i in range(10):
-            obj = db.create_obj("Dummy", "TestDummy-%d" % i)
+            db.create_obj("Dummy", "TestDummy-%d" % i)
         db.commit()
 
     def test05a_CanCreateObjectFromOtherObject(self):
         db = config.Configuration("oksconfig:test.data.xml")
         master = db.create_obj("Dummy", "MasterDummy")
         for i in range(100, 110):
-            obj = db.create_obj("Dummy", "TestDummy-%d" % i)
+            db.create_obj("Dummy", "TestDummy-%d" % i)
         db.commit()
 
     def test06_CanTestForObjects(self):
