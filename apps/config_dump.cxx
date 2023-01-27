@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
                       }
                     else
                       {
-                        std::cout << prefix << " - skip \'" << j->UID() << "\' (database class name = \'" << j->class_name() << "\')\n";
+                        std::cout << prefix << " - \'" << j->UID() << "\' (database class name = \'" << j->class_name() << "\')\n";
                       }
                 }
             }

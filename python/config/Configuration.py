@@ -13,6 +13,8 @@ from . import ConfigObject
 from ._daq_config_py import _Configuration
 import logging
 from .proxy import _DelegateMetaFunction
+import re
+import os
 
 class _ConfigurationProxy(object,
                      metaclass=_DelegateMetaFunction):
@@ -58,7 +60,27 @@ class Configuration(_ConfigurationProxy):
         Raises RuntimeError, in case of problems.
         """
 
-        super(Configuration, self).__init__(connection)
+        try:
+            super(Configuration, self).__init__(connection)
+        except RuntimeError:
+            preamble = f"Unable to open database off of \"{connection}\""
+            if not re.search(r"^oksconfig:", connection):
+                raise RuntimeError(f"""
+{preamble}; one reason is that it looks 
+like the database type wasn't specified in the name (i.e. \"oksconfig:<filename>\")
+""")
+            else:
+                dbfilename = connection[len("oksconfig:"):]
+                if not os.path.exists(dbfilename):
+                    raise RuntimeError(f"{preamble}; one reason is that it looks like \"{dbfilename}\" doesn't exist")
+                elif not re.search(r".xml$", dbfilename):
+                    raise RuntimeError(f"{preamble}; one reason is that it looks like \"{dbfilename}\" isn't an XML file")
+                else:
+                    raise RuntimeError(f"""
+{preamble}; try running 
+\"config_dump --database {connection}\" 
+to see if there's a problem with the input database""")
+
         self.__core_init__()
 
     def databases(self):
