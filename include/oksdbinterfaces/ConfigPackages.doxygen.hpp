@@ -1109,7 +1109,7 @@ class TestCallback implements oksdbinterfaces.Callback {
 
 	    // an example of correct down cast
 	  if(a.class_name().equals("RunControlApplication")) {
-	    dal.RunControlApplication_Helper.get(db, a.oksdbinterfaces_object()).print("  "); // print as RC application
+	    dal.RunControlApplication_Helper.get(db, a.config_object()).print("  "); // print as RC application
 	  }
 	  else {
 	    a.print("  "); // print as an application

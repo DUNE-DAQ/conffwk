@@ -27,7 +27,7 @@
  *  - class_name() access object's database class name
  *  - UID() access object's unique identity
  *  - full_name() full object's name returned as string
- *  - oksdbinterfaces_object() provide access to the representation of object at oksdbinterfaces layer
+ *  - config_object() provide access to the representation of object at oksdbinterfaces layer
  *
  *  Several methods below are used to set state of the object and normally should only be used internally
  *  by generated DAL and algorithms:
@@ -189,7 +189,7 @@ public:
    */
 
   const ::ConfigObject&
-  oksdbinterfaces_object() const
+  config_object() const
     {
       std::lock_guard<std::mutex> scoped_lock(m_mutex);
       check();
@@ -395,7 +395,7 @@ protected:
       std::lock_guard<std::mutex> scoped_lock(m_mutex);
       check();
       clear();
-      p_obj.set_obj(name, (value ? &value->oksdbinterfaces_object() : (::ConfigObject*) nullptr));
+      p_obj.set_obj(name, (value ? &value->config_object() : (::ConfigObject*) nullptr));
     }
 
   /// Helper method for generated set multi-value relationship methods
@@ -408,7 +408,7 @@ protected:
       clear();
       std::vector<const ConfigObject*> v;
       for (auto &i : value)
-        v.push_back(&(i->oksdbinterfaces_object()));
+        v.push_back(&(i->config_object()));
       p_obj.set_objs(name, v);
     }
 
@@ -447,7 +447,7 @@ template<class T>
   const T *
   Configuration::create(const ::DalObject& at, const std::string& id, bool init_object)
   {
-    return create<T>(at.oksdbinterfaces_object().contained_in(), id, init_object);
+    return create<T>(at.config_object().contained_in(), id, init_object);
   }
 
 template<class T>

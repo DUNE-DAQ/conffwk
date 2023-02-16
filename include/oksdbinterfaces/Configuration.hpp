@@ -1720,7 +1720,7 @@ template<class T>
   void
   Configuration::destroy(T& obj)
   {
-    destroy_obj(const_cast<ConfigObject&>(obj.oksdbinterfaces_object()));
+    destroy_obj(const_cast<ConfigObject&>(obj.config_object()));
   }
 
 // Get object of given class and instantiate the template parameter with it.
