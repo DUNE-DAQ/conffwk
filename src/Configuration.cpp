@@ -9,33 +9,33 @@
 #include "ers/ers.hpp"
 #include "ers/internal/SingletonCreator.hpp"
 
-#include "config/Change.hpp"
-#include "config/DalObject.hpp"
-#include "config/DalObjectPrint.hpp"
-#include "config/DalFactory.hpp"
-#include "config/ConfigObject.hpp"
-#include "config/ConfigAction.hpp"
-#include "config/Configuration.hpp"
-#include "config/ConfigurationImpl.hpp"
-#include "config/Schema.hpp"
+#include "oksdbinterfaces/Change.hpp"
+#include "oksdbinterfaces/DalObject.hpp"
+#include "oksdbinterfaces/DalObjectPrint.hpp"
+#include "oksdbinterfaces/DalFactory.hpp"
+#include "oksdbinterfaces/ConfigObject.hpp"
+#include "oksdbinterfaces/ConfigAction.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "oksdbinterfaces/ConfigurationImpl.hpp"
+#include "oksdbinterfaces/Schema.hpp"
 
 namespace dunedaq {
 
-  ERS_DEFINE_ISSUE_CXX( config, Exception, , )
+  ERS_DEFINE_ISSUE_CXX( oksdbinterfaces, Exception, , )
 
   ERS_DEFINE_ISSUE_BASE_CXX(
-    config,
+    oksdbinterfaces,
     Generic,
-    config::Exception,
+    oksdbinterfaces::Exception,
     what,
     ,
     ((const char*)what)
   )
 
   ERS_DEFINE_ISSUE_BASE_CXX(
-    config,
+    oksdbinterfaces,
     NotFound,
-    config::Exception,
+    oksdbinterfaces::Exception,
     type << " \"" << data << "\" is not found",
     ,
     ((const char*)type)
@@ -43,9 +43,9 @@ namespace dunedaq {
   )
 
   ERS_DEFINE_ISSUE_BASE_CXX(
-    config,
+    oksdbinterfaces,
     DeletedObject,
-    config::Exception,
+    oksdbinterfaces::Exception,
     "object \'" << object_id << '@' << class_name << "\' was deleted",
     ,
     ((const char*)class_name)
@@ -111,7 +111,7 @@ Configuration::Configuration(const std::string& spec) :
     }
 
   if (m_impl_spec.empty())
-    throw dunedaq::config::Generic(ERS_HERE, "no database parameter found (check parameter of the constructor or value of TDAQ_DB environment variable)");
+    throw dunedaq::oksdbinterfaces::Generic(ERS_HERE, "no database parameter found (check parameter of the constructor or value of TDAQ_DB environment variable)");
 
   std::string::size_type idx = m_impl_spec.find_first_of(':');
 
@@ -136,7 +136,7 @@ Configuration::Configuration(const std::string& spec) :
     {
       std::ostringstream text;
       text << "failed to load implementation plug-in \'" << plugin_name << "\': \"" << dlerror() << '\"';
-      throw(dunedaq::config::Generic( ERS_HERE, text.str().c_str() ) );
+      throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str() ) );
     }
 
   // search in plug-in implementation creator function
@@ -153,7 +153,7 @@ Configuration::Configuration(const std::string& spec) :
     {
       std::ostringstream text;
       text << "failed to find implementation creator function \'" << impl_creator << "\' in plug-in \'" << plugin_name << "\': \"" << error << '\"';
-      throw(dunedaq::config::Generic( ERS_HERE, text.str().c_str() ) );
+      throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str() ) );
     }
 
 
@@ -185,7 +185,7 @@ Configuration::print_profiling_info() noexcept
       "  number of read template objects: " << p_number_of_template_object_read << "\n"
       "  number of cache hits: " << p_number_of_cache_hits << std::endl;
 
-  const char * s = ::getenv("TDAQ_DUMP_CONFIG_PROFILER_INFO");
+  const char * s = ::getenv("TDAQ_DUMP_OKSDB_INTERFACE_PROFILER_INFO");
   if (s && !strcmp(s, "DEBUG"))
     {
       std::cout << "  Details of accessed objects:\n";
@@ -208,7 +208,7 @@ Configuration::print_profiling_info() noexcept
 
 Configuration::~Configuration() noexcept
 {
-  if (::getenv("TDAQ_DUMP_CONFIG_PROFILER_INFO"))
+  if (::getenv("TDAQ_DUMP_OKSDB_INTERFACE_PROFILER_INFO"))
     print_profiling_info();
 
   try
@@ -225,7 +225,7 @@ Configuration::~Configuration() noexcept
           m_shlib_h = 0;
         }
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       ers::error(ex);
     }
@@ -245,11 +245,11 @@ Configuration::_get(const std::string& class_name, const std::string& name, Conf
     {
       m_impl->get(class_name, name, object, rlevel, rclasses);
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to get object \'" << name << '@' << class_name << '\'';
-      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -261,7 +261,7 @@ Configuration::get(const std::string& class_name, std::vector<ConfigObject>& obj
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       m_impl->get(class_name, objects, query, rlevel, rclasses);
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to get objects of class \'" << class_name << '\'';
@@ -269,7 +269,7 @@ Configuration::get(const std::string& class_name, std::vector<ConfigObject>& obj
         {
           text << " with query \'" << query << '\'';
         }
-      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -281,11 +281,11 @@ Configuration::get(const ConfigObject& obj_from, const std::string& query, std::
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       m_impl->get(obj_from, query, objects, rlevel, rclasses);
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to get path \'" << query << "\' from object \'" << obj_from << '\'';
-      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -318,7 +318,7 @@ Configuration::load(const std::string& db_name)
             }
           else
             {
-              throw(dunedaq::config::Generic( ERS_HERE, "no database name was provided" ) );
+              throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no database name was provided" ) );
             }
         }
     }
@@ -329,7 +329,7 @@ Configuration::load(const std::string& db_name)
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
-  // call config actions if any
+  // call oksdbinterfaces actions if any
     {
       std::lock_guard<std::mutex> scoped_lock(m_actn_mutex);
       for (auto & i : m_actions)
@@ -354,7 +354,7 @@ Configuration::load(const std::string& db_name)
     }
   else
     {
-      throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no implementation loaded" );
     }
 }
 
@@ -362,12 +362,12 @@ void
 Configuration::unload()
 {
   if (m_impl == nullptr)
-    throw dunedaq::config::Generic( ERS_HERE, "nothing to unload" );
+    throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "nothing to unload" );
 
   std::lock_guard<std::mutex> scoped_lock1(m_tmpl_mutex);  // always lock template objects mutex first
   std::lock_guard<std::mutex> scoped_lock2(m_impl_mutex);
 
-  // call config actions if any
+  // call oksdbinterfaces actions if any
     {
       std::lock_guard<std::mutex> scoped_lock(m_actn_mutex);
       for(auto & i : m_actions)
@@ -426,7 +426,7 @@ void
 Configuration::create(const std::string& db_name, const std::list<std::string>& includes)
 {
   if (m_impl == nullptr)
-    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -436,11 +436,11 @@ Configuration::create(const std::string& db_name, const std::list<std::string>& 
       m_impl->get_superclasses(p_superclasses);
       set_subclasses();
     }
-  catch(dunedaq::config::Generic & ex)
+  catch(dunedaq::oksdbinterfaces::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to create database \'" << db_name << '\'';
-      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -449,7 +449,7 @@ bool
 Configuration::is_writable(const std::string& db_name) const
 {
   if (m_impl == nullptr)
-    throw(dunedaq::config::Generic(ERS_HERE, "no implementation loaded" ) );
+    throw(dunedaq::oksdbinterfaces::Generic(ERS_HERE, "no implementation loaded" ) );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -457,11 +457,11 @@ Configuration::is_writable(const std::string& db_name) const
     {
       return m_impl->is_writable(db_name);
     }
-  catch(dunedaq::config::Generic & ex)
+  catch(dunedaq::oksdbinterfaces::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to get write access status for database \'" << db_name<< '\'';
-      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -470,7 +470,7 @@ void
 Configuration::add_include(const std::string& db_name, const std::string& include)
 {
   if (m_impl == nullptr)
-    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -480,11 +480,11 @@ Configuration::add_include(const std::string& db_name, const std::string& includ
       m_impl->get_superclasses(p_superclasses);
       set_subclasses();
     }
-  catch(dunedaq::config::Generic & ex)
+  catch(dunedaq::oksdbinterfaces::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to add include \'" << include << "\' to database \'" << db_name<< '\'';
-      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -492,7 +492,7 @@ void
 Configuration::remove_include(const std::string& db_name, const std::string& include)
 {
   if (m_impl == nullptr)
-    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
   std::lock_guard<std::mutex> scoped_lock2(m_tmpl_mutex);
@@ -503,11 +503,11 @@ Configuration::remove_include(const std::string& db_name, const std::string& inc
       m_impl->get_superclasses(p_superclasses);
       set_subclasses();
     }
-  catch(dunedaq::config::Generic & ex)
+  catch(dunedaq::oksdbinterfaces::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to remove include \'" << include << "\' from database \'" << db_name<< '\'';
-      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -515,7 +515,7 @@ void
 Configuration::get_includes(const std::string& db_name, std::list<std::string>& includes) const
 {
   if (m_impl == nullptr)
-    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -523,11 +523,11 @@ Configuration::get_includes(const std::string& db_name, std::list<std::string>& 
     {
       m_impl->get_includes(db_name, includes);
     }
-  catch(dunedaq::config::Generic & ex)
+  catch(dunedaq::oksdbinterfaces::Generic & ex)
     {
       std::ostringstream text;
       text << "failed to get includes of database \'" << db_name<< '\'';
-      throw ( dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex ) );
+      throw ( dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex ) );
     }
 }
 
@@ -536,7 +536,7 @@ void
 Configuration::get_updated_dbs(std::list<std::string>& dbs) const
 {
   if (m_impl == nullptr)
-    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -544,9 +544,9 @@ Configuration::get_updated_dbs(std::list<std::string>& dbs) const
     {
       m_impl->get_updated_dbs(dbs);
     }
-  catch(dunedaq::config::Generic & ex)
+  catch(dunedaq::oksdbinterfaces::Generic & ex)
     {
-      throw ( dunedaq::config::Generic( ERS_HERE, "get_updated_dbs failed", ex ) );
+      throw ( dunedaq::oksdbinterfaces::Generic( ERS_HERE, "get_updated_dbs failed", ex ) );
     }
 }
 
@@ -555,7 +555,7 @@ void
 Configuration::set_commit_credentials(const std::string& user, const std::string& password)
 {
   if (m_impl == nullptr)
-    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded" );
+    throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no implementation loaded" );
 
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
@@ -563,9 +563,9 @@ Configuration::set_commit_credentials(const std::string& user, const std::string
     {
       m_impl->set_commit_credentials(user, password);
     }
-  catch(dunedaq::config::Generic & ex)
+  catch(dunedaq::oksdbinterfaces::Generic & ex)
     {
-      throw ( dunedaq::config::Generic( ERS_HERE, "set_commit_credentials failed", ex ) );
+      throw ( dunedaq::oksdbinterfaces::Generic( ERS_HERE, "set_commit_credentials failed", ex ) );
     }
 }
 
@@ -576,7 +576,7 @@ Configuration::commit(const std::string& log_message)
   TLOG_DEBUG(1) << "call commit";
 
   if (m_impl == nullptr)
-    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded");
+    throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no implementation loaded");
 
   std::lock_guard<std::mutex> scoped_lock1(m_tmpl_mutex);  // always lock template objects mutex first
   std::lock_guard<std::mutex> scoped_lock2(m_impl_mutex);
@@ -585,9 +585,9 @@ Configuration::commit(const std::string& log_message)
     {
       m_impl->commit(log_message);
     }
-  catch (dunedaq::config::Generic & ex)
+  catch (dunedaq::oksdbinterfaces::Generic & ex)
     {
-      throw(dunedaq::config::Generic( ERS_HERE, "commit failed", ex ) );
+      throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "commit failed", ex ) );
     }
 }
 
@@ -597,7 +597,7 @@ Configuration::abort()
   TLOG_DEBUG(1) << "call abort";
 
   if (m_impl == nullptr)
-    throw dunedaq::config::Generic( ERS_HERE, "no implementation loaded");
+    throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "no implementation loaded");
 
   std::lock_guard<std::mutex> scoped_lock1(m_tmpl_mutex);  // always lock template objects mutex first
   std::lock_guard<std::mutex> scoped_lock2(m_impl_mutex);
@@ -605,14 +605,14 @@ Configuration::abort()
   try
     {
       m_impl->abort();
-      _unread_implementation_objects(dunedaq::config::Unknown);
+      _unread_implementation_objects(dunedaq::oksdbinterfaces::Unknown);
       _unread_template_objects();
       m_impl->get_superclasses(p_superclasses);
       set_subclasses();
     }
-  catch (dunedaq::config::Generic & ex)
+  catch (dunedaq::oksdbinterfaces::Generic & ex)
     {
-      throw(dunedaq::config::Generic( ERS_HERE, "abort failed", ex));
+      throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "abort failed", ex));
     }
 }
 
@@ -626,9 +626,9 @@ Configuration::prefetch_all_data()
     {
       m_impl->prefetch_all_data();
     }
-  catch (dunedaq::config::Generic & ex)
+  catch (dunedaq::oksdbinterfaces::Generic & ex)
     {
-      throw(dunedaq::config::Generic( ERS_HERE, "prefetch all data failed", ex));
+      throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "prefetch all data failed", ex));
     }
 }
 
@@ -636,7 +636,7 @@ void
 Configuration::unread_all_objects(bool unread_implementation_objs) noexcept
 {
   if (unread_implementation_objs)
-    unread_implementation_objects(dunedaq::config::Unknown);
+    unread_implementation_objects(dunedaq::oksdbinterfaces::Unknown);
 
   unread_template_objects();
 }
@@ -650,7 +650,7 @@ Configuration::_unread_template_objects() noexcept
 }
 
 void
-Configuration::_unread_implementation_objects(dunedaq::config::ObjectState state) noexcept
+Configuration::_unread_implementation_objects(dunedaq::oksdbinterfaces::ObjectState state) noexcept
 {
   for (auto &i : m_impl->m_impl_objects)
     for (auto &j : *i.second)
@@ -696,11 +696,11 @@ Configuration::test_object(const std::string& class_name, const std::string& id,
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       return m_impl->test_object(class_name, id, rlevel, rclasses);
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to test existence of object \'" << id << '@' << class_name << '\'';
-      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -712,11 +712,11 @@ Configuration::create(const std::string& at, const std::string& class_name, cons
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       m_impl->create(at, class_name, id, object);
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to create object \'" << id << '@' << class_name << '\'';
-      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -728,11 +728,11 @@ Configuration::create(const ConfigObject& at, const std::string& class_name, con
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       m_impl->create(at, class_name, id, object);
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to create object \'" << id << '@' << class_name << '\'';
-      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -746,11 +746,11 @@ Configuration::destroy_obj(ConfigObject& object)
       std::lock_guard<std::mutex> scoped_lock2(m_tmpl_mutex);
       m_impl->destroy(object);
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to destroy object \'" << object << '\'';
-      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -772,16 +772,16 @@ Configuration::rename_object(ConfigObject& obj, const std::string& new_id)
 
   TLOG_DEBUG(3) << " * call rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << obj.class_name() << "\')";
 
-  config::fmap<CacheBase*>::iterator j = m_cache_map.find(&obj.class_name());
+  oksdbinterfaces::fmap<CacheBase*>::iterator j = m_cache_map.find(&obj.class_name());
   if (j != m_cache_map.end())
     j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
 
-  config::fmap<config::fset>::const_iterator sc = p_superclasses.find(&obj.class_name());
+  oksdbinterfaces::fmap<oksdbinterfaces::fset>::const_iterator sc = p_superclasses.find(&obj.class_name());
 
   if (sc != p_superclasses.end())
-    for (config::fset::const_iterator c = sc->second.begin(); c != sc->second.end(); ++c)
+    for (oksdbinterfaces::fset::const_iterator c = sc->second.begin(); c != sc->second.end(); ++c)
       {
-        config::fmap<CacheBase*>::iterator j = m_cache_map.find(*c);
+        oksdbinterfaces::fmap<CacheBase*>::iterator j = m_cache_map.find(*c);
 
         if (j != m_cache_map.end())
           j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
@@ -798,30 +798,30 @@ Configuration::rename_object(ConfigObject& obj, const std::string& new_id)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-const dunedaq::config::class_t&
+const dunedaq::oksdbinterfaces::class_t&
 Configuration::get_class_info(const std::string& class_name, bool direct_only)
 {
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
-  config::map<dunedaq::config::class_t *>& d_cache(direct_only ? p_direct_classes_desc_cache : p_all_classes_desc_cache);
+  oksdbinterfaces::map<dunedaq::oksdbinterfaces::class_t *>& d_cache(direct_only ? p_direct_classes_desc_cache : p_all_classes_desc_cache);
 
-  config::map<dunedaq::config::class_t *>::const_iterator i = d_cache.find(class_name);
+  oksdbinterfaces::map<dunedaq::oksdbinterfaces::class_t *>::const_iterator i = d_cache.find(class_name);
 
   if (i != d_cache.end())
     return *(i->second);
 
   try
     {
-      dunedaq::config::class_t * d = m_impl->get(class_name, direct_only);
+      dunedaq::oksdbinterfaces::class_t * d = m_impl->get(class_name, direct_only);
       d_cache[class_name] = d;
       return *d;
     }
   // catch Generic exception only; the NotFound is forwarded from implementation
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       std::ostringstream text;
       text << "failed to get description of class \'" << class_name << '\'';
-      throw dunedaq::config::Generic( ERS_HERE, text.str().c_str(), ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str(), ex );
     }
 }
 
@@ -839,7 +839,7 @@ init_regex(std::unique_ptr<std::regex>& ptr, const std::string& str, const char 
       {
         std::ostringstream text;
         text << "failed to create " << what << " regex \"" << str << "\": " << ex.what();
-        throw dunedaq::config::Generic( ERS_HERE, text.str().c_str());
+        throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str());
       }
 }
 
@@ -870,7 +870,7 @@ Configuration::export_schema(boost::property_tree::ptree& pt, const std::string&
   for (const auto &c : sorted_classes)
     if (classes_str.empty() || std::regex_match(*c, *classes_regex.get()))
       {
-        const dunedaq::config::class_t& info(get_class_info(*c, direct_only));
+        const dunedaq::oksdbinterfaces::class_t& info(get_class_info(*c, direct_only));
 
         boost::property_tree::ptree class_pt;
 
@@ -896,11 +896,11 @@ Configuration::export_schema(boost::property_tree::ptree& pt, const std::string&
               {
                 boost::property_tree::ptree attribute;
 
-                attribute.put("type", dunedaq::config::attribute_t::type(x.p_type));
+                attribute.put("type", dunedaq::oksdbinterfaces::attribute_t::type(x.p_type));
                 if (!x.p_range.empty())
                   attribute.put("range", x.p_range);
-                if (x.p_int_format != dunedaq::config::na_int_format)
-                  attribute.put("format", dunedaq::config::attribute_t::format2str(x.p_int_format));
+                if (x.p_int_format != dunedaq::oksdbinterfaces::na_int_format)
+                  attribute.put("format", dunedaq::oksdbinterfaces::attribute_t::format2str(x.p_int_format));
                 if (x.p_is_not_null)
                   attribute.put("is-not-null", x.p_is_not_null);
                 if (x.p_is_multi_value)
@@ -925,7 +925,7 @@ Configuration::export_schema(boost::property_tree::ptree& pt, const std::string&
                 boost::property_tree::ptree relationship;
 
                 relationship.put("type", x.p_type);
-                relationship.put("cardinality", dunedaq::config::relationship_t::card2str(x.p_cardinality));
+                relationship.put("cardinality", dunedaq::oksdbinterfaces::relationship_t::card2str(x.p_cardinality));
                 if (!x.p_is_aggregation)
                   relationship.put("is-aggregation", x.p_is_aggregation);
                 if (!x.p_description.empty())
@@ -943,7 +943,7 @@ Configuration::export_schema(boost::property_tree::ptree& pt, const std::string&
 
 template<class T>
 static void
-add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const dunedaq::config::attribute_t &attribute, const std::string &empty_array_item)
+add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const dunedaq::oksdbinterfaces::attribute_t &attribute, const std::string &empty_array_item)
 {
   auto &o = const_cast<ConfigObject&>(obj);
   if (!attribute.p_is_multi_value)
@@ -971,9 +971,9 @@ add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const dunedaq
 }
 
 static void
-add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const dunedaq::config::relationship_t &relationship, const std::string &empty_array_item)
+add_data(boost::property_tree::ptree &pt, const ConfigObject &obj, const dunedaq::oksdbinterfaces::relationship_t &relationship, const std::string &empty_array_item)
 {
-  if (relationship.p_cardinality == dunedaq::config::zero_or_many || relationship.p_cardinality == dunedaq::config::one_or_many)
+  if (relationship.p_cardinality == dunedaq::oksdbinterfaces::zero_or_many || relationship.p_cardinality == dunedaq::oksdbinterfaces::one_or_many)
     {
       std::vector<ConfigObject> values;
       const_cast<ConfigObject&>(obj).get(relationship.p_name, values);
@@ -1016,7 +1016,7 @@ Configuration::export_data(boost::property_tree::ptree& pt, const std::string& c
   for (const auto &c : sorted_classes)
     if (classes_str.empty() || std::regex_match(*c, *classes_regex.get()))
       {
-        const dunedaq::config::class_t& info(get_class_info(*c));
+        const dunedaq::oksdbinterfaces::class_t& info(get_class_info(*c));
 
         boost::property_tree::ptree pt_objects;
 
@@ -1043,44 +1043,44 @@ Configuration::export_data(boost::property_tree::ptree& pt, const std::string& c
                 for (const auto &a : info.p_attributes)
                   switch (a.p_type)
                     {
-                      case dunedaq::config::bool_type:
+                      case dunedaq::oksdbinterfaces::bool_type:
                               add_data<bool>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::s8_type:
+                      case dunedaq::oksdbinterfaces::s8_type:
                               add_data<int8_t>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::u8_type:
+                      case dunedaq::oksdbinterfaces::u8_type:
                               add_data<uint8_t>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::s16_type:
+                      case dunedaq::oksdbinterfaces::s16_type:
                               add_data<int16_t>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::u16_type:
+                      case dunedaq::oksdbinterfaces::u16_type:
                               add_data<uint16_t>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::s32_type:
+                      case dunedaq::oksdbinterfaces::s32_type:
                               add_data<int32_t>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::u32_type:
+                      case dunedaq::oksdbinterfaces::u32_type:
                               add_data<uint32_t>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::s64_type:
+                      case dunedaq::oksdbinterfaces::s64_type:
                               add_data<int64_t>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::u64_type:
+                      case dunedaq::oksdbinterfaces::u64_type:
                               add_data<uint64_t>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::float_type:
+                      case dunedaq::oksdbinterfaces::float_type:
                               add_data<float>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::double_type:
+                      case dunedaq::oksdbinterfaces::double_type:
                               add_data<double>(data, *x, a, empty_array_item);
                               break;
-                      case dunedaq::config::date_type:
-                      case dunedaq::config::time_type:
-                      case dunedaq::config::enum_type:
-                      case dunedaq::config::class_type:
-                      case dunedaq::config::string_type:
+                      case dunedaq::oksdbinterfaces::date_type:
+                      case dunedaq::oksdbinterfaces::time_type:
+                      case dunedaq::oksdbinterfaces::enum_type:
+                      case dunedaq::oksdbinterfaces::class_type:
+                      case dunedaq::oksdbinterfaces::string_type:
                               add_data<std::string>(data, *x, a, empty_array_item);
                               break;
                       default:
@@ -1108,7 +1108,7 @@ Configuration::export_data(boost::property_tree::ptree& pt, const std::string& c
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
-std::vector<dunedaq::config::Version>
+std::vector<dunedaq::oksdbinterfaces::Version>
 Configuration::get_changes()
 {
   try
@@ -1116,24 +1116,24 @@ Configuration::get_changes()
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       return m_impl->get_changes();
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
-      throw dunedaq::config::Generic( ERS_HERE, "failed to get new versions", ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "failed to get new versions", ex );
     }
 }
 
 
-std::vector<dunedaq::config::Version>
-Configuration::get_versions(const std::string& since, const std::string& until, dunedaq::config::Version::QueryType type, bool skip_irrelevant)
+std::vector<dunedaq::oksdbinterfaces::Version>
+Configuration::get_versions(const std::string& since, const std::string& until, dunedaq::oksdbinterfaces::Version::QueryType type, bool skip_irrelevant)
 {
   try
     {
       std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
       return m_impl->get_versions(since, until, type, skip_irrelevant);
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
-      throw dunedaq::config::Generic( ERS_HERE, "failed to get versions", ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "failed to get versions", ex );
     }
 }
 
@@ -1162,7 +1162,7 @@ Configuration::subscribe(const ::ConfigurationSubscriptionCriteria& criteria, no
 
   if (!user_cb)
     {
-      throw dunedaq::config::Generic( ERS_HERE, "callback function is not defined" );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "callback function is not defined" );
     }
 
   // create callback subscription structure
@@ -1183,11 +1183,11 @@ Configuration::subscribe(const ::ConfigurationSubscriptionCriteria& criteria, no
       reset_subscription();
       return cs;
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
       m_callbacks.erase(cs);
       delete cs;
-      throw dunedaq::config::Generic( ERS_HERE, "subscription failed", ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "subscription failed", ex );
     }
 }
 
@@ -1197,7 +1197,7 @@ Configuration::subscribe(pre_notify user_cb, void * parameter)
   // check if there is no subscription function provided
 
   if (!user_cb)
-    throw(dunedaq::config::Generic( ERS_HERE, "callback function is not defined" ) );
+    throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "callback function is not defined" ) );
 
   // create callback subscription structure
 
@@ -1239,7 +1239,7 @@ Configuration::unsubscribe(CallbackId id)
         {
           std::ostringstream text;
           text << "unsubscription failed for CallbackId = " << (void *) id << " (no such callback id found)";
-          throw(dunedaq::config::Generic( ERS_HERE, text.str().c_str() ) );
+          throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, text.str().c_str() ) );
         }
     }
   else
@@ -1258,9 +1258,9 @@ Configuration::unsubscribe(CallbackId id)
     {
       reset_subscription();
     }
-  catch (dunedaq::config::Generic& ex)
+  catch (dunedaq::oksdbinterfaces::Generic& ex)
     {
-      throw dunedaq::config::Generic( ERS_HERE, "unsubscription failed", ex );
+      throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "unsubscription failed", ex );
     }
 }
 
@@ -1315,23 +1315,23 @@ Configuration::reset_subscription()
 
 
 void
-Configuration::update_impl_objects(config::pmap<config::map<ConfigObjectImpl *> * >& cache, ConfigurationChange& change, const std::string * class_name)
+Configuration::update_impl_objects(oksdbinterfaces::pmap<oksdbinterfaces::map<ConfigObjectImpl *> * >& cache, ConfigurationChange& change, const std::string * class_name)
 {
   if (change.get_removed_objs().empty() == false)
     {
-      config::pmap<config::map<ConfigObjectImpl *> *>::iterator i = cache.find(class_name);
+      oksdbinterfaces::pmap<oksdbinterfaces::map<ConfigObjectImpl *> *>::iterator i = cache.find(class_name);
 
       if (i != cache.end())
         {
           for (auto & x : change.get_removed_objs())
             {
-              config::map<ConfigObjectImpl *>::iterator j = i->second->find(x);
+              oksdbinterfaces::map<ConfigObjectImpl *>::iterator j = i->second->find(x);
               if (j != i->second->end())
                 {
                   TLOG_DEBUG( 2 ) << "set implementation object " << x << '@' << *class_name << " [" << (void *)j->second << "] deleted";
 
                   std::lock_guard<std::mutex> scoped_lock(j->second->m_mutex);
-                  j->second->m_state = dunedaq::config::Deleted;
+                  j->second->m_state = dunedaq::oksdbinterfaces::Deleted;
                   j->second->clear();
                 }
             }
@@ -1340,13 +1340,13 @@ Configuration::update_impl_objects(config::pmap<config::map<ConfigObjectImpl *> 
 
   if (change.get_created_objs().empty() == false)
     {
-      config::pmap<config::map<ConfigObjectImpl *> *>::iterator i = cache.find(class_name);
+      oksdbinterfaces::pmap<oksdbinterfaces::map<ConfigObjectImpl *> *>::iterator i = cache.find(class_name);
 
       if (i != cache.end())
         {
           for (auto & x : change.get_created_objs())
             {
-              config::map<ConfigObjectImpl *>::iterator j = i->second->find(x);
+              oksdbinterfaces::map<ConfigObjectImpl *>::iterator j = i->second->find(x);
               if (j != i->second->end())
                 {
                   TLOG_DEBUG( 2 ) << "re-set created implementation object " << x << '@' << *class_name << " [" << (void *)j->second << ']';
@@ -1360,20 +1360,20 @@ Configuration::update_impl_objects(config::pmap<config::map<ConfigObjectImpl *> 
 
   if (change.get_modified_objs().empty() == false)
     {
-      config::pmap<config::map<ConfigObjectImpl *> *>::iterator i = cache.find(class_name);
+      oksdbinterfaces::pmap<oksdbinterfaces::map<ConfigObjectImpl *> *>::iterator i = cache.find(class_name);
 
       if (i != cache.end())
         {
           for (auto & x : change.get_modified_objs())
             {
-              config::map<ConfigObjectImpl *>::iterator j = i->second->find(x);
+              oksdbinterfaces::map<ConfigObjectImpl *>::iterator j = i->second->find(x);
               if (j != i->second->end())
                 {
                   TLOG_DEBUG(2) << "clear implementation object " << x << '@' << *class_name << " [" << (void *)j->second << ']';
 
                   std::lock_guard<std::mutex> scoped_lock(j->second->m_mutex);
 
-                  if(j->second->m_state != dunedaq::config::Valid)
+                  if(j->second->m_state != dunedaq::oksdbinterfaces::Valid)
                     j->second->reset();
                   else
                     j->second->clear();
@@ -1399,7 +1399,7 @@ Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcep
       update_impl_objects(m_impl->m_impl_objects, *i, class_name);
 
       // delete/update implementation objects defined in superclasses
-      config::fmap<config::fset>::const_iterator sc = p_superclasses.find(class_name);
+      oksdbinterfaces::fmap<oksdbinterfaces::fset>::const_iterator sc = p_superclasses.find(class_name);
 
       if (sc != p_superclasses.end())
         for (const auto &c : sc->second)
@@ -1420,7 +1420,7 @@ Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcep
       // invoke configuration update if there are template objects of given class
 
         {
-          config::fmap<CacheBase*>::iterator j = m_cache_map.find(class_name);
+          oksdbinterfaces::fmap<CacheBase*>::iterator j = m_cache_map.find(class_name);
 
           if (j != m_cache_map.end())
             {
@@ -1433,13 +1433,13 @@ Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcep
       // invoke configuration update if there are template objects in super-classes
 
         {
-          config::fmap<config::fset>::const_iterator sc = p_superclasses.find(class_name);
+          oksdbinterfaces::fmap<oksdbinterfaces::fset>::const_iterator sc = p_superclasses.find(class_name);
 
           if (sc != p_superclasses.end())
             {
               for (const auto& c : sc->second)
                 {
-                  config::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
+                  oksdbinterfaces::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
 
                   if (j != m_cache_map.end())
                     {
@@ -1454,13 +1454,13 @@ Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcep
       // invoke configuration update if there are template objects in sub-classes
 
         {
-          config::fmap<config::fset>::const_iterator sc = p_subclasses.find(class_name);
+          oksdbinterfaces::fmap<oksdbinterfaces::fset>::const_iterator sc = p_subclasses.find(class_name);
 
           if (sc != p_subclasses.end())
             {
               for (const auto& c : sc->second)
                 {
-                  config::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
+                  oksdbinterfaces::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
 
                   if (j != m_cache_map.end())
                     {
@@ -1485,7 +1485,7 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
     "*** Number of user subscriptions: " << conf->m_callbacks.size()
   ;
 
-  // call config actions if any
+  // call oksdbinterfaces actions if any
   {
     std::lock_guard<std::mutex> scoped_lock(conf->m_impl_mutex);
     std::lock_guard<std::mutex> scoped_lock2(conf->m_actn_mutex);
@@ -1506,7 +1506,7 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
   if(conf->m_callbacks.empty()) return;
 
   // note, one cannot lock m_tmpl_mutex or m_impl_mutex here,
-  // since user callback may call arbitrary get() methods to access config
+  // since user callback may call arbitrary get() methods to access oksdbinterfaces
   // and template objects locking above two mutexes
   std::lock_guard<std::mutex> scoped_lock(conf->m_else_mutex);
 
@@ -1554,15 +1554,15 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
                 }
               catch (const ers::Issue &ex)
                 {
-                  ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown ers exception", ex));
+                  ers::error(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "user callback thrown ers exception", ex));
                 }
               catch (const std::exception &ex)
                 {
-                  ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown std exception", ex));
+                  ers::error(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "user callback thrown std exception", ex));
                 }
               catch (...)
                 {
-                  ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown unknown exception"));
+                  ers::error(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "user callback thrown unknown exception"));
                 }
             }
           else
@@ -1624,15 +1624,15 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
                     }
                   catch (const ers::Issue &ex)
                     {
-                      ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown ers exception", ex));
+                      ers::error(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "user callback thrown ers exception", ex));
                     }
                   catch (const std::exception &ex)
                     {
-                      ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown std exception", ex));
+                      ers::error(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "user callback thrown std exception", ex));
                     }
                   catch (...)
                     {
-                      ers::error(dunedaq::config::Generic( ERS_HERE, "user callback thrown unknown exception"));
+                      ers::error(dunedaq::oksdbinterfaces::Generic( ERS_HERE, "user callback thrown unknown exception"));
                     }
 
                   for (const auto &i : changes1)
@@ -1776,7 +1776,7 @@ Configuration::try_cast(const std::string *target, const std::string *source) no
       return true;
     }
 
-  config::fmap<config::fset>::iterator i = p_superclasses.find(source);
+  oksdbinterfaces::fmap<oksdbinterfaces::fset>::iterator i = p_superclasses.find(source);
 
   if (i == p_superclasses.end())
     {
@@ -1863,9 +1863,9 @@ Configuration::referenced_by(const DalObject& obj, const std::string& relationsh
       obj.p_obj.referenced_by(objs, relationship_name, check_composite_only, rlevel, rclasses);
       return make_dal_objects(objs, upcast_unregistered);
     }
-  catch (dunedaq::config::Generic & ex)
+  catch (dunedaq::oksdbinterfaces::Generic & ex)
     {
-      throw(dunedaq::config::Generic( ERS_HERE, mk_ref_by_ex_text("DalObject", relationship_name, obj.p_obj).c_str(), ex ) );
+      throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, mk_ref_by_ex_text("DalObject", relationship_name, obj.p_obj).c_str(), ex ) );
     }
 }
 
@@ -1874,11 +1874,11 @@ Configuration::attributes_pybind(const std::string& class_name, bool all) {
 
   std::unordered_map<std::string, std::unordered_map<std::string, std::string>> all_attributes_properties;
 
-  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+  const dunedaq::oksdbinterfaces::class_t& c = this->get_class_info(class_name, !all);
 
   for (const auto& ap : c.p_attributes) {
     std::unordered_map<std::string, std::string> attribute_properties;
-    attribute_properties["type"] = dunedaq::config::attribute_t::type(ap.p_type);
+    attribute_properties["type"] = dunedaq::oksdbinterfaces::attribute_t::type(ap.p_type);
     
     attribute_properties["range"] = ap.p_range.empty() ? "None" : ap.p_range;
 
@@ -1946,16 +1946,16 @@ Configuration::relations_pybind(const std::string& class_name, bool all) {
 
   std::unordered_map<std::string, std::unordered_map<std::string, std::string>> all_relationships_properties;
 
-  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+  const dunedaq::oksdbinterfaces::class_t& c = this->get_class_info(class_name, !all);
 
   for (const auto& rp : c.p_relationships) {
     std::unordered_map<std::string, std::string> relationship_properties;
 
     relationship_properties["type"] = rp.p_type;
     relationship_properties["description"] = rp.p_description;
-    relationship_properties["multivalue"] = (rp.p_cardinality == dunedaq::config::zero_or_many || rp.p_cardinality == dunedaq::config::one_or_many) ? "True" : "False";
+    relationship_properties["multivalue"] = (rp.p_cardinality == dunedaq::oksdbinterfaces::zero_or_many || rp.p_cardinality == dunedaq::oksdbinterfaces::one_or_many) ? "True" : "False";
     relationship_properties["aggregation"] = rp.p_is_aggregation ? "True" : "False";
-    relationship_properties["not-null"] = (rp.p_cardinality == dunedaq::config::only_one || rp.p_cardinality == dunedaq::config::one_or_many) ? "True" : "False";
+    relationship_properties["not-null"] = (rp.p_cardinality == dunedaq::oksdbinterfaces::only_one || rp.p_cardinality == dunedaq::oksdbinterfaces::one_or_many) ? "True" : "False";
     
     all_relationships_properties[rp.p_name] = relationship_properties;
   }
@@ -1973,14 +1973,14 @@ Configuration::return_includes_pybind(const std::string& db_name) {
 std::vector<std::string> 
 Configuration::subclasses_pybind(const std::string& class_name, bool all) {
 
-  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+  const dunedaq::oksdbinterfaces::class_t& c = this->get_class_info(class_name, !all);
   return c.p_subclasses;
 }
 
 std::vector<std::string> 
 Configuration::superclasses_pybind(const std::string& class_name, bool all) {
 
-  const dunedaq::config::class_t& c = this->get_class_info(class_name, !all);
+  const dunedaq::oksdbinterfaces::class_t& c = this->get_class_info(class_name, !all);
   return c.p_superclasses;
 }
 
@@ -2034,7 +2034,7 @@ DalObject::p_rm(std::ostream &s)
 }
 
 void
-DalObject::p_error(std::ostream &s, dunedaq::config::Exception &ex)
+DalObject::p_error(std::ostream &s, dunedaq::oksdbinterfaces::Exception &ex)
 {
   s << "ERROR in generated DAL print method:\n\twas caused by: " << ex << std::endl;
 }
@@ -2049,7 +2049,7 @@ DalObject::p_hdr(std::ostream &s, unsigned int indent, const std::string &cl, co
   s << cl << " object:\n" << str << "  id: \'" << UID() << "\', class name: \'" << DalObject::class_name() << "\'\n";
 }
 
-namespace config
+namespace oksdbinterfaces
 {
   void
   p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject *obj)
@@ -2059,19 +2059,19 @@ namespace config
 }
 
 
-void DalObject::throw_init_ex(dunedaq::config::Exception& ex)
+void DalObject::throw_init_ex(dunedaq::oksdbinterfaces::Exception& ex)
 {
   std::ostringstream text;
   text << "failed to init " << this << ":\n\twas caused by: " << ex << std::endl;
   p_was_read = false;
-  throw dunedaq::config::Generic (ERS_HERE, text.str().c_str());
+  throw dunedaq::oksdbinterfaces::Generic (ERS_HERE, text.str().c_str());
 }
 
 void DalObject::throw_get_ex(const std::string& what, const std::string& class_name, const DalObject * obj)
 {
   std::ostringstream text;
   text << "cannot find relationship or algorithm \"" << what << "\" in c++ class \"" << class_name << "\" for object " << obj;
-  throw dunedaq::config::Generic(ERS_HERE, text.str().c_str());
+  throw dunedaq::oksdbinterfaces::Generic(ERS_HERE, text.str().c_str());
 }
 
 
@@ -2121,7 +2121,7 @@ DalFactory::functions(const Configuration& db, const std::string& name, bool upc
         }
 
       std::string text(std::string("DAL class ") + name + " was not registered");
-      throw dunedaq::config::Generic(ERS_HERE, text.c_str());
+      throw dunedaq::oksdbinterfaces::Generic(ERS_HERE, text.c_str());
     }
 
   return it->second;

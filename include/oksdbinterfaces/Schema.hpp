@@ -2,18 +2,18 @@
    *  \file Schema.h This file contains several schema classes,
    *  which can be used to get information about classes and their properties.
    *  \author Igor Soloviev
-   *  \brief config schema description
+   *  \brief oksdbinterfaces schema description
    */
 
-#ifndef CONFIG_SCHEMA_H_
-#define CONFIG_SCHEMA_H_
+#ifndef OKSDB_INTERFACE_SCHEMA_H_
+#define OKSDB_INTERFACE_SCHEMA_H_
 
 #include <string>
 #include <vector>
 #include <iostream>
 
 namespace dunedaq {
-  namespace config {
+  namespace oksdbinterfaces {
 
       /** The supported attribute types. */
 
@@ -194,4 +194,4 @@ namespace dunedaq {
   }
 }
 
-#endif // CONFIG_SCHEMA_H_
+#endif // OKSDB_INTERFACE_SCHEMA_H_

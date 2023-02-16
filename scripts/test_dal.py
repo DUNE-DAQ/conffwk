@@ -7,12 +7,12 @@
 
 import os
 import unittest
-import config
+import oksdbinterfaces
 
 scriptsdir=os.path.dirname(os.path.realpath(__file__))
 
 # binds a new dal into the module named "test"
-test = config.dal.module('test', f'{scriptsdir}/test.schema.xml')
+test = oksdbinterfaces.dal.module('test', f'{scriptsdir}/test.schema.xml')
 
 SIZE_TEST = 1000
 RECURSION_TEST = 500
@@ -158,7 +158,7 @@ class DalTest(unittest.TestCase):
         self.assertEqual(obj2.Dummy, [obj])
 
     def test22_CanReadWriteDalOnConfiguration(self):
-        db = config.Configuration("oksconfig")
+        db = oksdbinterfaces.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         obj3 = test.Dummy('Test-3', string_vector=['test05', 'test06'])
         obj1 = test.Second('Test-1', Dummy=[obj3], string_vector=['test30'])
@@ -171,7 +171,7 @@ class DalTest(unittest.TestCase):
         self.assertEqual(ret.Seconds[0].Dummy[0], obj3)
 
     def test23_CanSearchForDalsAtConfiguration(self):
-        db = config.Configuration("oksconfig")
+        db = oksdbinterfaces.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         obj3 = test.Dummy('Test-3', string_vector=['test05', 'test06'])
         obj1 = test.Second('Test-1', Dummy=[obj3], string_vector=['test30'])
@@ -179,7 +179,7 @@ class DalTest(unittest.TestCase):
         db.update_dal(obj2, recurse=True)  # should serialize everybody
         db.commit()
         del db
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         ret = db.get_dal('Third', 'Test-2')
         self.assertEqual(ret, obj2)
         self.assertEqual(ret.Seconds[0], obj1)
@@ -193,13 +193,13 @@ class DalTest(unittest.TestCase):
         objs = []
         for i in range(number):
             objs.append(test.Second("Object-%d" % i))
-        db = config.Configuration("oksconfig")
+        db = oksdbinterfaces.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         for k in objs:
             db.update_dal(k, recurse=True)
         db.commit()
         del db
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         objs = db.get_dals('Second')
         self.assertEqual(len(objs), number)
 
@@ -213,12 +213,12 @@ class DalTest(unittest.TestCase):
             if previous:
                 obj.Another = previous
             previous = obj
-        db = config.Configuration("oksconfig")
+        db = oksdbinterfaces.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         db.update_dal(previous, recurse=True)
         db.commit()
         del db
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         top = db.get_dal('Second', 'Object-%d' % (depth-1))
         counter = 0
         while top:
@@ -230,7 +230,7 @@ class DalTest(unittest.TestCase):
         import sys
         sys.setrecursionlimit(50000)
         depth = RECURSION_TEST
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         top = db.get_dal('Second', 'Object-%d' % (depth-1))
         all = [top]
         while top.Another:
@@ -252,7 +252,7 @@ class DalTest(unittest.TestCase):
         del db
 
         # reopen and check
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         top = db.get_dal('Second', 'Object-0')  # that should be on the top now
         counter = 0
         while top:
@@ -262,12 +262,12 @@ class DalTest(unittest.TestCase):
 
     def test27_CanSearchUsingBaseClasses(self):
         # reopen and check
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         self.assertEqual(len(db.get_dals('Dummy')), RECURSION_TEST)
 
     def test28_CanHandleInheritanceAtSearch(self):
         # reopen and check
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         objs = db.get_dals('Dummy')
         self.assertEqual(len(objs), RECURSION_TEST)
         for k in objs:
@@ -278,13 +278,13 @@ class DalTest(unittest.TestCase):
         obj2 = test.Second('Obj-2')
         obj1.Another = obj2
         obj2.Another = obj1
-        db = config.Configuration("oksconfig")
+        db = oksdbinterfaces.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         db.update_dal(obj1, recurse=True)
         db.commit()
 
     def test30_CanReadInfiniteRecursion(self):
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         obj1 = db.get_dal('Second', 'Obj-1')
         obj2 = db.get_dal('Second', 'Obj-2')
         self.assertEqual(obj1.Another, obj2)
@@ -299,13 +299,13 @@ class DalTest(unittest.TestCase):
         obj2.Another = obj3
         obj3.Another = obj4
         obj4.Another = obj1
-        db = config.Configuration("oksconfig")
+        db = oksdbinterfaces.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         db.update_dal(obj1, recurse=True)
         db.commit()
 
     def test32_CanReadBiggerRecursion(self):
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         obj1 = db.get_dal('Second', 'Obj-1')
         obj2 = db.get_dal('Second', 'Obj-2')
         obj3 = db.get_dal('Second', 'Obj-3')
@@ -316,7 +316,7 @@ class DalTest(unittest.TestCase):
         self.assertEqual(obj4.Another, obj1)
 
     def test33_CanHandleDalDestruction(self):
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         obj1 = db.get_dal('Second', 'Obj-1')
         obj2 = db.get_dal('Second', 'Obj-2')
         obj3 = db.get_dal('Second', 'Obj-3')
@@ -327,14 +327,14 @@ class DalTest(unittest.TestCase):
         db.destroy_dal(obj3)
         db.commit()
         del db
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         obj1 = db.get_dal('Second', 'Obj-1')
         obj2 = db.get_dal('Second', 'Obj-2')
         self.assertRaises(RuntimeError, db.get_dal, 'Second', 'Obj-3')
         obj4 = db.get_dal('Second', 'Obj-4')
 
     def test34_CanModifyNonRecursively(self):
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         obj1 = db.get_dal('Second', 'Obj-1')
         obj1.Another = None
         obj2 = db.get_dal('Second', 'Obj-2')
@@ -342,7 +342,7 @@ class DalTest(unittest.TestCase):
         db.update_dal(obj1, recurse=False)
         db.commit()
         del db
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         obj1 = db.get_dal('Second', 'Obj-1')
         self.assertNotEqual(obj1.Another, obj2)
         self.assertEqual(obj1.Another, None)
@@ -358,13 +358,13 @@ class DalTest(unittest.TestCase):
         obj22.Another = obj33
         obj33.Another = obj44
         obj44.Another = obj11
-        db = config.Configuration("oksconfig")
+        db = oksdbinterfaces.Configuration("oksconfig")
         db.create_db("test2.data.xml", [f'{scriptsdir}/test.schema.xml'])
         db.update_dal(obj11, recurse=True)
         db.commit()
         del db
 
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         obj1 = db.get_dal('Second', 'Obj-1')
         obj1.Another = obj22
         self.assertRaises(RuntimeError, db.update_dal, obj1, recurse=False)
@@ -375,7 +375,7 @@ class DalTest(unittest.TestCase):
         del db
 
     def test36_CanSearchForObjects(self):
-        db = config.Configuration("oksconfig")
+        db = oksdbinterfaces.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         obj3 = test.Dummy('Test-3', string_vector=['test05', 'test06'])
         obj1 = test.Second('Test-1', Dummy=[obj3], string_vector=['test30'])
@@ -383,7 +383,7 @@ class DalTest(unittest.TestCase):
         db.update_dal(obj2, recurse=True)  # should serialize everybody
         db.commit()
         del db
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         ret = db.get_dal('Third', 'Test-2')
 
         import re
@@ -396,25 +396,25 @@ class DalTest(unittest.TestCase):
             len(ret.get('Second', re.compile(r'Test-[0-9]'), True)), 2)
 
     def test37_BookkeepUpdatedObjects(self):
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         obj = db.get_dal('Dummy', 'Test-3')
-        config.reset_updated_dals()
-        self.assertEqual(len(config.updated_dals()), 0)
+        oksdbinterfaces.reset_updated_dals()
+        self.assertEqual(len(oksdbinterfaces.updated_dals()), 0)
         obj.bool = False
-        self.assertEqual(len(config.updated_dals()), 1)
-        self.assertEqual(config.updated_dals(), set((obj,)))
+        self.assertEqual(len(oksdbinterfaces.updated_dals()), 1)
+        self.assertEqual(oksdbinterfaces.updated_dals(), set((obj,)))
         obj.sint8 = 0
-        self.assertEqual(len(config.updated_dals()), 1)
+        self.assertEqual(len(oksdbinterfaces.updated_dals()), 1)
 
         obj1 = db.get_dal('Second', 'Test-1')
-        self.assertEqual(len(config.updated_dals()), 1)
+        self.assertEqual(len(oksdbinterfaces.updated_dals()), 1)
 
         obj1.bool = False
-        self.assertEqual(len(config.updated_dals()), 2)
-        self.assertEqual(config.updated_dals(), set((obj, obj1)))
+        self.assertEqual(len(oksdbinterfaces.updated_dals()), 2)
+        self.assertEqual(oksdbinterfaces.updated_dals(), set((obj, obj1)))
 
     def test38_CanRename(self):
-        db = config.Configuration('oksconfig:test.data.xml')
+        db = oksdbinterfaces.Configuration('oksconfig:test.data.xml')
         obj = db.get_dal('Dummy', 'Test-3')
         obj.rename('Test-4')
         db.update_dal(obj)

@@ -1,9 +1,9 @@
-#ifndef CONFIG_ACTION_H_
-#define CONFIG_ACTION_H_
+#ifndef OKSDB_INTERFACE_ACTION_H_
+#define OKSDB_INTERFACE_ACTION_H_
 
 #include <string>
 
-#include "config/Change.hpp"
+#include "oksdbinterfaces/Change.hpp"
 
 class ConfigObject;
 
@@ -27,4 +27,4 @@ class ConfigAction {
 
 };
 
-#endif // CONFIG_DAL_ACTION_H_
+#endif // OKSDB_INTERFACE_DAL_ACTION_H_

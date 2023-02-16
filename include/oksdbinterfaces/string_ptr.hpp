@@ -1,9 +1,9 @@
-#ifndef CONFIG_STRING_PTR_H_
-#define CONFIG_STRING_PTR_H_
+#ifndef OKSDB_INTERFACE_STRING_PTR_H_
+#define OKSDB_INTERFACE_STRING_PTR_H_
 
 #include <string>
 
-namespace config
+namespace oksdbinterfaces
 {
   struct string_ptr_compare {
     bool operator()(const std::string * left, const std::string * right) const
@@ -20,4 +20,4 @@ namespace config
   };
 }
 
-#endif // CONFIG_STRING_PTR_H_
+#endif // OKSDB_INTERFACE_STRING_PTR_H_

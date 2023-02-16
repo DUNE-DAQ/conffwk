@@ -4,12 +4,12 @@
  *  \brief print functions for generated template objects
  */
 
-#ifndef CONFIG_DAL_OBJECT_PRINT_H_
-#define CONFIG_DAL_OBJECT_PRINT_H_
+#ifndef OKSDB_INTERFACE_DAL_OBJECT_PRINT_H_
+#define OKSDB_INTERFACE_DAL_OBJECT_PRINT_H_
 
 #include <iostream>
 
-namespace config {
+namespace oksdbinterfaces {
   enum PrintNumBase {dec, hex, oct};
 
   template<class T>
@@ -145,4 +145,4 @@ namespace config {
 }
 
 
-#endif // CONFIG_CONFIGOBJECT_H_
+#endif // OKSDB_INTERFACE_CONFIGOBJECT_H_

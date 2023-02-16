@@ -7,21 +7,21 @@
 #include <fstream>
 #include <string>
 
-#include "config/Configuration.hpp"
-#include "config/ConfigObject.hpp"
-#include "config/Schema.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "oksdbinterfaces/ConfigObject.hpp"
+#include "oksdbinterfaces/Schema.hpp"
 
 ERS_DECLARE_ISSUE(
-  config_time_test,
+  oksdbinterfaces_time_test,
   BadCommandLine,
   "bad command line: " << reason,
   ((const char*)reason)
 )
 
 ERS_DECLARE_ISSUE(
-  config_time_test,
+  oksdbinterfaces_time_test,
   ConfigException,
-  "caught dunedaq::config::Exception exception",
+  "caught dunedaq::oksdbinterfaces::Exception exception",
 )
 
 static void
@@ -29,7 +29,7 @@ no_param(const char * s)
 {
   std::ostringstream text;
   text << "no parameter for " << s << " provided";
-  ers::fatal(config_time_test::BadCommandLine(ERS_HERE, text.str().c_str()));
+  ers::fatal(oksdbinterfaces_time_test::BadCommandLine(ERS_HERE, text.str().c_str()));
   exit(EXIT_FAILURE);
 }
 
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     if(!strcmp(cp, "-h") || !strcmp(cp, "--help")) {
       std::cout << 
-        "Usage: config_time_test -d dbspec [-c | -C [class_name]] [-o | -O [object_id]] [-n]\n"
+        "Usage: oksdbinterfaces_time_test -d dbspec [-c | -C [class_name]] [-o | -O [object_id]] [-n]\n"
         "\n"
         "Options/Arguments:\n"
         "  -d | --database dbspec        database specification in format plugin-name:parameters\n"
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
   }
 
   if(!db_name) {
-    ers::fatal(config_time_test::BadCommandLine(ERS_HERE, "no database name given"));
+    ers::fatal(oksdbinterfaces_time_test::BadCommandLine(ERS_HERE, "no database name given"));
     return (EXIT_FAILURE);
   }
 
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
     std::set<std::string> classes;
 
-    for(config::fmap<config::fset>::const_iterator i = conf.superclasses().begin(); i != conf.superclasses().end(); ++i) {
+    for(oksdbinterfaces::fmap<oksdbinterfaces::fset>::const_iterator i = conf.superclasses().begin(); i != conf.superclasses().end(); ++i) {
       classes.insert(*i->first);
     }
 
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     }
 
     for(std::set<std::string>::const_iterator i = classes.begin(); i != classes.end(); ++i) {
-      const dunedaq::config::class_t& d(conf.get_class_info(*i));
+      const dunedaq::oksdbinterfaces::class_t& d(conf.get_class_info(*i));
       if(verbose) {
         d.print(std::cout, "  ");
       }
@@ -186,8 +186,8 @@ int main(int argc, char *argv[])
 
     return 0;
   }
-  catch (dunedaq::config::Exception & ex) {
-    ers::fatal(config_time_test::ConfigException(ERS_HERE, ex));
+  catch (dunedaq::oksdbinterfaces::Exception & ex) {
+    ers::fatal(oksdbinterfaces_time_test::ConfigException(ERS_HERE, ex));
   }
 
   return (EXIT_FAILURE);

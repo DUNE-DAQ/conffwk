@@ -1,11 +1,11 @@
   /**
    *  \file ConfigVersion.h This file contains ConfigVersion class describing OKS GIT repository version.
    *  \author Igor Soloviev
-   *  \brief config version class
+   *  \brief oksdbinterfaces version class
    */
 
-#ifndef CONFIG_CONFIGVERSION_H_
-#define CONFIG_CONFIGVERSION_H_
+#ifndef OKSDB_INTERFACE_CONFIGVERSION_H_
+#define OKSDB_INTERFACE_CONFIGVERSION_H_
 
 #include <ctime>
 #include <string>
@@ -13,7 +13,7 @@
 
 namespace dunedaq
 {
-  namespace config
+  namespace oksdbinterfaces
   {
 
     /**
@@ -110,4 +110,4 @@ namespace dunedaq
   }
 }
 
-#endif // CONFIG_CONFIGVERSION_H_
+#endif // OKSDB_INTERFACE_CONFIGVERSION_H_

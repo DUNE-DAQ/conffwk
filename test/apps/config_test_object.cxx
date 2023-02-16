@@ -3,27 +3,27 @@
 #include <iostream>
 #include <string>
 
-#include "config/Configuration.hpp"
-#include "config/ConfigObject.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "oksdbinterfaces/ConfigObject.hpp"
 
 ERS_DECLARE_ISSUE(
-  config_test_object,
+  oksdbinterfaces_test_object,
   BadCommandLine,
   "bad command line: " << reason,
   ((const char*)reason)
 )
 
 ERS_DECLARE_ISSUE(
-  config_test_object,
+  oksdbinterfaces_test_object,
   ConfigException,
-  "caught dunedaq::config::Exception exception",
+  "caught dunedaq::oksdbinterfaces::Exception exception",
 )
 
 static void
 usage()
 {
   std::cout << 
-    "Usage: config_test_object -d | --database dbspec\n"
+    "Usage: oksdbinterfaces_test_object -d | --database dbspec\n"
     "                          -c | --class-name class\n"
     "                          -o | --object-id object\n"
     "\n"
@@ -42,7 +42,7 @@ no_param(const char * s)
 {
   std::ostringstream text;
   text << "no parameter for " << s << " provided";
-  ers::fatal(config_test_object::BadCommandLine(ERS_HERE, text.str().c_str()));
+  ers::fatal(oksdbinterfaces_test_object::BadCommandLine(ERS_HERE, text.str().c_str()));
   exit(EXIT_FAILURE);
 }
 
@@ -72,23 +72,23 @@ int main(int argc, char *argv[])
     else {
       std::ostringstream text;
       text << "unexpected parameter: \'" << cp << "\'; run command with --help to see valid command line options.";
-      ers::fatal(config_test_object::BadCommandLine(ERS_HERE, text.str().c_str()));
+      ers::fatal(oksdbinterfaces_test_object::BadCommandLine(ERS_HERE, text.str().c_str()));
       return (EXIT_FAILURE);
     }
   }
 
   if(!db_name) {
-    ers::fatal(config_test_object::BadCommandLine(ERS_HERE, "no database name given"));
+    ers::fatal(oksdbinterfaces_test_object::BadCommandLine(ERS_HERE, "no database name given"));
     return (EXIT_FAILURE);
   }
 
   if(!class_name) {
-    ers::fatal(config_test_object::BadCommandLine(ERS_HERE, "no class name given"));
+    ers::fatal(oksdbinterfaces_test_object::BadCommandLine(ERS_HERE, "no class name given"));
     return (EXIT_FAILURE);
   }
 
   if(!object_id) {
-    ers::fatal(config_test_object::BadCommandLine(ERS_HERE, "no object id given"));
+    ers::fatal(oksdbinterfaces_test_object::BadCommandLine(ERS_HERE, "no object id given"));
     return (EXIT_FAILURE);
   }
 
@@ -104,8 +104,8 @@ int main(int argc, char *argv[])
 
     return 0;
   }
-  catch (dunedaq::config::Exception & ex) {
-    ers::fatal(config_test_object::ConfigException(ERS_HERE, ex));
+  catch (dunedaq::oksdbinterfaces::Exception & ex) {
+    ers::fatal(oksdbinterfaces_test_object::ConfigException(ERS_HERE, ex));
   }
 
   return (EXIT_FAILURE);

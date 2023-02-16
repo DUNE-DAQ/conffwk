@@ -7,8 +7,8 @@
 
 #include "ers/ers.hpp"
 
-#include "config/set.hpp"
-#include "config/DalFactoryFunctions.hpp"
+#include "oksdbinterfaces/set.hpp"
+#include "oksdbinterfaces/DalFactoryFunctions.hpp"
 
 #include "logging/Logging.hpp"
 
@@ -45,15 +45,15 @@ public:
 
 
   /**
-   * \brief Get DAL object from config object
+   * \brief Get DAL object from oksdbinterfaces object
    *
    * \param db                    configuration database object
-   * \param obj                   config object
+   * \param obj                   oksdbinterfaces object
    * \param uid                   uid for generated objects
-   * \param upcast_unregistered   if true and and native DAL class of config object is not registered, search an appropriate base class within superclasses hierarchy
+   * \param upcast_unregistered   if true and and native DAL class of oksdbinterfaces object is not registered, search an appropriate base class within superclasses hierarchy
    * \return                      the DAL object
    *
-   * \throw                       config::Generic exception if class of object is not registered
+   * \throw                       oksdbinterfaces::Generic exception if class of object is not registered
    */
 
   DalObject *
@@ -68,7 +68,7 @@ public:
    *
    * \param db                    configuration database object
    * \param                       name of OKS class
-   * \param upcast_unregistered   if true and native DAL class of config object is not registered, search an appropriate base class within superclasses hierarchy
+   * \param upcast_unregistered   if true and native DAL class of oksdbinterfaces object is not registered, search an appropriate base class within superclasses hierarchy
    * \return                      the factory functions for given class
    */
 
@@ -96,7 +96,7 @@ private:
   std::map<std::string, DalFactoryFunctions> m_classes;
 
   std::mutex m_known_class_mutex;
-  config::set m_known_classes;
+  oksdbinterfaces::set m_known_classes;
 };
 
 #endif
