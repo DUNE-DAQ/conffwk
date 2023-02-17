@@ -528,7 +528,7 @@ class DalType(type):
     functionality one can extract by looking at the C++ Configuration class.
 
     The work here is modelled after the old PyDALBase implementation that used
-    to live in the "genconfig" package.
+    to live in the "genoksdbinterfaces" package.
     """
 
     def __init__(cls, name, bases, dct):
@@ -585,7 +585,7 @@ def generate(configuration, other_dals=[]):
     """Generates the DAL python access layer for the configuration passed.
 
     This method will generate the python DAL access layer for all classes
-    declared through the config.Configuration object passed. If this file
+    declared through the oksdbinterfaces.Configuration object passed. If this file
     includes other schemas, the classes for those schemas will also be
     generated, unless, classes with matching names are passed through the
     "other_dals" parameters.
@@ -597,7 +597,7 @@ def generate(configuration, other_dals=[]):
 
     Keyword parameters:
 
-    configuration -- The config.Configuration object that you want the prepare
+    configuration -- The oksdbinterfaces.Configuration object that you want the prepare
     the DAL for.
 
     other_dals -- This is a list of classes that contain other DALs that should
@@ -678,9 +678,9 @@ def module(name, schema, other_dals=[], backend='oksconfig', db=None):
     passed as parameter. Classes from other DALs are not re-created, but just
     re-used. This is an example usage:
 
-    import config.dal
-    dal = config.dal.module('dal', 'dal/schema/core.schema.xml')
-    DFdal = config.dal.module('DFdal', 'DFConfiguration/schema/df.schema.xml',
+    import oksdbinterfaces.dal
+    dal = oksdbinterfaces.dal.module('dal', 'dal/schema/core.schema.xml')
+    DFdal = oksdbinterfaces.dal.module('DFdal', 'DFConfiguration/schema/df.schema.xml',
                               [dal])
 
     This will generate two python dals in the current context. One that binds

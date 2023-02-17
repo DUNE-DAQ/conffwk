@@ -1,11 +1,11 @@
-#include "config/ConfigObject.hpp"
-#include "config/ConfigObjectImpl.hpp"
+#include "oksdbinterfaces/ConfigObject.hpp"
+#include "oksdbinterfaces/ConfigObjectImpl.hpp"
 
 class ConfigObjectDefault : public ConfigObjectImpl {
 
   private:
   
-    /// \throw dunedaq::config::Generic
+    /// \throw dunedaq::oksdbinterfaces::Generic
     static void bad();
     static const std::string s_invalid;
 
@@ -98,7 +98,7 @@ class ConfigObjectDefault : public ConfigObjectImpl {
 
 };
 
-ConfigObjectImpl::ConfigObjectImpl(ConfigurationImpl * impl, const std::string& id, dunedaq::config::ObjectState state) noexcept : m_impl (impl), m_state(state), m_id(id), m_class_name(nullptr)
+ConfigObjectImpl::ConfigObjectImpl(ConfigurationImpl * impl, const std::string& id, dunedaq::oksdbinterfaces::ObjectState state) noexcept : m_impl (impl), m_state(state), m_id(id), m_class_name(nullptr)
 {
 }
 
@@ -115,5 +115,5 @@ const std::string ConfigObjectDefault::s_invalid = "*INVALID*";
 
 void ConfigObjectDefault::bad()
 {
-  throw dunedaq::config::Generic( ERS_HERE, "access *INVALID* object");
+  throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "access *INVALID* object");
 }

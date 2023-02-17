@@ -1,10 +1,10 @@
-#ifndef CONFIG_SET_H_
-#define CONFIG_SET_H_
+#ifndef OKSDB_INTERFACE_SET_H_
+#define OKSDB_INTERFACE_SET_H_
 
-#include "config/string_ptr.hpp"
+#include "oksdbinterfaces/string_ptr.hpp"
 #include <unordered_set>
 
-namespace config
+namespace oksdbinterfaces
 {
   typedef std::unordered_set<std::string> set;
 
@@ -12,4 +12,4 @@ namespace config
   typedef std::unordered_set<const std::string *, string_ptr_hash> fset;
 }
 
-#endif // CONFIG_SET_H_
+#endif // OKSDB_INTERFACE_SET_H_

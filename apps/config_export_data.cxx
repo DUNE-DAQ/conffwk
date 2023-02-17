@@ -8,7 +8,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "config/Configuration.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
 
 
 int
@@ -164,7 +164,7 @@ main(int argc, char *argv[])
 
       return EXIT_SUCCESS;
     }
-  catch (const dunedaq::config::Exception &ex)
+  catch (const dunedaq::oksdbinterfaces::Exception &ex)
     {
       std::cout << "config error: " << ex << std::endl;
     }

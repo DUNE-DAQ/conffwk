@@ -20,9 +20,9 @@
 
   // include headers describing abstract configuration interface
 
-#include "config/Change.h"
-#include "config/ConfigObject.h"
-#include "config/Configuration.h"
+#include "oksdbinterfaces/Change.h"
+#include "oksdbinterfaces/ConfigObject.h"
+#include "oksdbinterfaces/Configuration.h"
 
   /**
    *  The callback function is called when changes occurred.
@@ -77,7 +77,7 @@ static void
 usage()
 {
   std::cout <<
-    "Usage: config_subscriber [-d | --data database-name]\n"
+    "Usage: oksdbinterfaces_subscriber [-d | --data database-name]\n"
     "                         [-c | --classes [class-1 ...] ]\n"
     "\n"
     "Options/Arguments:\n"
@@ -91,7 +91,7 @@ usage()
 
 extern "C" void signal_handler(int sig)
 {
-  std::cout << "config_subscriber caught signal " << sig << std::endl;
+  std::cout << "oksdbinterfaces_subscriber caught signal " << sig << std::endl;
 }
 
 
@@ -178,11 +178,11 @@ int main(int argc, char *argv[])
       ;
     }
 
-    std::cout << "Exiting config_subscriber ..." << std::endl;
+    std::cout << "Exiting oksdbinterfaces_subscriber ..." << std::endl;
 
     conf.unsubscribe();
   }
-  catch (dunedaq::config::Exception & ex) {
+  catch (dunedaq::oksdbinterfaces::Exception & ex) {
     std::cerr << "Caught " << ex << std::endl;
     return (EXIT_FAILURE);
   }

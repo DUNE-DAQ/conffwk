@@ -1,11 +1,11 @@
 #include <stdlib.h>
 
-#include "config/Configuration.hpp"
-#include "config/ConfigurationImpl.hpp"
-#include "config/Schema.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "oksdbinterfaces/ConfigurationImpl.hpp"
+#include "oksdbinterfaces/Schema.hpp"
 
 namespace dunedaq {
-  namespace config {
+  namespace oksdbinterfaces {
 
     const char * bool2str(bool value) { return (value ? "yes" : "no"); }
 
@@ -244,9 +244,9 @@ ConfigurationImpl::print_cache_info() noexcept
 
 
 #ifndef ERS_NO_DEBUG
-# define CONFIG_ADD_DEBUG_MSG(STREAM, MSG) if(ers::debug_level() >= 4) { *STREAM << MSG; }
+# define OKSDB_INTERFACE_ADD_DEBUG_MSG(STREAM, MSG) if(ers::debug_level() >= 4) { *STREAM << MSG; }
 #else
-# define CONFIG_ADD_DEBUG_MSG(STREAM, MSG) ;
+# define OKSDB_INTERFACE_ADD_DEBUG_MSG(STREAM, MSG) ;
 #endif
 
 
@@ -259,12 +259,12 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
     dbg_text.reset(new std::ostringstream());
 #endif
 
-  config::pmap<config::map<ConfigObjectImpl *> *>::const_iterator i = m_impl_objects.find(&name);
+  oksdbinterfaces::pmap<oksdbinterfaces::map<ConfigObjectImpl *> *>::const_iterator i = m_impl_objects.find(&name);
 
   const std::string * class_name = nullptr;
 
   if(i != m_impl_objects.end()) {
-    config::map<ConfigObjectImpl *>::const_iterator j = i->second->find(id);
+    oksdbinterfaces::map<ConfigObjectImpl *>::const_iterator j = i->second->find(id);
 
     if(j != i->second->end()) {
       p_number_of_cache_hits++;
@@ -279,12 +279,12 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
       // prepare and print out debug message
 
     if(ers::debug_level() >= 4) {
-      CONFIG_ADD_DEBUG_MSG( dbg_text , "\n  * there is no object with id = \'" << id << "\' found in the class \'" << name << "\' that has " << i->second->size() << " objects in cache: " )
+      OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , "\n  * there is no object with id = \'" << id << "\' found in the class \'" << name << "\' that has " << i->second->size() << " objects in cache: " )
       for(j=i->second->begin(); j != i->second->end();++j) {
-        if(j != i->second->begin()) { CONFIG_ADD_DEBUG_MSG( dbg_text , ", " ) }
-	CONFIG_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
+        if(j != i->second->begin()) { OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , ", " ) }
+	OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
       }
-      CONFIG_ADD_DEBUG_MSG( dbg_text , '\n' )
+      OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , '\n' )
     }
 
 #endif
@@ -292,23 +292,23 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
   }
   else {
     class_name = &DalFactory::instance().get_known_class_name_ref(name);
-    CONFIG_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << name << "\' that has no objects in cache\n" )
+    OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << name << "\' that has no objects in cache\n" )
   }
 
     // check implementation objects of subclasses
 
   if(m_conf) {
-    config::fmap<config::fset>::const_iterator subclasses = m_conf->subclasses().find(class_name);
+    oksdbinterfaces::fmap<oksdbinterfaces::fset>::const_iterator subclasses = m_conf->subclasses().find(class_name);
 
     if(subclasses != m_conf->subclasses().end()) {
-      for(config::fset::const_iterator k = subclasses->second.begin(); k != subclasses->second.end(); ++k) {
+      for(oksdbinterfaces::fset::const_iterator k = subclasses->second.begin(); k != subclasses->second.end(); ++k) {
         i = m_impl_objects.find(*k);
         if(i != m_impl_objects.end()) {
-          config::map<ConfigObjectImpl *>::const_iterator j = i->second->find(id);
+          oksdbinterfaces::map<ConfigObjectImpl *>::const_iterator j = i->second->find(id);
 
           if(j != i->second->end()) {
             p_number_of_cache_hits++;
-  	    CONFIG_ADD_DEBUG_MSG( dbg_text , "  * found the object with id = \'" << id << "\' in class \'" << *k << '\'' )
+  	    OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , "  * found the object with id = \'" << id << "\' in class \'" << *k << '\'' )
 	      TLOG_DEBUG(4) << dbg_text->str() ;
             return j->second;
           }
@@ -318,28 +318,28 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
             // prepare and print out debug message
 
           else if(ers::debug_level() >= 4) {
-            CONFIG_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << *k << "\' that has " << i->second->size() << " objects in cache: " )
+            OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << *k << "\' that has " << i->second->size() << " objects in cache: " )
             for(j=i->second->begin(); j != i->second->end();++j) {
-              if(j != i->second->begin()) { CONFIG_ADD_DEBUG_MSG( dbg_text , ", " ) }
-	      CONFIG_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
+              if(j != i->second->begin()) { OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , ", " ) }
+	      OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
             }
-  	    CONFIG_ADD_DEBUG_MSG( dbg_text , '\n' )
+  	    OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , '\n' )
           }
 
 #endif
 
         }
         else {
-          CONFIG_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << *k << "\' that has no objects in cache\n" )
+          OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << *k << "\' that has no objects in cache\n" )
         }
 
       }
     }
 
-    CONFIG_ADD_DEBUG_MSG( dbg_text , "  * there is no object \'" << id << "\' in class \'" << name << "\' and it's subclasses, returning NULL ..." )
+    OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , "  * there is no object \'" << id << "\' in class \'" << name << "\' and it's subclasses, returning NULL ..." )
   }
   else {
-    CONFIG_ADD_DEBUG_MSG( dbg_text , "  * there is no object \'" << id << "\' in class \'" << name << "\', returning NULL ..." )
+    OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , "  * there is no object \'" << id << "\' in class \'" << name << "\', returning NULL ..." )
   }
 
   TLOG_DEBUG(4) << dbg_text->str() ;
@@ -353,14 +353,14 @@ ConfigurationImpl::put_impl_object(const std::string& name, const std::string& i
 {
   p_number_of_object_read++;
 
-  config::pmap<config::map<ConfigObjectImpl *> * >::iterator i = m_impl_objects.find(&name);
+  oksdbinterfaces::pmap<oksdbinterfaces::map<ConfigObjectImpl *> * >::iterator i = m_impl_objects.find(&name);
 
   if(i != m_impl_objects.end()) {
     (*i->second)[id] = obj;
     obj->m_class_name = i->first;
   }
   else {
-    config::map<ConfigObjectImpl *> * m = new config::map<ConfigObjectImpl *>();
+    oksdbinterfaces::map<ConfigObjectImpl *> * m = new oksdbinterfaces::map<ConfigObjectImpl *>();
     obj->m_class_name = &DalFactory::instance().get_known_class_name_ref(name);
     m_impl_objects[obj->m_class_name] = m;
     (*m)[id] = obj;
@@ -370,11 +370,11 @@ ConfigurationImpl::put_impl_object(const std::string& name, const std::string& i
 void
 ConfigurationImpl::rename_impl_object(const std::string * class_name, const std::string& old_id, const std::string& new_id) noexcept
 {
-  config::pmap<config::map<ConfigObjectImpl *> *>::iterator i = m_impl_objects.find(class_name);
+  oksdbinterfaces::pmap<oksdbinterfaces::map<ConfigObjectImpl *> *>::iterator i = m_impl_objects.find(class_name);
 
   if (i != m_impl_objects.end())
     {
-      config::map<ConfigObjectImpl *>::iterator j = i->second->find(old_id);
+      oksdbinterfaces::map<ConfigObjectImpl *>::iterator j = i->second->find(old_id);
 
       if (j != i->second->end())
         {
@@ -382,7 +382,7 @@ ConfigurationImpl::rename_impl_object(const std::string * class_name, const std:
 
           if (obj != nullptr)
             {
-              obj->m_state = dunedaq::config::Unknown;
+              obj->m_state = dunedaq::oksdbinterfaces::Unknown;
               m_tangled_objects.push_back(obj);
             }
 

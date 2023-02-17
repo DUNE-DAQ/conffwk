@@ -1,5 +1,5 @@
 /**
- * @file config/ConfigurationPointer.h
+ * @file oksdbinterfaces/ConfigurationPointer.h
  * @author <a href="mailto:andre.dos.anjos@cern.ch">Andre Anjos</a> 
  *
  * @brief A wrapper to the Configuration class to make it boost friendly
@@ -8,7 +8,7 @@
 #ifndef PYTHONCONFIGURATION_H 
 #define PYTHONCONFIGURATION_H
 
-#include "config/Configuration.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace python {

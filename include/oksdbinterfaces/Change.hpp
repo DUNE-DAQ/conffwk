@@ -5,8 +5,8 @@
    *  \brief describe database changes
    */
 
-#ifndef CONFIG_CONFIGURATION__CHANGE_H_
-#define CONFIG_CONFIGURATION__CHANGE_H_
+#ifndef OKSDB_INTERFACE_CONFIGURATION__CHANGE_H_
+#define OKSDB_INTERFACE_CONFIGURATION__CHANGE_H_
 
 #include <string>
 #include <vector>
@@ -118,4 +118,4 @@ std::ostream& operator<<(std::ostream&, const ConfigurationChange&);
 
 std::ostream& operator<<(std::ostream&, const std::vector<ConfigurationChange *>&);
 
-#endif // CONFIG_CONFIGURATION__CHANGE_H_
+#endif // OKSDB_INTERFACE_CONFIGURATION__CHANGE_H_

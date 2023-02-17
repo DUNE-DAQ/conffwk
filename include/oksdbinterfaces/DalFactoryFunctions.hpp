@@ -19,7 +19,7 @@ class CacheBase;
  *  It is used by the referenced_by() method returning DAL object.
  *
  *  \param db    reference on configuration
- *  \param obj   config object
+ *  \param obj   oksdbinterfaces object
  *  \param uid   uid for generated objects
  *  \return      the DAL object
  */

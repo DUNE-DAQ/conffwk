@@ -1,19 +1,19 @@
   /**
    *  \file ConfigObjectImpl.h This file contains abstract ConfigObjectImpl class,
-   *  that is used to implement config objects.
+   *  that is used to implement oksdbinterfaces objects.
    *  \author Igor Soloviev
    *  \brief abstract ConfigObject implementation
    */
 
-#ifndef CONFIG_CONFIGOBJECTIMPL_H_
-#define CONFIG_CONFIGOBJECTIMPL_H_
+#ifndef OKSDB_INTERFACE_CONFIGOBJECTIMPL_H_
+#define OKSDB_INTERFACE_CONFIGOBJECTIMPL_H_
 
 #include <string>
 #include <vector>
 #include <iostream>
 #include <stdint.h>
 
-#include "config/Errors.hpp"
+#include "oksdbinterfaces/Errors.hpp"
 
 class ConfigObject;
 class Configuration;
@@ -22,7 +22,7 @@ class DalObject;
 
 namespace dunedaq
 {
-  namespace config
+  namespace oksdbinterfaces
   {
 
     /** Possible states of configuration objects. */
@@ -45,7 +45,7 @@ namespace dunedaq
    *  it is necessary to derive new class from ConfigObjectImpl
    *  and to implement all virtual methods.
    *
-   *  The methods may throw dunedaq::config::Generic exception in case of an error
+   *  The methods may throw dunedaq::oksdbinterfaces::Generic exception in case of an error
    *  unless \b noexcept is explicitly used in their specification.
    */
 
@@ -60,7 +60,7 @@ class ConfigObjectImpl {
   public:
 
       /// The constructor stores configuration implementation pointer
-    ConfigObjectImpl(ConfigurationImpl * impl, const std::string& id, dunedaq::config::ObjectState state = dunedaq::config::Valid) noexcept;
+    ConfigObjectImpl(ConfigurationImpl * impl, const std::string& id, dunedaq::oksdbinterfaces::ObjectState state = dunedaq::oksdbinterfaces::Valid) noexcept;
 
       /// The virtual destructor
     virtual ~ConfigObjectImpl() noexcept;
@@ -177,7 +177,7 @@ class ConfigObjectImpl {
       /// Virtual method to read vector-of-strings attribute value
     virtual void get(const std::string& attribute, std::vector<std::string>& value) = 0;
 
-      /// Virtual method to read vector-of-config-objects relationship value
+      /// Virtual method to read vector-of-oksdbinterfaces-objects relationship value
     virtual void get(const std::string& association, std::vector<ConfigObject>& value) = 0;
 
 
@@ -186,7 +186,7 @@ class ConfigObjectImpl {
       /// Virtual method to read any relationship value without throwing an exception if there is no such relationship (return false)
     virtual bool rel(const std::string& name, std::vector<ConfigObject>& value) = 0;
 
-      /// Virtual method to read vector-of-config-object referencing this object
+      /// Virtual method to read vector-of-oksdbinterfaces-object referencing this object
     virtual void referenced_by(std::vector<ConfigObject>& value, const std::string& association, bool check_composite_only, unsigned long rlevel, const std::vector<std::string> * rclasses) const = 0;
 
 
@@ -291,10 +291,10 @@ class ConfigObjectImpl {
       /// Virtual method to read vector-of-times attribute value
     virtual void set_time(const std::string& attribute, const std::vector<std::string>& value) = 0;
 
-      /// Virtual method to read config-object relationship  value
+      /// Virtual method to read oksdbinterfaces-object relationship  value
     virtual void set(const std::string& association, const ConfigObject * value, bool skip_non_null_check) = 0;
 
-      /// Virtual method to read vector-of-config-objects relationship value
+      /// Virtual method to read vector-of-oksdbinterfaces-objects relationship value
     virtual void set(const std::string& association, const std::vector<const ConfigObject*>& value, bool skip_non_null_check) = 0;
 
       /// Virtual method to move object to a file
@@ -313,19 +313,19 @@ class ConfigObjectImpl {
     bool
     is_deleted() const
     {
-      if (m_state == dunedaq::config::Unknown)
+      if (m_state == dunedaq::oksdbinterfaces::Unknown)
         {
           const_cast<ConfigObjectImpl *>(this)->reset();
         }
 
-      return (m_state == dunedaq::config::Deleted);
+      return (m_state == dunedaq::oksdbinterfaces::Deleted);
     }
 
 
   protected:
 
     ConfigurationImpl * m_impl;               /*!< Pointer to configuration implementation object */
-    dunedaq::config::ObjectState m_state;         /*!< State of the object */
+    dunedaq::oksdbinterfaces::ObjectState m_state;         /*!< State of the object */
     std::string m_id;                         /*!< Object ID */
     const std::string * m_class_name;         /*!< Name of object's class */
     mutable std::mutex m_mutex;               /*!< Mutex protecting concurrent access to this object */
@@ -335,14 +335,14 @@ class ConfigObjectImpl {
 
     /**
      * Check state of object and throw exception if it has been deleted
-     * \throw dunedaq::config::DeletedObject if the object has been deleted
+     * \throw dunedaq::oksdbinterfaces::DeletedObject if the object has been deleted
      */
     void
     throw_if_deleted() const
     {
       if (is_deleted())
         {
-          throw dunedaq::config::DeletedObject(ERS_HERE, m_class_name->c_str(), m_id.c_str());
+          throw dunedaq::oksdbinterfaces::DeletedObject(ERS_HERE, m_class_name->c_str(), m_id.c_str());
         }
     }
 
@@ -382,4 +382,4 @@ class ConfigObjectImpl {
 };
 
 
-#endif // CONFIG_CONFIGOBJECTIMPL_H_
+#endif // OKSDB_INTERFACE_CONFIGOBJECTIMPL_H_

@@ -1,5 +1,5 @@
-#include "config/SubscriptionCriteria.hpp"
-#include "config/DalObject.hpp"
+#include "oksdbinterfaces/SubscriptionCriteria.hpp"
+#include "oksdbinterfaces/DalObject.hpp"
 
 void
 ConfigurationSubscriptionCriteria::add(const std::string& class_name)

@@ -1,11 +1,11 @@
-#ifndef CONFIG_MAP_H_
-#define CONFIG_MAP_H_
+#ifndef OKSDB_INTERFACE_MAP_H_
+#define OKSDB_INTERFACE_MAP_H_
 
-#include "config/string_ptr.hpp"
+#include "oksdbinterfaces/string_ptr.hpp"
 #include <unordered_map>
 
 
-namespace config
+namespace oksdbinterfaces
 {
   template<class T>
     class map : public std::unordered_map<std::string, T>
@@ -50,4 +50,4 @@ namespace config
     };
 }
 
-#endif // CONFIG_MAP_H_
+#endif // OKSDB_INTERFACE_MAP_H_

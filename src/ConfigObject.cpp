@@ -1,11 +1,11 @@
 #include <vector>
 #include <iostream>
 
-#include "config/Configuration.hpp"
-#include "config/ConfigurationImpl.hpp"
-#include "config/ConfigObject.hpp"
-#include "config/ConfigObjectImpl.hpp"
-#include "config/Schema.hpp"
+#include "oksdbinterfaces/Configuration.hpp"
+#include "oksdbinterfaces/ConfigurationImpl.hpp"
+#include "oksdbinterfaces/ConfigObject.hpp"
+#include "oksdbinterfaces/ConfigObjectImpl.hpp"
+#include "oksdbinterfaces/Schema.hpp"
 
 ConfigObject::ConfigObject() noexcept :
   m_impl(nullptr)
@@ -188,9 +188,9 @@ is_null_obj(const ConfigObject * o)
 }
 
 void
-ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::string& prefix, bool show_contained_in) const noexcept
+ConfigObject::print_ref(std::ostream& s, ::Configuration& oksdbinterfaces, const std::string& prefix, bool show_contained_in) const noexcept
 {
-  static bool expand_aggregation = (getenv("TDAQ_CONFIG_PRINT_EXPAND_AGGREGATIONS")); // FIXME tdaq-09-05-00 => add new parameter to config and add fuse
+  static bool expand_aggregation = (getenv("TDAQ_OKSDB_INTERFACE_PRINT_EXPAND_AGGREGATIONS")); // FIXME tdaq-09-05-00 => add new parameter to oksdbinterfaces and add fuse
 
   // check if it is not a reference to 0
   if (is_null_obj(this))
@@ -209,7 +209,7 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
 
   try
     {
-      const dunedaq::config::class_t& cd(config.get_class_info(class_name()));
+      const dunedaq::oksdbinterfaces::class_t& cd(oksdbinterfaces.get_class_info(class_name()));
 
       // print attributes
       for (const auto& i : cd.p_attributes)
@@ -221,23 +221,23 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
 
           switch (i.p_type)
             {
-              case dunedaq::config::string_type :
-              case dunedaq::config::enum_type :
-              case dunedaq::config::date_type :
-              case dunedaq::config::time_type :
-              case dunedaq::config::class_type :
+              case dunedaq::oksdbinterfaces::string_type :
+              case dunedaq::oksdbinterfaces::enum_type :
+              case dunedaq::oksdbinterfaces::date_type :
+              case dunedaq::oksdbinterfaces::time_type :
+              case dunedaq::oksdbinterfaces::class_type :
                                              print_value<std::string>(*this, aname, ismv, '\"', s); break;
-              case dunedaq::config::bool_type:   print_value<bool>(*this, aname, ismv, 0, s);           break;
-              case dunedaq::config::u8_type:     print_value<uint8_t>(*this, aname, ismv, 0, s);        break;
-              case dunedaq::config::s8_type:     print_value<int8_t>(*this, aname, ismv, 0, s);         break;
-              case dunedaq::config::u16_type:    print_value<uint16_t>(*this, aname, ismv, 0, s);       break;
-              case dunedaq::config::s16_type:    print_value<int16_t>(*this, aname, ismv, 0, s);        break;
-              case dunedaq::config::u32_type:    print_value<uint32_t>(*this, aname, ismv, 0, s);       break;
-              case dunedaq::config::s32_type:    print_value<int32_t>(*this, aname, ismv, 0, s);        break;
-              case dunedaq::config::u64_type:    print_value<uint64_t>(*this, aname, ismv, 0, s);       break;
-              case dunedaq::config::s64_type:    print_value<int64_t>(*this, aname, ismv, 0, s);        break;
-              case dunedaq::config::float_type:  print_value<float>(*this, aname, ismv, 0, s);          break;
-              case dunedaq::config::double_type: print_value<double>(*this, aname, ismv, 0, s);         break;
+              case dunedaq::oksdbinterfaces::bool_type:   print_value<bool>(*this, aname, ismv, 0, s);           break;
+              case dunedaq::oksdbinterfaces::u8_type:     print_value<uint8_t>(*this, aname, ismv, 0, s);        break;
+              case dunedaq::oksdbinterfaces::s8_type:     print_value<int8_t>(*this, aname, ismv, 0, s);         break;
+              case dunedaq::oksdbinterfaces::u16_type:    print_value<uint16_t>(*this, aname, ismv, 0, s);       break;
+              case dunedaq::oksdbinterfaces::s16_type:    print_value<int16_t>(*this, aname, ismv, 0, s);        break;
+              case dunedaq::oksdbinterfaces::u32_type:    print_value<uint32_t>(*this, aname, ismv, 0, s);       break;
+              case dunedaq::oksdbinterfaces::s32_type:    print_value<int32_t>(*this, aname, ismv, 0, s);        break;
+              case dunedaq::oksdbinterfaces::u64_type:    print_value<uint64_t>(*this, aname, ismv, 0, s);       break;
+              case dunedaq::oksdbinterfaces::s64_type:    print_value<int64_t>(*this, aname, ismv, 0, s);        break;
+              case dunedaq::oksdbinterfaces::float_type:  print_value<float>(*this, aname, ismv, 0, s);          break;
+              case dunedaq::oksdbinterfaces::double_type: print_value<double>(*this, aname, ismv, 0, s);         break;
               default:                       s << "*** bad type ***";
             }
 
@@ -251,7 +251,7 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
           if (expand_aggregation == false || i.p_is_aggregation == false)
             {
               s << ' ';
-              print_value<ConfigObject>(*this, i.p_name, (i.p_cardinality == dunedaq::config::zero_or_many) || (i.p_cardinality == dunedaq::config::one_or_many), '\"', s);
+              print_value<ConfigObject>(*this, i.p_name, (i.p_cardinality == dunedaq::oksdbinterfaces::zero_or_many) || (i.p_cardinality == dunedaq::oksdbinterfaces::one_or_many), '\"', s);
               s << std::endl;
             }
           else
@@ -259,7 +259,7 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
               s << std::endl;
               std::string prefix2(prefix + "    ");
               ConfigObject& obj = const_cast<ConfigObject&>(*this);
-              if ((i.p_cardinality == dunedaq::config::zero_or_many) || (i.p_cardinality == dunedaq::config::one_or_many))
+              if ((i.p_cardinality == dunedaq::oksdbinterfaces::zero_or_many) || (i.p_cardinality == dunedaq::oksdbinterfaces::one_or_many))
                 {
                   std::vector<ConfigObject> value;
                   obj.get(i.p_name, value);
@@ -267,7 +267,7 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
                     s << prefix2 << "(null)\n";
                   else
                     for (const auto& x : value)
-                      x.print_ref(s, config, prefix2, show_contained_in);
+                      x.print_ref(s, oksdbinterfaces, prefix2, show_contained_in);
                 }
               else
                 {
@@ -276,14 +276,14 @@ ConfigObject::print_ref(std::ostream& s, ::Configuration& config, const std::str
                   if (value.is_null())
                     s << prefix2 << "(null)\n";
                   else
-                    value.print_ref(s, config, prefix2, show_contained_in);
+                    value.print_ref(s, oksdbinterfaces, prefix2, show_contained_in);
                 }
             }
         }
     }
-  catch (dunedaq::config::Exception& ex)
+  catch (dunedaq::oksdbinterfaces::Exception& ex)
     {
-      s << "cannot get schema description: caught dunedaq::config::Exception exception" << std::endl;
+      s << "cannot get schema description: caught dunedaq::oksdbinterfaces::Exception exception" << std::endl;
       std::cerr << "ERROR: " << ex << std::endl;
     }
 

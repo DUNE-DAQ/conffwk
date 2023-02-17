@@ -1,12 +1,12 @@
   /**
    *  \file Errors.h This file contains exception classes,
-   *  which can be thrown by methods of config packages.
+   *  which can be thrown by methods of oksdbinterfaces packages.
    *  \author Igor Soloviev
-   *  \brief exceptions of methods of config packages
+   *  \brief exceptions of methods of oksdbinterfaces packages
    */
 
-#ifndef CONFIG_ERRORS_H_
-#define CONFIG_ERRORS_H_
+#ifndef OKSDB_INTERFACE_ERRORS_H_
+#define OKSDB_INTERFACE_ERRORS_H_
 
 #include "ers/Issue.hpp"
 
@@ -14,39 +14,39 @@
 namespace dunedaq {
 
     /**
-     * \class dunedaq::config::Exception
-     * \brief Base class for all \b config exceptions
+     * \class dunedaq::oksdbinterfaces::Exception
+     * \brief Base class for all \b oksdbinterfaces exceptions
      *
-     *	This exception normally should be caught when any config method is used.
+     *	This exception normally should be caught when any oksdbinterfaces method is used.
 \code   
 try {
   Configuration db(...);
   ... // any user code working with db
 }
-catch (dunedaq::config::Exception & ex) {
-    // throw some user-defined exception in case of config exception
-  throw ers::error(user::exception(ERS_HERE, "config database problem", ex));
+catch (dunedaq::oksdbinterfaces::Exception & ex) {
+    // throw some user-defined exception in case of oksdbinterfaces exception
+  throw ers::error(user::exception(ERS_HERE, "oksdbinterfaces database problem", ex));
 }
 \endcode
      */
 
-  ERS_DECLARE_ISSUE_HPP( config, Exception, , )
+  ERS_DECLARE_ISSUE_HPP( oksdbinterfaces, Exception, , )
 
 
     /**
-     * \class dunedaq::config::Generic
+     * \class dunedaq::oksdbinterfaces::Generic
      * \brief Generic configuration exception.
      *
-     *	It reports most of the config problems, such as:
+     *	It reports most of the oksdbinterfaces problems, such as:
      *  - bad database,
      *  - wrong parameter,
      *  - plug-in specific problems
      */
 
   ERS_DECLARE_ISSUE_BASE_HPP(
-    config,
+    oksdbinterfaces,
     Generic,
-    config::Exception,
+    oksdbinterfaces::Exception,
     ,
     ,
     ((const char*)what)
@@ -54,17 +54,17 @@ catch (dunedaq::config::Exception & ex) {
 
 
     /**
-     * \class dunedaq::config::NotFound
+     * \class dunedaq::oksdbinterfaces::NotFound
      * \brief Try to access non-existent object or class.
      *
-     *	It is thrown if a config object accessed by ID is not found,
+     *	It is thrown if a oksdbinterfaces object accessed by ID is not found,
      *  or a class accessed by name is not found.
      */
 
   ERS_DECLARE_ISSUE_BASE_HPP(
-    config,
+    oksdbinterfaces,
     NotFound,
-    config::Exception,
+    oksdbinterfaces::Exception,
     ,
     ,
     ((const char*)type)
@@ -72,7 +72,7 @@ catch (dunedaq::config::Exception & ex) {
   )
 
     /**
-     * \class dunedaq::config::DeletedObject
+     * \class dunedaq::oksdbinterfaces::DeletedObject
      * \brief Try to access deleted DAL object.
      *
      *	It is thrown when a deleted DAL template object is accessed.
@@ -81,9 +81,9 @@ catch (dunedaq::config::Exception & ex) {
      */
 
   ERS_DECLARE_ISSUE_BASE_HPP(
-    config,
+    oksdbinterfaces,
     DeletedObject,
-    config::Exception,
+    oksdbinterfaces::Exception,
     ,
     ,
     ((const char*)class_name)

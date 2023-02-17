@@ -8,10 +8,10 @@
 Necessary to give the user a more pythonic experience than dealing with
 std::vector objects and memory management.
 """
-#import libpyconfig
+#import libpyoksdbinterfaces
 import logging
 from . import dalproperty
-from ._daq_config_py import _ConfigObject
+from ._daq_oksdbinterfaces_py import _ConfigObject
 from .proxy import _DelegateMetaFunction
 
 class _ConfigObjectProxy(object,
@@ -32,7 +32,7 @@ class ConfigObject(_ConfigObjectProxy):
         import sys
         sys.setrecursionlimit(10000) # for example
 
-        raw_object -- This is the libpyconfig.ConfigObject to initialize this
+        raw_object -- This is the libpyoksdbinterfaces.ConfigObject to initialize this
         object from.
 
         schema -- A pointer to the overall schema from the Configuration
@@ -98,7 +98,7 @@ class ConfigObject(_ConfigObjectProxy):
                        (name, self.class_name()))
 
     def __eq__(self, other):
-        """True is the 2 objects have the same class and ID and config database
+        """True is the 2 objects have the same class and ID and oksdbinterfaces database
         """
         return (self.class_name() == other.class_name()) and \
                (self.UID() == other.UID())
@@ -108,7 +108,7 @@ class ConfigObject(_ConfigObjectProxy):
         return not (self == other)
 
     def __hash__(self):
-        """True is the 2 objects have the same class and ID and config database
+        """True is the 2 objects have the same class and ID and oksdbinterfaces database
         """
         return hash(self.full_name())
 
@@ -277,7 +277,7 @@ class ConfigObject(_ConfigObjectProxy):
         """
 
         # the C++ implementation of set_obj wants
-        # a libpyconfig.ConfigObject instance. So
+        # a libpyoksdbinterfaces.ConfigObject instance. So
         # we have to extract it from our proxy
 
         if value is not None:
@@ -291,7 +291,7 @@ class ConfigObject(_ConfigObjectProxy):
         """
 
         # the C++ implementation of set_objs wants
-        # a libpyconfig.ConfigObject instances. So
+        # a libpyoksdbinterfaces.ConfigObject instances. So
         # we have to extract them from our proxy
 
         if value is not None:

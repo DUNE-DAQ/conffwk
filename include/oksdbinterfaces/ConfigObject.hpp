@@ -1,12 +1,12 @@
   /**
    *  \file ConfigObject.h This file contains ConfigObject class,
-   *  that is used to represent config objects.
+   *  that is used to represent oksdbinterfaces objects.
    *  \author Igor Soloviev
-   *  \brief config object class
+   *  \brief oksdbinterfaces object class
    */
 
-#ifndef CONFIG_CONFIGOBJECT_H_
-#define CONFIG_CONFIGOBJECT_H_
+#ifndef OKSDB_INTERFACE_CONFIGOBJECT_H_
+#define OKSDB_INTERFACE_CONFIGOBJECT_H_
 
 #include <string>
 #include <vector>
@@ -14,8 +14,8 @@
 
 #include <mutex>
 
-#include "config/ConfigObjectImpl.hpp"
-#include "config/Errors.hpp"
+#include "oksdbinterfaces/ConfigObjectImpl.hpp"
+#include "oksdbinterfaces/Errors.hpp"
 
 class Configuration;
 
@@ -255,7 +255,7 @@ class ConfigObject {
 
      /**
       *  \brief Return the name of the database file this object belongs to.
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     const std::string contained_in() const
@@ -284,7 +284,7 @@ class ConfigObject {
       *  \param name   name of attribute or relationship
       *  \param value  type of attribute or relationship
       *
-      *  \throw dunedaq::config::Exception in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Exception in case of an error
       */
 
     template<class T> void get(const std::string& name, T& value) {
@@ -302,7 +302,7 @@ class ConfigObject {
       *  \param value  returned value of relationship
       *  \return true if there is such relationship and false otherwise
       *
-      *  \throw dunedaq::config::Exception in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Exception in case of an error
       */
 
     bool
@@ -333,7 +333,7 @@ class ConfigObject {
       *  \param rlevel                optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache)
       *  \param rclasses              optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void referenced_by(std::vector<ConfigObject>& value,
@@ -355,7 +355,7 @@ class ConfigObject {
       *  \param o                     pointer to object
       *  \param skip_non_null_check   if true, ignore low cardinality constraint
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_obj(const std::string& name, const ::ConfigObject * o, bool skip_non_null_check = false) {
@@ -368,10 +368,10 @@ class ConfigObject {
       *  \brief Set relationship multi-value.
       *
       *  \param name                  name of relationship
-      *  \param o                     vector of pointers on config object
+      *  \param o                     vector of pointers on oksdbinterfaces object
       *  \param skip_non_null_check   if true, ignore low cardinality constraint
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_objs(const std::string& name, const std::vector<const ::ConfigObject*> & o, bool skip_non_null_check = false) {
@@ -397,7 +397,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  type of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     template<class T> void set_by_val(const std::string& name, T value) {
@@ -418,7 +418,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  type of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     template<class T> void set_by_ref(const std::string& name, T& value) {
@@ -435,7 +435,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_enum(const std::string& name, const std::string& value) {
@@ -452,7 +452,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_class(const std::string& name, const std::string& value) {
@@ -469,7 +469,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_date(const std::string& name, const std::string& value) {
@@ -486,7 +486,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_time(const std::string& name, const std::string& value) {
@@ -503,7 +503,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_enum(const std::string& name, const std::vector<std::string>& value) {
@@ -520,7 +520,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_class(const std::string& name, const std::vector<std::string>& value) {
@@ -537,7 +537,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_date(const std::string& name, const std::vector<std::string>& value) {
@@ -554,7 +554,7 @@ class ConfigObject {
       *  \param name   name of attribute
       *  \param value  value of attribute
       *
-      *  \throw dunedaq::config::Generic in case of an error
+      *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
     void set_time(const std::string& name, const std::vector<std::string>& value) {
@@ -570,7 +570,7 @@ class ConfigObject {
      *
      *  \param at name of database file
      *
-     *  \throw dunedaq::config::Generic in case of an error
+     *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
      */
 
     void move(const std::string& at) {
@@ -585,7 +585,7 @@ class ConfigObject {
      *
      *  \param new_id new object ID
      *
-     *  \throw dunedaq::config::Generic in case of an error
+     *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
      */
 
     void
@@ -639,13 +639,13 @@ class ConfigObject {
 };
 
 
-  /** Operator to print pointer on config object in 'obj-id\@class-name' format **/
+  /** Operator to print pointer on oksdbinterfaces object in 'obj-id\@class-name' format **/
 
 std::ostream& operator<<(std::ostream&, const ConfigObject *);
 
 
-  /** Operator to print reference on config object in 'obj-id\@class-name' format **/
+  /** Operator to print reference on oksdbinterfaces object in 'obj-id\@class-name' format **/
 
 std::ostream& operator<<(std::ostream&, const ConfigObject &);
 
-#endif // CONFIG_CONFIGOBJECT_H_
+#endif // OKSDB_INTERFACE_CONFIGOBJECT_H_
