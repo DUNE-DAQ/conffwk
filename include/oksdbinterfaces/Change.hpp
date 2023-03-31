@@ -12,6 +12,8 @@
 #include <vector>
 #include <iostream>
 
+namespace dunedaq {
+namespace oksdbinterfaces {
 
   /**
    *  \brief Describes changes inside a class returned by the notification mechanism.
@@ -117,5 +119,8 @@ std::ostream& operator<<(std::ostream&, const ConfigurationChange&);
   /** Operator prints out to stream details of all configuration changes. **/
 
 std::ostream& operator<<(std::ostream&, const std::vector<ConfigurationChange *>&);
+
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif // OKSDB_INTERFACE_CONFIGURATION__CHANGE_H_

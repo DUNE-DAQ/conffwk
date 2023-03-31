@@ -4,7 +4,7 @@
 #include "oksdbinterfaces/string_ptr.hpp"
 #include <unordered_map>
 
-
+namespace dunedaq {
 namespace oksdbinterfaces
 {
   template<class T>
@@ -48,6 +48,7 @@ namespace oksdbinterfaces
         ;
       }
     };
-}
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif // OKSDB_INTERFACE_MAP_H_

@@ -17,6 +17,9 @@
 #include "oksdbinterfaces/ConfigObjectImpl.hpp"
 #include "oksdbinterfaces/Errors.hpp"
 
+namespace dunedaq {
+namespace oksdbinterfaces {
+
 class Configuration;
 
   /**
@@ -358,7 +361,7 @@ class ConfigObject {
       *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
-    void set_obj(const std::string& name, const ::ConfigObject * o, bool skip_non_null_check = false) {
+    void set_obj(const std::string& name, const ConfigObject * o, bool skip_non_null_check = false) {
       m_impl->set(name, o, skip_non_null_check);
       action_on_object_update(get_configuration(), name);
     }
@@ -374,7 +377,7 @@ class ConfigObject {
       *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
       */
 
-    void set_objs(const std::string& name, const std::vector<const ::ConfigObject*> & o, bool skip_non_null_check = false) {
+    void set_objs(const std::string& name, const std::vector<const ConfigObject*> & o, bool skip_non_null_check = false) {
       m_impl->set(name, o, skip_non_null_check);
       action_on_object_update(get_configuration(), name);
     }
@@ -605,7 +608,7 @@ class ConfigObject {
 
     void print_ref(
       std::ostream& s,                 /*!< the output stream */
-      ::Configuration & conf,          /*!< the configuration object (required to read schema description) */
+      Configuration & conf,          /*!< the configuration object (required to read schema description) */
       const std::string& prefix = "",  /*!< optional shift output using prefix */
       bool show_contained_in = false   /*!< optional print out info about object database file */
     ) const noexcept;
@@ -647,5 +650,8 @@ std::ostream& operator<<(std::ostream&, const ConfigObject *);
   /** Operator to print reference on oksdbinterfaces object in 'obj-id\@class-name' format **/
 
 std::ostream& operator<<(std::ostream&, const ConfigObject &);
+
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif // OKSDB_INTERFACE_CONFIGOBJECT_H_

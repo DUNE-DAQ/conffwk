@@ -11,6 +11,9 @@
 #include "oksdbinterfaces/Configuration.hpp"
 #include <boost/shared_ptr.hpp>
 
+namespace dunedaq {
+namespace oksdbinterfaces {
+
 namespace python {
 
   /**
@@ -65,6 +68,8 @@ namespace python {
   };
 
 }
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif /* PYTHONCONFIGURATION_H */
 

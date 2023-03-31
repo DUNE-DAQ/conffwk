@@ -3,6 +3,7 @@
 
 #include <string>
 
+namespace dunedaq {
 namespace oksdbinterfaces
 {
   struct string_ptr_compare {
@@ -18,6 +19,6 @@ namespace oksdbinterfaces
       return reinterpret_cast<size_t>(x);
     }
   };
-}
-
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 #endif // OKSDB_INTERFACE_STRING_PTR_H_

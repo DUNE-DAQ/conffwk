@@ -15,25 +15,21 @@
 
 #include "oksdbinterfaces/Errors.hpp"
 
+namespace dunedaq {
+namespace oksdbinterfaces {
+
 class ConfigObject;
 class Configuration;
 class ConfigurationImpl;
 class DalObject;
 
-namespace dunedaq
-{
-  namespace oksdbinterfaces
+  /** Possible states of configuration objects. */
+  enum ObjectState
   {
-
-    /** Possible states of configuration objects. */
-    enum ObjectState
-    {
-      Valid,           /*!< the object is valid */
-      Deleted,         /*!< the object was deleted and may not be accessed */
-      Unknown          /*!< the state of object i unknown (e.g. after abort) */
-    };
-  }
-}
+    Valid,           /*!< the object is valid */
+    Deleted,         /*!< the object was deleted and may not be accessed */
+    Unknown          /*!< the state of object i unknown (e.g. after abort) */
+  };
 
   /**
    *  \brief Implements database objects.
@@ -381,5 +377,7 @@ class ConfigObjectImpl {
 
 };
 
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif // OKSDB_INTERFACE_CONFIGOBJECTIMPL_H_

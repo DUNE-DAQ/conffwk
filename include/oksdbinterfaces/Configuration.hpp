@@ -33,16 +33,15 @@
 #include "oksdbinterfaces/map.hpp"
 #include "oksdbinterfaces/set.hpp"
 
+namespace dunedaq {
+namespace oksdbinterfaces {
 class DalObject;
 class ConfigAction;
 class ConfigurationImpl;
 class ConfigurationChange;
 
-namespace dunedaq {
-  namespace oksdbinterfaces {
-    struct class_t;
-  }
-}
+
+struct class_t;
 
 class Configuration;
 
@@ -71,7 +70,7 @@ protected:
   /** Method for configuration profiling */
 
   void
-  increment_gets(::Configuration& db) noexcept;
+  increment_gets(Configuration& db) noexcept;
 
   virtual
   ~CacheBase() noexcept
@@ -205,7 +204,7 @@ catch (dunedaq::oksdbinterfaces::Exception & ex) {
    *  \par Notification
    *
    *  To subscribe and unsubscribe on changes it is necessary to create a subscription criteria
-   *  (see ::ConfigurationSubscriptionCriteria class for more information).
+   *  (see ConfigurationSubscriptionCriteria class for more information).
    *  When a subscription criteria object is created, the following methods can be used:
    *  - subscribe() subscribe on any changes according criteria
    *  - unsubscribe() unsubscribe above changes (the CallbackId is returned by above method)
@@ -340,7 +339,7 @@ class Configuration {
        *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
        */
 
-    CallbackId subscribe(const ::ConfigurationSubscriptionCriteria& criteria, notify user_cb, void * user_param = nullptr);
+    CallbackId subscribe(const ConfigurationSubscriptionCriteria& criteria, notify user_cb, void * user_param = nullptr);
 
 
       /**
@@ -348,7 +347,7 @@ class Configuration {
        *
        *  The method is used to make complimentary subscription on pre-notification about changes,
        *  that can only be used together with real subscription on changes, i.e. using
-       *  subscribe(const ::ConfigurationSubscriptionCriteria&, notify, void *) method.
+       *  subscribe(const ConfigurationSubscriptionCriteria&, notify, void *) method.
        *
        *  When subscribed changes occurred, but before they are going to be applied,
        *  the user callback function is invoked with parameter 'user_param' defined by user.
@@ -618,7 +617,7 @@ class Configuration {
        *  \throw dunedaq::oksdbinterfaces::Generic in case of an error
        */
 
-    template<class T> const T * create(const ::DalObject& at, const std::string& id, bool init_object = false);
+    template<class T> const T * create(const DalObject& at, const std::string& id, bool init_object = false);
 
 
       /**
@@ -1036,12 +1035,12 @@ class Configuration {
 
       /** Helper method to prepare exception text when template ref() method fails **/
 
-    static std::string mk_ref_ex_text(const char * what, const std::string& cname, const std::string& rname, const ::ConfigObject& obj) noexcept;
+    static std::string mk_ref_ex_text(const char * what, const std::string& cname, const std::string& rname, const ConfigObject& obj) noexcept;
 
 
       /** Helper method to prepare exception text when template referenced_by() method fails **/
 
-    static std::string mk_ref_by_ex_text(const std::string& cname, const std::string& rname, const ::ConfigObject& obj) noexcept;
+    static std::string mk_ref_by_ex_text(const std::string& cname, const std::string& rname, const ConfigObject& obj) noexcept;
 
 
     // database manipulations
@@ -1790,7 +1789,7 @@ template<class T>
   const T *
   Configuration::_ref(ConfigObject& obj, const std::string& name, bool read_children)
   {
-    ::ConfigObject res;
+    ConfigObject res;
 
     try
       {
@@ -1875,7 +1874,8 @@ template<class T>
 
 template<class T>
   T *
-  Configuration::Cache<T>::get(Configuration& oksdbinterfaces, ConfigObject& obj, bool init_children, bool init_object)
+Configuration::Cache<T>::get(Configuration& oksdbinterfaces,
+                             ConfigObject& obj, bool init_children, bool init_object)
   {
     T*& result(m_cache[obj.m_impl->m_id]);
     if (result == nullptr)
@@ -2094,10 +2094,12 @@ template<class T>
   }
 
 inline void
-CacheBase::increment_gets(::Configuration& db) noexcept
+CacheBase::increment_gets(Configuration& db) noexcept
 {
   ++db.p_number_of_cache_hits;
 }
 
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif // OKSDB_INTERFACE_CONFIGURATION_H_

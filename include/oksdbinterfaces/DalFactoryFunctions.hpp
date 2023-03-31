@@ -6,6 +6,10 @@
 
 #include <boost/compute/functional/identity.hpp>
 
+namespace dunedaq {
+namespace oksdbinterfaces {
+
+
 class Configuration;
 class ConfigObject;
 class ConfigurationChange;
@@ -78,5 +82,7 @@ struct DalFactoryFunctions
   template<class T>
     DalFactoryFunctions(boost::compute::identity<T>, const std::set<std::string> algorithms);
 };
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif

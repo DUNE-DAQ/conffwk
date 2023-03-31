@@ -10,6 +10,7 @@
 
 #include "oksdbinterfaces/Configuration.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
 
 int
 main(int argc, char *argv[])

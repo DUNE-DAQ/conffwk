@@ -12,6 +12,9 @@
 
 #include "logging/Logging.hpp"
 
+namespace dunedaq {
+namespace oksdbinterfaces {
+
 class DalFactory
 {
 
@@ -98,5 +101,8 @@ private:
   std::mutex m_known_class_mutex;
   oksdbinterfaces::set m_known_classes;
 };
+
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif

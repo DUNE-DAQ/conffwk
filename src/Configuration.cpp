@@ -52,8 +52,8 @@ namespace dunedaq {
     ((const char*)object_id)
   )
 
-}
 
+namespace oksdbinterfaces {
 
 template <typename T> static T* get_new(ConfigObject& co,
 					const std::string& attrname) {
@@ -1156,7 +1156,7 @@ Configuration::find_callback(CallbackId cb_handler) const
 
 
 Configuration::CallbackId
-Configuration::subscribe(const ::ConfigurationSubscriptionCriteria& criteria, notify user_cb, void * parameter)
+Configuration::subscribe(const ConfigurationSubscriptionCriteria& criteria, notify user_cb, void * parameter)
 {
   // check if there is no subscription function provided
 
@@ -1167,7 +1167,7 @@ Configuration::subscribe(const ::ConfigurationSubscriptionCriteria& criteria, no
 
   // create callback subscription structure
 
-  ::Configuration::CallbackSubscription * cs = new CallbackSubscription();
+  Configuration::CallbackSubscription * cs = new CallbackSubscription();
 
   cs->m_criteria = criteria;
   cs->m_cb = user_cb;
@@ -1278,7 +1278,7 @@ Configuration::reset_subscription()
 
   // prepare subscription criteria
 
-  ::ConfigurationSubscriptionCriteria::ObjectMap obj_subscriptions;
+  ConfigurationSubscriptionCriteria::ObjectMap obj_subscriptions;
   std::set<std::string> class_subscriptions;
 
   // among existing subscriptions find one who has all subscriptions
@@ -1574,7 +1574,7 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
                   const std::string &cname = i->get_class_name();
                   ConfigurationChange *class_changes = nullptr;
 
-                  ::ConfigurationSubscriptionCriteria::ObjectMap::const_iterator p = j->m_criteria.get_objects_subscription().find(cname);
+                  ConfigurationSubscriptionCriteria::ObjectMap::const_iterator p = j->m_criteria.get_objects_subscription().find(cname);
                   const bool found_obj_subscription(p != j->m_criteria.get_objects_subscription().end());
                   const bool found_class_subscription(j->m_criteria.get_classes_subscription().find(cname) != j->m_criteria.get_classes_subscription().end());
 
@@ -1817,7 +1817,7 @@ operator<<(std::ostream& s, const DalObject * obj)
 }
 
 std::string
-Configuration::mk_ref_ex_text(const char * what, const std::string& cname, const std::string& rname, const ::ConfigObject& obj) noexcept
+Configuration::mk_ref_ex_text(const char * what, const std::string& cname, const std::string& rname, const ConfigObject& obj) noexcept
 {
   std::ostringstream text;
   text << "failed to get " << what << " of class \'" << cname << "\' via relationship \'" << rname << "\' of object \'" << obj << '\'';
@@ -1826,7 +1826,7 @@ Configuration::mk_ref_ex_text(const char * what, const std::string& cname, const
 
 
 std::string
-Configuration::mk_ref_by_ex_text(const std::string& cname, const std::string& rname, const ::ConfigObject& obj) noexcept
+Configuration::mk_ref_by_ex_text(const std::string& cname, const std::string& rname, const ConfigObject& obj) noexcept
 {
   std::ostringstream text;
   text << "failed to get objects of class \'" << cname << "\' referencing object \'" << obj << "\' via relationship \'" << rname << '\'';
@@ -2148,3 +2148,6 @@ DalFactory::functions(const std::string& name) const
 
   return it->second;
 }
+
+} // namespace oksdbinterfaces
+} // namespace dunedaq

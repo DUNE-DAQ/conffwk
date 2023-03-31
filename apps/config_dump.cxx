@@ -9,6 +9,8 @@
 #include "oksdbinterfaces/ConfigObject.hpp"
 #include "oksdbinterfaces/Schema.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
+
 ERS_DECLARE_ISSUE(
   config_dump,
   BadCommandLine,
