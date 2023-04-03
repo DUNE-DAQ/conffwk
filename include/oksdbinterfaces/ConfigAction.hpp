@@ -15,6 +15,7 @@ class ConfigObject;
 class ConfigAction {
 
   public:
+    virtual ~ConfigAction(){};
 
     /// Call action on database changes
     virtual void notify( std::vector<ConfigurationChange *>& changes ) noexcept = 0;

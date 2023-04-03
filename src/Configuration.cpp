@@ -1853,7 +1853,10 @@ Configuration::make_dal_object(ConfigObject& obj, const std::string& uid, const 
 
 
 std::vector<const DalObject*>
-Configuration::referenced_by(const DalObject& obj, const std::string& relationship_name, bool check_composite_only, bool upcast_unregistered, bool init, unsigned long rlevel, const std::vector<std::string> * rclasses)
+Configuration::referenced_by(const DalObject& obj, const std::string& relationship_name,
+                             bool check_composite_only, bool upcast_unregistered,
+                             bool /*init*/, unsigned long rlevel,
+                             const std::vector<std::string> * rclasses)
 {
   try
     {
@@ -2049,14 +2052,12 @@ DalObject::p_hdr(std::ostream &s, unsigned int indent, const std::string &cl, co
   s << cl << " object:\n" << str << "  id: \'" << UID() << "\', class name: \'" << DalObject::class_name() << "\'\n";
 }
 
-namespace oksdbinterfaces
-{
   void
   p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject *obj)
   {
     s << str << name << ": " << obj << '\n';
   }
-}
+
 
 
 void DalObject::throw_init_ex(dunedaq::oksdbinterfaces::Exception& ex)

@@ -976,7 +976,8 @@ class Configuration {
 
     template<class T>
     void
-    downcast_dal_objects(const std::vector<const T *>& objs, bool upcast_unregistered, std::vector<const DalObject*>& result)
+    downcast_dal_objects(const std::vector<const T *>& objs,
+                         bool /*upcast_unregistered*/, std::vector<const DalObject*>& result)
     {
       for (auto& i : objs)
         result.push_back(i);
@@ -984,7 +985,7 @@ class Configuration {
 
     template<class T>
     void
-    downcast_dal_object(const T * obj, bool upcast_unregistered, std::vector<const DalObject*>& result)
+    downcast_dal_object(const T * obj, bool /*upcast_unregistered*/, std::vector<const DalObject*>& result)
     {
       if(obj)
         result.push_back(obj);
