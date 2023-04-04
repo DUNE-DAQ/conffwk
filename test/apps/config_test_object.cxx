@@ -6,6 +6,8 @@
 #include "oksdbinterfaces/Configuration.hpp"
 #include "oksdbinterfaces/ConfigObject.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
+
 ERS_DECLARE_ISSUE(
   oksdbinterfaces_test_object,
   BadCommandLine,

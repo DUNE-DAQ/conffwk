@@ -8,7 +8,7 @@
 #define OKSDB_INTERFACE_DAL_OBJECT_PRINT_H_
 
 #include <iostream>
-
+namespace dunedaq {
 namespace oksdbinterfaces {
   enum PrintNumBase {dec, hex, oct};
 
@@ -142,7 +142,8 @@ namespace oksdbinterfaces {
         x->print(indent + 4, true, s);
     }
 
-}
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 
 #endif // OKSDB_INTERFACE_CONFIGOBJECT_H_

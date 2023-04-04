@@ -19,6 +19,9 @@
 #include "oksdbinterfaces/DalFactoryFunctions.hpp"
 #include "oksdbinterfaces/Errors.hpp"
 
+namespace dunedaq {
+namespace oksdbinterfaces {
+
 
 /**
  * \brief The base class for any generated DAL object.
@@ -51,7 +54,7 @@ protected:
    *  The constructor of DAL object.
    */
 
-  DalObject(Configuration& db, const ::ConfigObject& o) noexcept :
+  DalObject(Configuration& db, const ConfigObject& o) noexcept :
     p_was_read(false), p_db(db), p_obj(o), p_UID(p_obj.UID())
     {
       increment_created();
@@ -108,7 +111,7 @@ protected:
   Configuration& p_db;
 
   /// Config object used by given template object
-  ::ConfigObject p_obj;
+  ConfigObject p_obj;
 
   /// Is used for template objects (see dqm_oksdbinterfaces)
   std::string p_UID;
@@ -188,7 +191,7 @@ public:
    *  \throw dunedaq::oksdbinterfaces::DeletedObject if object was deleted
    */
 
-  const ::ConfigObject&
+  const ConfigObject&
   config_object() const
     {
       std::lock_guard<std::mutex> scoped_lock(m_mutex);
@@ -200,7 +203,7 @@ public:
    *  Returns reference on the configuration object.
    */
 
-  ::Configuration& configuration() const noexcept
+  Configuration& configuration() const noexcept
     {
       return p_db;
     }
@@ -345,26 +348,26 @@ private:
   DalObject& operator=(const DalObject&) = delete;
 
   template<typename T>
-  static void update(::Configuration& db, const ::ConfigurationChange * change) noexcept
+  static void update(Configuration& db, const ConfigurationChange * change) noexcept
     {
       db.update<T>(change->get_modified_objs(), change->get_removed_objs(), change->get_created_objs());
     }
 
   template<typename T>
-  static void change_id(::CacheBase* x, const std::string& old_id, const std::string& new_id) noexcept
+  static void change_id(CacheBase* x, const std::string& old_id, const std::string& new_id) noexcept
     {
-      ::Configuration::_rename_object<T>(x, old_id, new_id);
+      Configuration::_rename_object<T>(x, old_id, new_id);
     }
 
   template<typename T>
-  static void unread(::CacheBase* x) noexcept
+  static void unread(CacheBase* x) noexcept
     {
-      ::Configuration::_unread_objects<T>(x);
+      Configuration::_unread_objects<T>(x);
     }
 
   template<typename T>
     static DalObject *
-    create_instance(::Configuration& db, ::ConfigObject& obj, const std::string& uid)
+    create_instance(Configuration& db, ConfigObject& obj, const std::string& uid)
     {
       return db._make_instance<T>(obj, uid);
     }
@@ -395,7 +398,7 @@ protected:
       std::lock_guard<std::mutex> scoped_lock(m_mutex);
       check();
       clear();
-      p_obj.set_obj(name, (value ? &value->config_object() : (::ConfigObject*) nullptr));
+      p_obj.set_obj(name, (value ? &value->config_object() : (ConfigObject*) nullptr));
     }
 
   /// Helper method for generated set multi-value relationship methods
@@ -445,13 +448,13 @@ template<class T>
 
 template<class T>
   const T *
-  Configuration::create(const ::DalObject& at, const std::string& id, bool init_object)
+  Configuration::create(const DalObject& at, const std::string& id, bool init_object)
   {
     return create<T>(at.config_object().contained_in(), id, init_object);
   }
 
 template<class T>
-  Configuration::Cache<T> *
+Configuration::Cache<T> *
   Configuration::get_cache() noexcept
   {
     CacheBase*& c(m_cache_map[&T::s_class_name]);
@@ -481,5 +484,7 @@ template<class TARGET, class SOURCE>
 
     return nullptr;
   }
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif // OKSDB_INTERFACE_CONFIGOBJECT_H_

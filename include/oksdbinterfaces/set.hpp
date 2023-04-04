@@ -4,12 +4,15 @@
 #include "oksdbinterfaces/string_ptr.hpp"
 #include <unordered_set>
 
+namespace dunedaq {
 namespace oksdbinterfaces
 {
   typedef std::unordered_set<std::string> set;
 
   // compare string pointers (not values!)
   typedef std::unordered_set<const std::string *, string_ptr_hash> fset;
-}
+} // namespace oksdbinterfaces
+} // namespace dunedaq
+
 
 #endif // OKSDB_INTERFACE_SET_H_

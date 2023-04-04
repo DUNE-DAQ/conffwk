@@ -217,9 +217,6 @@ namespace dunedaq {
       return out;
     }
 
-  }
-}
-
 
 ConfigurationImpl::ConfigurationImpl() noexcept :
   p_number_of_cache_hits  (0),
@@ -563,3 +560,6 @@ ConfigObjectImpl::convert(std::vector<std::string>& value, const ConfigObject& o
 {
   m_impl->m_conf->convert2(value, obj, attr_name);
 }
+
+} // namespace oksdbinterfaces
+} // namespace dunedaq

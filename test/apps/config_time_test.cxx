@@ -11,6 +11,8 @@
 #include "oksdbinterfaces/ConfigObject.hpp"
 #include "oksdbinterfaces/Schema.hpp"
 
+using namespace dunedaq::oksdbinterfaces;
+
 ERS_DECLARE_ISSUE(
   oksdbinterfaces_time_test,
   BadCommandLine,
@@ -95,7 +97,7 @@ int main(int argc, char *argv[])
 
     std::set<std::string> classes;
 
-    for(oksdbinterfaces::fmap<oksdbinterfaces::fset>::const_iterator i = conf.superclasses().begin(); i != conf.superclasses().end(); ++i) {
+    for(fmap<fset>::const_iterator i = conf.superclasses().begin(); i != conf.superclasses().end(); ++i) {
       classes.insert(*i->first);
     }
 

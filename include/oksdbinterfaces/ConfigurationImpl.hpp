@@ -23,10 +23,10 @@ class ConfigObject;
 class ConfigObjectImpl;
 
 namespace dunedaq {
-  namespace oksdbinterfaces {
-    struct class_t;
-  }
-}
+namespace oksdbinterfaces {
+
+
+struct class_t;
 
 
   /**
@@ -280,5 +280,7 @@ class ConfigurationImpl {
 
 };
 
+} // namespace oksdbinterfaces
+} // namespace dunedaq
 
 #endif // OKSDB_INTERFACE_CONFIGURATIONIMPL_H_

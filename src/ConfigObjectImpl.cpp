@@ -1,6 +1,9 @@
 #include "oksdbinterfaces/ConfigObject.hpp"
 #include "oksdbinterfaces/ConfigObjectImpl.hpp"
 
+namespace dunedaq {
+namespace oksdbinterfaces {
+
 class ConfigObjectDefault : public ConfigObjectImpl {
 
   private:
@@ -117,3 +120,6 @@ void ConfigObjectDefault::bad()
 {
   throw dunedaq::oksdbinterfaces::Generic( ERS_HERE, "access *INVALID* object");
 }
+
+} // namespace oksdbinterfaces
+} // namespace dunedaq

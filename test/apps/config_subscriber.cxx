@@ -24,6 +24,8 @@
 #include "oksdbinterfaces/ConfigObject.h"
 #include "oksdbinterfaces/Configuration.h"
 
+using namespace dunedaq::oksdbinterfaces;
+
   /**
    *  The callback function is called when changes occurred.
    *  It contains all changes.

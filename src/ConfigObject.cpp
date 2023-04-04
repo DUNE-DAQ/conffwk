@@ -7,6 +7,9 @@
 #include "oksdbinterfaces/ConfigObjectImpl.hpp"
 #include "oksdbinterfaces/Schema.hpp"
 
+namespace dunedaq {
+namespace oksdbinterfaces {
+
 ConfigObject::ConfigObject() noexcept :
   m_impl(nullptr)
 {
@@ -188,7 +191,7 @@ is_null_obj(const ConfigObject * o)
 }
 
 void
-ConfigObject::print_ref(std::ostream& s, ::Configuration& oksdbinterfaces, const std::string& prefix, bool show_contained_in) const noexcept
+ConfigObject::print_ref(std::ostream& s, Configuration& oksdbinterfaces, const std::string& prefix, bool show_contained_in) const noexcept
 {
   static bool expand_aggregation = (getenv("TDAQ_OKSDB_INTERFACE_PRINT_EXPAND_AGGREGATIONS")); // FIXME tdaq-09-05-00 => add new parameter to oksdbinterfaces and add fuse
 
@@ -306,3 +309,6 @@ ConfigObject::get_obj_pybind(const std::string& attrname) {
   
   return newobject;
 }
+
+} // namespace oksdbinterfaces
+} // namespace dunedaq

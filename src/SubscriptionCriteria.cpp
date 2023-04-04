@@ -1,6 +1,9 @@
 #include "oksdbinterfaces/SubscriptionCriteria.hpp"
 #include "oksdbinterfaces/DalObject.hpp"
 
+namespace dunedaq {
+namespace oksdbinterfaces {
+
 void
 ConfigurationSubscriptionCriteria::add(const std::string& class_name)
 {
@@ -14,7 +17,7 @@ ConfigurationSubscriptionCriteria::add(const std::string& class_name, const std:
 }
 
 void
-ConfigurationSubscriptionCriteria::add(const ::DalObject& object)
+ConfigurationSubscriptionCriteria::add(const DalObject& object)
 {
   add(object.class_name(), object.UID());
 }
@@ -40,13 +43,13 @@ ConfigurationSubscriptionCriteria::remove(const std::string& class_name, const s
 }
 
 void
-ConfigurationSubscriptionCriteria::remove(const ::DalObject& object)
+ConfigurationSubscriptionCriteria::remove(const DalObject& object)
 {
   remove(object.class_name(), object.UID());
 }
 
 std::ostream&
-operator<<(std::ostream& s, const ::ConfigurationSubscriptionCriteria& criteria)
+operator<<(std::ostream& s, const ConfigurationSubscriptionCriteria& criteria)
 {
   s << "Subscription criteria:\n";
 
@@ -88,3 +91,5 @@ operator<<(std::ostream& s, const ::ConfigurationSubscriptionCriteria& criteria)
 
   return s;
 }
+} // namespace oksdbinterfaces
+} // namespace dunedaq
