@@ -339,6 +339,7 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
     OKSDB_INTERFACE_ADD_DEBUG_MSG( dbg_text , "  * there is no object \'" << id << "\' in class \'" << name << "\', returning NULL ..." )
   }
 
+  if (ers::debug_level() >= 4)
   TLOG_DEBUG(4) << dbg_text->str() ;
 
   return nullptr;
