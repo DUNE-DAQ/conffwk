@@ -25,8 +25,8 @@ class Configuration(_ConfigurationProxy):
     """Access OKS/RDB configuration databases from python.
     """
 
-    def __core_init__(self):
-        self.__schema__ = schema.Cache(self, all=True)
+    def __core_init__(self, all):
+        self.__schema__ = schema.Cache(self, all=all)
         self.__schema__.update_dal(self)
 
         # initialize the inner set of configuration files available
@@ -40,7 +40,7 @@ class Configuration(_ConfigurationProxy):
         self.__cache__ = {}
         self.__initialize_cache__()
 
-    def __init__(self, connection='oksconfig:'):
+    def __init__(self, connection='oksconfig:', all=False):
         """Initializes a Configuration database.
 
         Keyword arguments:
@@ -81,7 +81,7 @@ like the database type wasn't specified in the name (i.e. \"oksconfig:<filename>
 \"oksdbinterfaces_dump --database {connection}\" 
 to see if there's a problem with the input database""")
 
-        self.__core_init__()
+        self.__core_init__(all)
 
     def databases(self):
         """Returns a list of associated databases which are opened"""
