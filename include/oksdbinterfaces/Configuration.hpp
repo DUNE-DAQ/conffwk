@@ -1820,10 +1820,6 @@ template<class T>
         throw(dunedaq::oksdbinterfaces::Generic( ERS_HERE, mk_ref_ex_text("an object", T::s_class_name, name, obj).c_str(), ex ) );
       }
 
-    // std::cout << "- Looking up " << res.UID() << " <" << res.class_name() << "> and cast it to " << T::s_class_name << std::endl;
-    // std::cout << "- Cache object " << get_cache<T>(res.class_name()) << std::endl;
-    // std::cout << "- Object " << get_cache<T>(res.class_name())->get(*this, res, read_children, read_children) << std::endl;
-    
     return ((!res.is_null()) ? get_cache<T>(res.class_name())->get(*this, res, read_children, read_children) : nullptr);
   }
 
@@ -1844,9 +1840,6 @@ template<class T>
 
         for (auto& i : objs)
           {
-            // std::cout << "+ Looking up " << i.UID() << " <" << i.class_name() << "> and cast it to " << T::s_class_name << std::endl;
-            // std::cout << "+ Cache object " << get_cache<T>(i.class_name()) << std::endl;
-            // std::cout << "+ Object " << get_cache<T>(i.class_name())->get(*this, i, read_children, read_children) << std::endl;
             results.push_back(get_cache<T>(i.class_name())->get(*this, i, read_children, read_children));
           }
       }
@@ -1904,10 +1897,8 @@ template<class T>
 Configuration::Cache<T>::get(Configuration& oksdbinterfaces,
                              ConfigObject& obj, bool init_children, bool init_object)
   {
-    // std::cout << "AAAA 0" << obj.m_impl->m_id << " from " << m_class_name <<" to " << T::s_class_name << std::endl;
     DalObject*& dalptr = m_cache[obj.m_impl->m_id];
     T* result = dynamic_cast<T*>(dalptr);
-    // T*& result(m_cache[obj.m_impl->m_id]);
     if (dalptr == nullptr)
       {
         result = dynamic_cast<T*>(m_functions.m_instantiator_fn(oksdbinterfaces, obj));
@@ -1924,7 +1915,6 @@ Configuration::Cache<T>::get(Configuration& oksdbinterfaces,
         result->set(obj); // update implementation object; to be used in case if the object is re-created
       }
     increment_gets(oksdbinterfaces);
-    // std::cout << "AAAA R" << result << std::endl;
     return result;
   }
 
@@ -1940,7 +1930,6 @@ template<class T>
   T *
   Configuration::Cache<T>::get(Configuration& db, ConfigObject& obj, const std::string& id)
   {
-    // std::cout << "BBBB" << std::endl;
 
     DalObject*& dalptr = m_cache[id];
     T* result = dynamic_cast<T*>(dalptr);
@@ -1969,14 +1958,13 @@ template<class T>
 template<class T> T *
 Configuration::Cache<T>::get(Configuration& oksdbinterfaces, const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses)
 {
-  // std::cout << "CCCC" << std::endl;
 
   typename oksdbinterfaces::map<DalObject*>::iterator i = m_cache.find(name);
   if(i == m_cache.end()) {
     try {
       ConfigObject obj;
       // class name should be the true cache class name
-      oksdbinterfaces._get(T::s_class_name, name, obj, rlevel, rclasses);
+      oksdbinterfaces._get(m_class_name, name, obj, rlevel, rclasses);
       return get(oksdbinterfaces, obj, init_children, init_object);
     }
     catch(dunedaq::oksdbinterfaces::NotFound & ex) {
