@@ -78,7 +78,7 @@ like the database type wasn't specified in the name (i.e. \"oksconfig:<filename>
                 else:
                     raise RuntimeError(f"""
 {preamble}; try running
-\"oks_dump --files-only {connection}\"
+\"oks_dump --files-only {dbfilename}\"
 to see if there's a problem with the input database""")
 
         self.__core_init__()
