@@ -372,13 +372,6 @@ private:
       return db._make_instance<T>(obj, uid);
     }
 
-  template<typename T>
-    static DalObject *
-    new_instance(Configuration& db, ConfigObject& obj)
-    {
-      return new T(db, obj);
-    }
-
 protected:
 
   /**
@@ -447,7 +440,6 @@ template<class T>
       m_unread_object_fn(DalObject::unread<T>),
       m_rename_object_fn(DalObject::change_id<T>),
       m_creator_fn(DalObject::create_instance<T>),
-      m_instantiator_fn(DalObject::new_instance<T>),
       m_algorithms(algorithms)
   {
     ;
@@ -468,7 +460,7 @@ Configuration::Cache<T> *
     CacheBase*& c(m_cache_map[&T::s_class_name]);
 
     if (c == nullptr)
-      c = new CacheBase(T::s_class_name, DalFactory::instance().functions(*this, T::s_class_name, true));
+      c = new Cache<T>();
 
     return static_cast<Cache<T>*>(c);
   }
