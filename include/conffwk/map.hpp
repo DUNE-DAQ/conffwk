@@ -1,11 +1,11 @@
-#ifndef OKSDB_INTERFACE_MAP_H_
-#define OKSDB_INTERFACE_MAP_H_
+#ifndef CONFFWK_MAP_H_
+#define CONFFWK_MAP_H_
 
-#include "oksdbinterfaces/string_ptr.hpp"
+#include "conffwk/string_ptr.hpp"
 #include <unordered_map>
 
 namespace dunedaq {
-namespace oksdbinterfaces
+namespace conffwk
 {
   template<class T>
     class map : public std::unordered_map<std::string, T>
@@ -48,7 +48,7 @@ namespace oksdbinterfaces
         ;
       }
     };
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq
 
-#endif // OKSDB_INTERFACE_MAP_H_
+#endif // CONFFWK_MAP_H_

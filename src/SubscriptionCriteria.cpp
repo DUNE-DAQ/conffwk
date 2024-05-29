@@ -1,8 +1,8 @@
-#include "oksdbinterfaces/SubscriptionCriteria.hpp"
-#include "oksdbinterfaces/DalObject.hpp"
+#include "conffwk/SubscriptionCriteria.hpp"
+#include "conffwk/DalObject.hpp"
 
 namespace dunedaq {
-namespace oksdbinterfaces {
+namespace conffwk {
 
 void
 ConfigurationSubscriptionCriteria::add(const std::string& class_name)
@@ -91,5 +91,5 @@ operator<<(std::ostream& s, const ConfigurationSubscriptionCriteria& criteria)
 
   return s;
 }
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq

@@ -7,7 +7,7 @@
 """
 
 from test_configuration import *
-from test_oksdbinterfacesobject import *
+from test_conffwkobject import *
 from test_dal import *
 
 if __name__ == "__main__":

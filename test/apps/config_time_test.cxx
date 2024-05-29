@@ -7,23 +7,23 @@
 #include <fstream>
 #include <string>
 
-#include "oksdbinterfaces/Configuration.hpp"
-#include "oksdbinterfaces/ConfigObject.hpp"
-#include "oksdbinterfaces/Schema.hpp"
+#include "conffwk/Configuration.hpp"
+#include "conffwk/ConfigObject.hpp"
+#include "conffwk/Schema.hpp"
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 ERS_DECLARE_ISSUE(
-  oksdbinterfaces_time_test,
+  conffwk_time_test,
   BadCommandLine,
   "bad command line: " << reason,
   ((const char*)reason)
 )
 
 ERS_DECLARE_ISSUE(
-  oksdbinterfaces_time_test,
+  conffwk_time_test,
   ConfigException,
-  "caught dunedaq::oksdbinterfaces::Exception exception",
+  "caught dunedaq::conffwk::Exception exception",
 )
 
 static void
@@ -31,7 +31,7 @@ no_param(const char * s)
 {
   std::ostringstream text;
   text << "no parameter for " << s << " provided";
-  ers::fatal(oksdbinterfaces_time_test::BadCommandLine(ERS_HERE, text.str().c_str()));
+  ers::fatal(conffwk_time_test::BadCommandLine(ERS_HERE, text.str().c_str()));
   exit(EXIT_FAILURE);
 }
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     if(!strcmp(cp, "-h") || !strcmp(cp, "--help")) {
       std::cout << 
-        "Usage: oksdbinterfaces_time_test -d dbspec [-c | -C [class_name]] [-o | -O [object_id]] [-n]\n"
+        "Usage: conffwk_time_test -d dbspec [-c | -C [class_name]] [-o | -O [object_id]] [-n]\n"
         "\n"
         "Options/Arguments:\n"
         "  -d | --database dbspec        database specification in format plugin-name:parameters\n"
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
   }
 
   if(!db_name) {
-    ers::fatal(oksdbinterfaces_time_test::BadCommandLine(ERS_HERE, "no database name given"));
+    ers::fatal(conffwk_time_test::BadCommandLine(ERS_HERE, "no database name given"));
     return (EXIT_FAILURE);
   }
 
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     }
 
     for(std::set<std::string>::const_iterator i = classes.begin(); i != classes.end(); ++i) {
-      const dunedaq::oksdbinterfaces::class_t& d(conf.get_class_info(*i));
+      const dunedaq::conffwk::class_t& d(conf.get_class_info(*i));
       if(verbose) {
         d.print(std::cout, "  ");
       }
@@ -188,8 +188,8 @@ int main(int argc, char *argv[])
 
     return 0;
   }
-  catch (dunedaq::oksdbinterfaces::Exception & ex) {
-    ers::fatal(oksdbinterfaces_time_test::ConfigException(ERS_HERE, ex));
+  catch (dunedaq::conffwk::Exception & ex) {
+    ers::fatal(conffwk_time_test::ConfigException(ERS_HERE, ex));
   }
 
   return (EXIT_FAILURE);

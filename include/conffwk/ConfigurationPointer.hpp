@@ -1,5 +1,5 @@
 /**
- * @file oksdbinterfaces/ConfigurationPointer.h
+ * @file conffwk/ConfigurationPointer.h
  * @author <a href="mailto:andre.dos.anjos@cern.ch">Andre Anjos</a> 
  *
  * @brief A wrapper to the Configuration class to make it boost friendly
@@ -8,11 +8,11 @@
 #ifndef PYTHONCONFIGURATION_H 
 #define PYTHONCONFIGURATION_H
 
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace dunedaq {
-namespace oksdbinterfaces {
+namespace conffwk {
 
 namespace python {
 
@@ -68,7 +68,7 @@ namespace python {
   };
 
 }
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq
 
 #endif /* PYTHONCONFIGURATION_H */

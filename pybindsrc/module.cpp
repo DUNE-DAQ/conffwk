@@ -11,21 +11,21 @@
 
 namespace py = pybind11;
 
-namespace dunedaq::oksdbinterfaces::python {
+namespace dunedaq::conffwk::python {
 
 extern void
-register_oksdbinterfaces(py::module&);
+register_conffwk(py::module&);
 
 extern void
-register_oksdbinterfacesobject(py::module&);
+register_conffwkobject(py::module&);
 
-PYBIND11_MODULE(_daq_oksdbinterfaces_py, m)
+PYBIND11_MODULE(_daq_conffwk_py, m)
 {
 
-  m.doc() = "Python interface to the oksdbinterfaces package"; // optional module docstring
+  m.doc() = "Python interface to the conffwk package"; // optional module docstring
 
-  register_oksdbinterfaces(m);
-  register_oksdbinterfacesobject(m);
+  register_conffwk(m);
+  register_conffwkobject(m);
 }
 
-} // namespace dunedaq::oksdbinterfaces::python
+} // namespace dunedaq::conffwk::python

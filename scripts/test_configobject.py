@@ -7,12 +7,12 @@
 
 import os
 import unittest
-import oksdbinterfaces
+import conffwk
 
 scriptsdir=os.path.dirname(os.path.realpath(__file__))
 
 def limit_test(obj, attrname, min, max):
-    db = oksdbinterfaces.Configuration("oksconfig")
+    db = conffwk.Configuration("oksconfig")
     db.create_db('test.data.xml', [f'{scriptsdir}/test.schema.xml'])
 
     low = db.create_obj("Dummy", "TestDummy-Low")
@@ -27,7 +27,7 @@ def limit_test(obj, attrname, min, max):
 
 
 def limit_test_raise(obj, attrname, min, max):
-    db = oksdbinterfaces.Configuration("oksconfig")
+    db = conffwk.Configuration("oksconfig")
     filename = 'overflow_test.data.xml'
     db.create_db(filename, [f'{scriptsdir}/test.schema.xml'])
 
@@ -91,7 +91,7 @@ class ConfigObject(unittest.TestCase):
         # limit_test_raise(self, 'uint64', 0, (2**64)-1)
 
     def test08a_CanReadWriteUInt64WithRange(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         t = db.create_obj("Dummy", "TestDummy-1")
         attrname = 'uint64_vector_range'
@@ -104,7 +104,7 @@ class ConfigObject(unittest.TestCase):
         db.commit()
 
     def test09_CanReadWriteString(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         t = db.create_obj("Dummy", "TestDummy-1")
         val = 'bla'
@@ -114,7 +114,7 @@ class ConfigObject(unittest.TestCase):
         db.commit()
 
     def test10_CanReadWriteEnum(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         t = db.create_obj("Dummy", "TestDummy-1")
         val = 'FIRST'
@@ -125,7 +125,7 @@ class ConfigObject(unittest.TestCase):
         self.assertRaises(ValueError, t.__setitem__, attrname, val)
 
     def test11_CanReadWriteStringList(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         t = db.create_obj("Dummy", "TestDummy-1")
         val = ["test10", "test20"]
@@ -134,7 +134,7 @@ class ConfigObject(unittest.TestCase):
         self.assertEqual(t[attrname], val)
 
     def test12_CanReadWriteDate(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         t = db.create_obj("Dummy", "TestDummy-1")
         val = "2000-Jan-01"
@@ -143,7 +143,7 @@ class ConfigObject(unittest.TestCase):
         self.assertEqual(t[attrname], val)
 
     def test13_CanReadWriteTime(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         t = db.create_obj("Dummy", "TestDummy-1")
         val = "2000-Jan-01 00:00:00"
@@ -152,7 +152,7 @@ class ConfigObject(unittest.TestCase):
         self.assertEqual(t[attrname], val)
 
     def test14_CanReadWriteClassReference(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         t = db.create_obj("Dummy", "TestDummy-1")
         val = 'Second'
@@ -163,7 +163,7 @@ class ConfigObject(unittest.TestCase):
         db.commit()
 
     def test15_CanReadWriteSingleValuedRelations(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         relation = db.create_obj("Dummy", "Single-Relation")
         t = db.create_obj('Third', 'Originator')
@@ -174,7 +174,7 @@ class ConfigObject(unittest.TestCase):
         db.commit()
 
     def test16_CanReadWriteMultiValuedRelations(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         relations = []
         for i in range(10):
@@ -186,7 +186,7 @@ class ConfigObject(unittest.TestCase):
         db.commit()
 
     def test17_CanRename(self):
-        db = oksdbinterfaces.Configuration("oksconfig")
+        db = conffwk.Configuration("oksconfig")
         db.create_db("test.data.xml", [f'{scriptsdir}/test.schema.xml'])
         t = db.create_obj('Dummy', 'TestDummy-1')
         t.rename('TestDummy-2')

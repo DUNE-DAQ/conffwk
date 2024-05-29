@@ -8,9 +8,9 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "oksdbinterfaces/Configuration.hpp"
+#include "conffwk/Configuration.hpp"
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 int
 main(int argc, char *argv[])
@@ -18,7 +18,7 @@ main(int argc, char *argv[])
   std::string output_file, db_name, classes, format("json");
   bool direct_only(false);
 
-  boost::program_options::options_description desc("Export oksdbinterfaces schema using boost property tree.\n\nOptions/Arguments");
+  boost::program_options::options_description desc("Export conffwk schema using boost property tree.\n\nOptions/Arguments");
 
   try
     {
@@ -104,9 +104,9 @@ main(int argc, char *argv[])
 
       return EXIT_SUCCESS;
     }
-  catch (const dunedaq::oksdbinterfaces::Exception &ex)
+  catch (const dunedaq::conffwk::Exception &ex)
     {
-      std::cout << "oksdbinterfaces error: " << ex << std::endl;
+      std::cout << "conffwk error: " << ex << std::endl;
     }
   catch (const boost::property_tree::json_parser_error &ex)
     {
