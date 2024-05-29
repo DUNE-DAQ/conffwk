@@ -1,18 +1,18 @@
-#ifndef OKSDB_INTERFACE_SET_H_
-#define OKSDB_INTERFACE_SET_H_
+#ifndef CONFFWK_SET_H_
+#define CONFFWK_SET_H_
 
-#include "oksdbinterfaces/string_ptr.hpp"
+#include "conffwk/string_ptr.hpp"
 #include <unordered_set>
 
 namespace dunedaq {
-namespace oksdbinterfaces
+namespace conffwk
 {
   typedef std::unordered_set<std::string> set;
 
   // compare string pointers (not values!)
   typedef std::unordered_set<const std::string *, string_ptr_hash> fset;
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq
 
 
-#endif // OKSDB_INTERFACE_SET_H_
+#endif // CONFFWK_SET_H_

@@ -110,7 +110,7 @@ def check_range(v, range, range_re, pytype):
 
 def check_relation(v, rel):
     """Checks the value v against the relationship parameters in 'rel'."""
-    from oksdbinterfaces.dal import DalBase
+    from conffwk.dal import DalBase
 
     if not isinstance(v, DalBase):
         raise ValueError('Relationships should be DAL objects, but %s is not' %
@@ -216,7 +216,7 @@ def coerce(v, attr):
 
 
 def map_coercion(class_name, schema):
-    """Given a schema of a class, maps coercion functions from libpyoksdbinterfaces."""
+    """Given a schema of a class, maps coercion functions from libpyconffwk."""
 
     cls = ConfigObject.ConfigObject
 
@@ -328,7 +328,7 @@ class Cache(object):
     """Defines a cache for all known schemas at a certain time.
     """
 
-    def __init__(self, oksdbinterfaces, all=True):
+    def __init__(self, conffwk, all=True):
         """Initializes the cache with information from the Configuration
         object.
 
@@ -338,7 +338,7 @@ class Cache(object):
 
         Keyword parameters:
 
-        oksdbinterfaces -- The oksdbinterfaces.Configuration object to use as base for the
+        conffwk -- The conffwk.Configuration object to use as base for the
         current cache.
 
         all -- A boolean indicating if I should store all the attributes and
@@ -347,26 +347,26 @@ class Cache(object):
         """
         self.data = {}
         self.all = all
-        self.update(oksdbinterfaces)
+        self.update(conffwk)
 
-    def update(self, oksdbinterfaces):
+    def update(self, conffwk):
         """Updates this cache with information from the Configuration object.
 
         This method will add new classes not yet know to this cache. Classes
         with existing names will not be added. No warning is generated (this
         should be done by the OKS layer in any case.
         """
-        for k in oksdbinterfaces.classes():
+        for k in conffwk.classes():
             if k in list(self.data.keys()):
                 continue
             self.data[k] = {}
-            self.data[k]['attribute'] = oksdbinterfaces.attributes(k, self.all)
-            self.data[k]['relation'] = oksdbinterfaces.relations(k, self.all)
-            self.data[k]['superclass'] = oksdbinterfaces.superclasses(k, self.all)
-            self.data[k]['subclass'] = oksdbinterfaces.subclasses(k, self.all)
+            self.data[k]['attribute'] = conffwk.attributes(k, self.all)
+            self.data[k]['relation'] = conffwk.relations(k, self.all)
+            self.data[k]['superclass'] = conffwk.superclasses(k, self.all)
+            self.data[k]['subclass'] = conffwk.subclasses(k, self.all)
             map_coercion(k, self.data[k])
 
-    def update_dal(self, oksdbinterfaces):
+    def update_dal(self, conffwk):
         """Updates this cache with information for DAL.
 
         This method will add new DAL classes not yet know to this cache.
@@ -375,7 +375,7 @@ class Cache(object):
         from .dal import generate
 
         # generate
-        klasses = generate(oksdbinterfaces, [self.data[k]['dal'] for k
+        klasses = generate(conffwk, [self.data[k]['dal'] for k
                                     in list(self.data.keys())
                                     if 'dal' in self.data[k]])
         # associate

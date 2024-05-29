@@ -4,34 +4,34 @@
 #include <iostream>
 #include <string>
 
-#include "oksdbinterfaces/Configuration.hpp"
-#include "oksdbinterfaces/ConfigObject.hpp"
+#include "conffwk/Configuration.hpp"
+#include "conffwk/ConfigObject.hpp"
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 ERS_DECLARE_ISSUE(
-  oksdbinterfaces_test_rw,
+  conffwk_test_rw,
   BadCommandLine,
   "bad command line: " << reason,
   ((const char*)reason)
 )
 
 ERS_DECLARE_ISSUE(
-  oksdbinterfaces_test_rw,
+  conffwk_test_rw,
   ConfigException,
-  "caught dunedaq::oksdbinterfaces::Exception exception",
+  "caught dunedaq::conffwk::Exception exception",
 )
 
 static void
 usage()
 {
   std::cout << 
-    "Usage: oksdbinterfaces_test_rw -d data_name -s schema_name -p plugin_spec\n"
+    "Usage: conffwk_test_rw -d data_name -s schema_name -p plugin_spec\n"
     "\n"
     "Options/Arguments:\n"
     "       -d data_name      name of creating data file\n"
     "       -s schema_name    name of including schema file\n"
-    "       -p plugin_spec    oksdbinterfaces plugin specification (oksconfig | rdboksdbinterfaces:server-name)\n"
+    "       -p plugin_spec    conffwk plugin specification (oksconfig | rdbconffwk:server-name)\n"
     "\n"
     "Description:\n"
     "       The utility tests creation of files and objects using different plugins.\n\n";
@@ -42,7 +42,7 @@ no_param(const char * s)
 {
   std::ostringstream text;
   text << "no parameter for " << s << " provided";
-  ers::fatal(oksdbinterfaces_test_rw::BadCommandLine(ERS_HERE, text.str().c_str()));
+  ers::fatal(conffwk_test_rw::BadCommandLine(ERS_HERE, text.str().c_str()));
   exit(EXIT_FAILURE);
 }
 
@@ -184,23 +184,23 @@ int main(int argc, char *argv[])
     else {
       std::ostringstream text;
       text << "unexpected parameter: \'" << cp << "\'; run command with --help to see valid command line options.";
-      ers::fatal(oksdbinterfaces_test_rw::BadCommandLine(ERS_HERE, text.str().c_str()));
+      ers::fatal(conffwk_test_rw::BadCommandLine(ERS_HERE, text.str().c_str()));
       return (EXIT_FAILURE);
     }
   }
 
   if(!data_name) {
-    ers::fatal(oksdbinterfaces_test_rw::BadCommandLine(ERS_HERE, "no data filename given"));
+    ers::fatal(conffwk_test_rw::BadCommandLine(ERS_HERE, "no data filename given"));
     return (EXIT_FAILURE);
   }
 
   if(!schema_name) {
-    ers::fatal(oksdbinterfaces_test_rw::BadCommandLine(ERS_HERE, "no schema filename given"));
+    ers::fatal(conffwk_test_rw::BadCommandLine(ERS_HERE, "no schema filename given"));
     return (EXIT_FAILURE);
   }
 
   if(!plugin_name) {
-    ers::fatal(oksdbinterfaces_test_rw::BadCommandLine(ERS_HERE, "no plugin specification given (oksconfig, rdboksdbinterfaces:server-name)"));
+    ers::fatal(conffwk_test_rw::BadCommandLine(ERS_HERE, "no plugin specification given (oksconfig, rdbconffwk:server-name)"));
     return (EXIT_FAILURE);
   }
 
@@ -374,7 +374,7 @@ int main(int argc, char *argv[])
       }
     }
 
-    db.commit("test application (oksdbinterfaces/test/oksdbinterfaces_test_rw.cpp): create first data");
+    db.commit("test application (conffwk/test/conffwk_test_rw.cpp): create first data");
 
 
       // create file names for 2 intermediate and 4 leave files;
@@ -432,7 +432,7 @@ int main(int argc, char *argv[])
     db.add_include(data_name, f1);
     db.add_include(data_name, f2);
 
-    db.commit("test application (oksdbinterfaces/test/oksdbinterfaces_test_rw.cpp): create 6 nested files");
+    db.commit("test application (conffwk/test/conffwk_test_rw.cpp): create 6 nested files");
 
     std::cout << "\n\nTEST VALIDITY OF OBJECTS AFTER REMOVAL OF INCLUDES: Removing include \"" << f1 << "\"\n\n";
 
@@ -455,7 +455,7 @@ int main(int argc, char *argv[])
 	  std::cout << "OK, object was not removed";
 	}
       }
-      catch(dunedaq::oksdbinterfaces::NotFound& ex) {
+      catch(dunedaq::conffwk::NotFound& ex) {
 	for(int j = 0; j < 4; ++j) {
 	  if(!strcmp(removed_objects_by_include[j], data[i].id)) {
 	    std::cout << "OK, object was removed"; state = true; break;
@@ -497,7 +497,7 @@ int main(int argc, char *argv[])
 	  std::cout << "OK, object was not removed";
 	}
       }
-      catch(dunedaq::oksdbinterfaces::NotFound& ex) {
+      catch(dunedaq::conffwk::NotFound& ex) {
 	for(int j = 0; j < 2; ++j) {
 	  if(!strcmp(removed_objects_by_composite_parent[j], existing_objects[i])) {
 	    std::cout << "OK, object was removed"; state = true; break;
@@ -548,8 +548,8 @@ int main(int argc, char *argv[])
 
     return 0;
   }
-  catch (dunedaq::oksdbinterfaces::Exception & ex) {
-    ers::fatal(oksdbinterfaces_test_rw::ConfigException(ERS_HERE, ex));
+  catch (dunedaq::conffwk::Exception & ex) {
+    ers::fatal(conffwk_test_rw::ConfigException(ERS_HERE, ex));
   }
 
   return (EXIT_FAILURE);

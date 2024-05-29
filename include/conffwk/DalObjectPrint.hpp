@@ -4,12 +4,12 @@
  *  \brief print functions for generated template objects
  */
 
-#ifndef OKSDB_INTERFACE_DAL_OBJECT_PRINT_H_
-#define OKSDB_INTERFACE_DAL_OBJECT_PRINT_H_
+#ifndef CONFFWK_DAL_OBJECT_PRINT_H_
+#define CONFFWK_DAL_OBJECT_PRINT_H_
 
 #include <iostream>
 namespace dunedaq {
-namespace oksdbinterfaces {
+namespace conffwk {
   enum PrintNumBase {dec, hex, oct};
 
   template<class T>
@@ -142,8 +142,8 @@ namespace oksdbinterfaces {
         x->print(indent + 4, true, s);
     }
 
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq
 
 
-#endif // OKSDB_INTERFACE_CONFIGOBJECT_H_
+#endif // CONFFWK_CONFIGOBJECT_H_

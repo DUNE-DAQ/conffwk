@@ -5,15 +5,15 @@
    *  \brief describe database changes
    */
 
-#ifndef OKSDB_INTERFACE_CONFIGURATION__CHANGE_H_
-#define OKSDB_INTERFACE_CONFIGURATION__CHANGE_H_
+#ifndef CONFFWK_CONFIGURATION__CHANGE_H_
+#define CONFFWK_CONFIGURATION__CHANGE_H_
 
 #include <string>
 #include <vector>
 #include <iostream>
 
 namespace dunedaq {
-namespace oksdbinterfaces {
+namespace conffwk {
 
   /**
    *  \brief Describes changes inside a class returned by the notification mechanism.
@@ -120,7 +120,7 @@ std::ostream& operator<<(std::ostream&, const ConfigurationChange&);
 
 std::ostream& operator<<(std::ostream&, const std::vector<ConfigurationChange *>&);
 
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq
 
-#endif // OKSDB_INTERFACE_CONFIGURATION__CHANGE_H_
+#endif // CONFFWK_CONFIGURATION__CHANGE_H_
