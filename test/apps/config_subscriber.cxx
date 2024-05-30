@@ -20,11 +20,11 @@
 
   // include headers describing abstract configuration interface
 
-#include "oksdbinterfaces/Change.h"
-#include "oksdbinterfaces/ConfigObject.h"
-#include "oksdbinterfaces/Configuration.h"
+#include "conffwk/Change.h"
+#include "conffwk/ConfigObject.h"
+#include "conffwk/Configuration.h"
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
   /**
    *  The callback function is called when changes occurred.
@@ -79,7 +79,7 @@ static void
 usage()
 {
   std::cout <<
-    "Usage: oksdbinterfaces_subscriber [-d | --data database-name]\n"
+    "Usage: conffwk_subscriber [-d | --data database-name]\n"
     "                         [-c | --classes [class-1 ...] ]\n"
     "\n"
     "Options/Arguments:\n"
@@ -93,7 +93,7 @@ usage()
 
 extern "C" void signal_handler(int sig)
 {
-  std::cout << "oksdbinterfaces_subscriber caught signal " << sig << std::endl;
+  std::cout << "conffwk_subscriber caught signal " << sig << std::endl;
 }
 
 
@@ -180,11 +180,11 @@ int main(int argc, char *argv[])
       ;
     }
 
-    std::cout << "Exiting oksdbinterfaces_subscriber ..." << std::endl;
+    std::cout << "Exiting conffwk_subscriber ..." << std::endl;
 
     conf.unsubscribe();
   }
-  catch (dunedaq::oksdbinterfaces::Exception & ex) {
+  catch (dunedaq::conffwk::Exception & ex) {
     std::cerr << "Caught " << ex << std::endl;
     return (EXIT_FAILURE);
   }

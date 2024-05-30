@@ -10,7 +10,7 @@ std::vector objects and memory management.
 """
 from . import schema
 from . import ConfigObject
-from ._daq_oksdbinterfaces_py import _Configuration
+from ._daq_conffwk_py import _Configuration
 import logging
 from .proxy import _DelegateMetaFunction
 import re
@@ -40,21 +40,21 @@ class Configuration(_ConfigurationProxy):
         self.__cache__ = {}
         self.__initialize_cache__()
 
-    def __init__(self, connection='oksconfig:'):
+    def __init__(self, connection='oksconflibs:'):
         """Initializes a Configuration database.
 
         Keyword arguments:
 
         connection -- A connection string, in the form of <backend>:<database>
-        name, where <backend> may be set to be 'oksconfig' or 'rdboksdbinterfaces' and
+        name, where <backend> may be set to be 'oksconflibs' or 'rdbconffwk' and
         <database> is either the name of the database XML file (in the case of
-        'oksconfig') or the name of a database associated with an RDB server
-        (in the case of 'rdboksdbinterfaces').
+        'oksconflibs') or the name of a database associated with an RDB server
+        (in the case of 'rdbconffwk').
 
         Warning: To use the RDB server, the IPC subsystem has to be initialized
         beforehand and as this is not done by this package. If the parameter
         'connection' is empty, the default is whatever is the default for the
-        oksdbinterfaces::Configuration C++ class, which at this time boils down to look
+        conffwk::Configuration C++ class, which at this time boils down to look
         if TDAQ_DB is set and take that default.
 
         Raises RuntimeError, in case of problems.
@@ -64,13 +64,13 @@ class Configuration(_ConfigurationProxy):
             super(Configuration, self).__init__(connection)
         except RuntimeError:
             preamble = f"Unable to open database off of \"{connection}\""
-            if not re.search(r"^oksconfig:", connection):
+            if not re.search(r"^oksconflibs:", connection):
                 raise RuntimeError(f"""
 {preamble}; one reason is that it looks
-like the database type wasn't specified in the name (i.e. \"oksconfig:<filename>\")
+like the database type wasn't specified in the name (i.e. \"oksconflibs:<filename>\")
 """)
             else:
-                dbfilename = connection[len("oksconfig:"):]
+                dbfilename = connection[len("oksconflibs:"):]
                 if not os.path.exists(dbfilename):
                     raise RuntimeError(f"{preamble}; one reason is that it looks like \"{dbfilename}\" doesn't exist")
                 elif not re.search(r".xml$", dbfilename):
@@ -139,7 +139,7 @@ to see if there's a problem with the input database""")
         objects for which the class (or base class) matches the 'class_name'
         parameter you set.
 
-        Returns a (python) list with oksdbinterfaces.ConfigObject's
+        Returns a (python) list with conffwk.ConfigObject's
         """
         objs = super(Configuration, self).get_objs(class_name, query)
         return [ConfigObject.ConfigObject(k, self.__schema__, self)
@@ -636,6 +636,6 @@ to see if there's a problem with the input database""")
         """
 
         # the C++ implementation of destroy_obj wants
-        # a libpyoksdbinterfaces.ConfigObject instance. So
+        # a libpyconffwk.ConfigObject instance. So
         # we have to extract it from our proxy
         return super(Configuration, self).destroy_obj(obj._obj)

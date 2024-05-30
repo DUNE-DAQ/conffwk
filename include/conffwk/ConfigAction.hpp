@@ -1,12 +1,12 @@
-#ifndef OKSDB_INTERFACE_ACTION_H_
-#define OKSDB_INTERFACE_ACTION_H_
+#ifndef CONFFWK_ACTION_H_
+#define CONFFWK_ACTION_H_
 
 #include <string>
 
-#include "oksdbinterfaces/Change.hpp"
+#include "conffwk/Change.hpp"
 
 namespace dunedaq {
-namespace oksdbinterfaces {
+namespace conffwk {
 
 class ConfigObject;
 
@@ -30,7 +30,7 @@ class ConfigAction {
     virtual void update( const ConfigObject& obj, const std::string& name) noexcept = 0;
 
 };
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq
 
-#endif // OKSDB_INTERFACE_DAL_ACTION_H_
+#endif // CONFFWK_DAL_ACTION_H_

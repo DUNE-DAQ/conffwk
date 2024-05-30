@@ -1,10 +1,10 @@
-#ifndef OKSDB_INTERFACE_STRING_PTR_H_
-#define OKSDB_INTERFACE_STRING_PTR_H_
+#ifndef CONFFWK_STRING_PTR_H_
+#define CONFFWK_STRING_PTR_H_
 
 #include <string>
 
 namespace dunedaq {
-namespace oksdbinterfaces
+namespace conffwk
 {
   struct string_ptr_compare {
     bool operator()(const std::string * left, const std::string * right) const
@@ -19,6 +19,6 @@ namespace oksdbinterfaces
       return reinterpret_cast<size_t>(x);
     }
   };
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq
-#endif // OKSDB_INTERFACE_STRING_PTR_H_
+#endif // CONFFWK_STRING_PTR_H_

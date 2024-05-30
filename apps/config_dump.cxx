@@ -5,11 +5,11 @@
 
 #include <boost/program_options.hpp>
 
-#include "oksdbinterfaces/Configuration.hpp"
-#include "oksdbinterfaces/ConfigObject.hpp"
-#include "oksdbinterfaces/Schema.hpp"
+#include "conffwk/Configuration.hpp"
+#include "conffwk/ConfigObject.hpp"
+#include "conffwk/Schema.hpp"
 
-using namespace dunedaq::oksdbinterfaces;
+using namespace dunedaq::conffwk;
 
 ERS_DECLARE_ISSUE(
   config_dump,
@@ -21,7 +21,7 @@ ERS_DECLARE_ISSUE(
 ERS_DECLARE_ISSUE(
   config_dump,
   ConfigException,
-  "caught dunedaq::oksdbinterfaces::Exception exception",
+  "caught dunedaq::conffwk::Exception exception",
 )
 
 struct SortByName
@@ -52,7 +52,7 @@ print_referenced_by(const ConfigObject &obj, const char *prefix)
 }
 
 static void
-print_versions(const std::vector<dunedaq::oksdbinterfaces::Version>& versions)
+print_versions(const std::vector<dunedaq::conffwk::Version>& versions)
 {
   const auto len = versions.size();
   unsigned int idx = 1;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
   bool changes = false;
 
   bool skip_irrelevant = true;
-  dunedaq::oksdbinterfaces::Version::QueryType query_type = dunedaq::oksdbinterfaces::Version::query_by_tag;
+  dunedaq::conffwk::Version::QueryType query_type = dunedaq::conffwk::Version::query_by_tag;
 
   bool direct_info = false;
   bool objects_details = false;
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
   bool referenced_by = false;
 
   boost::program_options::options_description desc(
-      "Dumps class and objects descriptions using abstract oksdbinterfaces API.\n"
+      "Dumps class and objects descriptions using abstract conffwk API.\n"
       "Without -c or -o options, the utility lists all classes.\n"
       "\n"
       "Options/Arguments");
@@ -185,9 +185,9 @@ int main(int argc, char *argv[])
                 throw std::runtime_error("first parameter of -v has to be \"all\" or \"skip\"");
 
               if (vesrions_str[1] == "date")
-                query_type = dunedaq::oksdbinterfaces::Version::query_by_date;
+                query_type = dunedaq::conffwk::Version::query_by_date;
               else if (vesrions_str[1] == "id")
-                query_type = dunedaq::oksdbinterfaces::Version::query_by_id;
+                query_type = dunedaq::conffwk::Version::query_by_id;
               else if (vesrions_str[1] != "tag")
                 throw std::runtime_error("second versions parameter must be \"date\", \"id\" or \"tag\"");
 
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
             print_referenced_by(obj, prefix2);
         }
     }
-  catch (dunedaq::oksdbinterfaces::Exception &ex)
+  catch (dunedaq::conffwk::Exception &ex)
     {
       ers::fatal(config_dump::ConfigException(ERS_HERE, ex));
       return EXIT_FAILURE;
