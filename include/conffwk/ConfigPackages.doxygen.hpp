@@ -273,7 +273,7 @@ All above exceptions have common class \c daq::conffwk::Exception, that can be u
 \code{.cpp}
 try {
     // load database using oks file /tmp/mydb.data.xml
-  Configuration db("oksconfig:/tmp/mydb.data.xml");
+  Configuration db("oksconflibs:/tmp/mydb.data.xml");
 
   ... // user's code working with db
 }
@@ -302,17 +302,17 @@ The format of the parameter %is \e "name-of-plugin:plugin-parameters".
 The plug-in's parameter %is optional. If it %is non-empty, it %is passed to the implementation plug-in constructor.
 
 In C++ the name of plug-in %is converted into name of the shared library by adding prefix \c lib and suffix \c .so,
-e.g. \e "oksconfig" plug-in name %is converted into "liboksconfig.so".
+e.g. \e "oksconflibs" plug-in name %is converted into "liboksconflibs.so".
 The shared library must be in the path to shared libraries, e.g. in the LD_LIBRARY_PATH environment variable.
 
 In Java the name of plug-in %is converted into name of the class in package \e "plugin-name"
 with name created from \e "plugin-name", where 1-st and 4-th characters are converted to upper case
-and \e "uration" string %is appended (it %is so by historical reasons), e.g. \e "oksconfig" plug-in name
-%is converted into \e "oksconfig.OksConfiguration". The CLASSPATH variable has to point to such class or jar file.
+and \e "uration" string %is appended (it %is so by historical reasons), e.g. \e "oksconflibs" plug-in name
+%is converted into \e "oksconflibs.OksConfiguration". The CLASSPATH variable has to point to such class or jar file.
 
 For the moment three implementation plug-ins are available:
-\li the \b oksconfig using OKS implementation directly (i.e. reads XML files),
-\li the read-only \b roksconfig using OKS archive (oks2coral) (i.e. reads OKS data from Oracle archive),
+\li the \b oksconflibs using OKS implementation directly (i.e. reads XML files),
+\li the read-only \b roksconflibs using OKS archive (oks2coral) (i.e. reads OKS data from Oracle archive),
 \li the \b rdbconffwk accessing OKS with RDB %server.
 
   \subsubsection HTGD_CppInitialisation Details of initialization in C++ and examples
@@ -323,7 +323,7 @@ Below there are examples of the Configuration constructor explicit parameters:
  
 try {
     // example (1): load daq/partitions/be_test.data.xml file using oks
-  ::Configuration db1("oksconfig:daq/partitions/be_test.data.xml");
+  ::Configuration db1("oksconflibs:daq/partitions/be_test.data.xml");
  
     // example (2): connect with server RDB using rdb implementation (in initial partition)
   ::Configuration db2("rdbconffwk:RDB");
@@ -335,7 +335,7 @@ try {
   ::Configuration db2b("rdbconffwk:RDB@test");
  
     // example (3): use oks implementation and create new database
-  ::Configuration db3("oksconfig");
+  ::Configuration db3("oksconflibs");
   db3.create("", "/tmp/my.data.xml", std::list<std::string>(1,"/tmp/my.sch.xml"));
  
     // example (4): use rdb implementation and create new database
@@ -763,7 +763,7 @@ to use C++ \c const_cast to get non-const pointer or reference.
 
 To create a new database file using C++ it %is necessary to build an object of the ::Configuration class only providing name of implementation plug-in:
 \code{.cpp}
-::Configuration db("oksconfig");
+::Configuration db("oksconflibs");
 \endcode
 
 Similar code for Java %is below:
@@ -781,7 +781,7 @@ check it's return status.
 Below there %is example for C++ and oks implementation:
 \code{.cpp}
 try {
-  ::Configuration db("oksconfig");
+  ::Configuration db("oksconflibs");
   std::list<std::string> includes;
   includes.push_back("online/schema/online.schema.xml"); // common schema
   includes.push_back("online/segments/setup.data.xml");  // online infrastructure

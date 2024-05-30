@@ -24,14 +24,14 @@ echo ''
 ###############################################################################
 
 echo '**********************************************************************'
-echo '******************** tests using oksconfig plug-in *******************'
+echo '******************** tests using oksconflibs plug-in *******************'
 echo '**********************************************************************'
 echo ''
 
-echo "${1}/conffwk_time_test -d oksconfig:daq/segments/setup-initial.data.xml"
+echo "${1}/conffwk_time_test -d oksconflibs:daq/segments/setup-initial.data.xml"
 echo ''
 
-if ${1}/conffwk_time_test -d "oksconfig:daq/segments/setup-initial.data.xml"
+if ${1}/conffwk_time_test -d "oksconflibs:daq/segments/setup-initial.data.xml"
 then
   echo '' 
   echo 'conffwk_time_test test passed' 
@@ -42,10 +42,10 @@ else
 fi
 
 echo ''
-echo "${1}/conffwk_dump -d oksconfig:${test_data_file} -c Employee"
+echo "${1}/conffwk_dump -d oksconflibs:${test_data_file} -c Employee"
 echo ''
 
-if ${1}/conffwk_dump -d "oksconfig:${test_data_file}" -c "Employee"
+if ${1}/conffwk_dump -d "oksconflibs:${test_data_file}" -c "Employee"
 then
   echo ''
   echo 'conffwk_dump test passed'
@@ -70,14 +70,14 @@ data_file="/tmp/test-conffwk-by-`whoami`.$$"
 echo ''
 echo ''
 echo '**********************************************************************'
-echo '************* conffwk_test_rw test using oksconfig plug-in ************'
+echo '************* conffwk_test_rw test using oksconflibs plug-in ************'
 echo '**********************************************************************'
 echo ''
 
-echo "${1}/conffwk_test_rw -d ${data_file} -s ${schema_file} -p oksconfig"
+echo "${1}/conffwk_test_rw -d ${data_file} -s ${schema_file} -p oksconflibs"
 echo ''
 
-if ${1}/conffwk_test_rw -d ${data_file} -s ${schema_file} -p oksconfig
+if ${1}/conffwk_test_rw -d ${data_file} -s ${schema_file} -p oksconflibs
 then
   echo '' 
   echo 'conffwk_test_rw test passed' 

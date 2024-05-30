@@ -111,7 +111,7 @@ protected:
 \code   
 try {
     // load database using oks file /tmp/mydb.data.xml
-  Configuration db("oksconfig:/tmp/mydb.data.xml");
+  Configuration db("oksconflibs:/tmp/mydb.data.xml");
 
     // get object "foo@bar"
   ConfigObject obj;
@@ -154,7 +154,7 @@ catch (dunedaq::conffwk::Exception & ex) {
    *  Below there is example to read all computer objects
 \code   
 try {
-  Configuration db("oksconfig:daq/partitions/part_hlt.data.xml");
+  Configuration db("oksconflibs:daq/partitions/part_hlt.data.xml");
 
   // read all objects of "Computer" class
   std::vector<ConfigObject> hosts;
@@ -181,7 +181,7 @@ catch (dunedaq::conffwk::Exception & ex) {
 #include "dal/Segment.h"
 
 try {
-  Configuration db("oksconfig:daq/partitions/part_hlt.data.xml");
+  Configuration db("oksconflibs:daq/partitions/part_hlt.data.xml");
 
   // read all variables with Name = "TDAQ_DB_NAME"
   std::vector<const daq::core::Variable*> vars;
@@ -226,7 +226,7 @@ class Configuration {
        *
        *  The constructor expects parameter in format "plugin-name:plugin-parameter".
        *  The plugin-name is used to get implementation shared library by adding "lib"
-       *  prefix and ".so" suffix, e.g. "oksconfig" -> "liboksconfig.so". 
+       *  prefix and ".so" suffix, e.g. "oksconflibs" -> "liboksconflibs.so". 
        *  The plugin-parameter is optional; if non-empty, it is passed to the plug-in
        *  constructor.
        *
