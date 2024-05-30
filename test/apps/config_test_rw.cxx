@@ -31,7 +31,7 @@ usage()
     "Options/Arguments:\n"
     "       -d data_name      name of creating data file\n"
     "       -s schema_name    name of including schema file\n"
-    "       -p plugin_spec    conffwk plugin specification (oksconfig | rdbconffwk:server-name)\n"
+    "       -p plugin_spec    conffwk plugin specification (oksconflibs | rdbconffwk:server-name)\n"
     "\n"
     "Description:\n"
     "       The utility tests creation of files and objects using different plugins.\n\n";
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
   }
 
   if(!plugin_name) {
-    ers::fatal(conffwk_test_rw::BadCommandLine(ERS_HERE, "no plugin specification given (oksconfig, rdbconffwk:server-name)"));
+    ers::fatal(conffwk_test_rw::BadCommandLine(ERS_HERE, "no plugin specification given (oksconflibs, rdbconffwk:server-name)"));
     return (EXIT_FAILURE);
   }
 

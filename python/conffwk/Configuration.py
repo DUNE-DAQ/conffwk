@@ -40,15 +40,15 @@ class Configuration(_ConfigurationProxy):
         self.__cache__ = {}
         self.__initialize_cache__()
 
-    def __init__(self, connection='oksconfig:'):
+    def __init__(self, connection='oksconflibs:'):
         """Initializes a Configuration database.
 
         Keyword arguments:
 
         connection -- A connection string, in the form of <backend>:<database>
-        name, where <backend> may be set to be 'oksconfig' or 'rdbconffwk' and
+        name, where <backend> may be set to be 'oksconflibs' or 'rdbconffwk' and
         <database> is either the name of the database XML file (in the case of
-        'oksconfig') or the name of a database associated with an RDB server
+        'oksconflibs') or the name of a database associated with an RDB server
         (in the case of 'rdbconffwk').
 
         Warning: To use the RDB server, the IPC subsystem has to be initialized
@@ -64,13 +64,13 @@ class Configuration(_ConfigurationProxy):
             super(Configuration, self).__init__(connection)
         except RuntimeError:
             preamble = f"Unable to open database off of \"{connection}\""
-            if not re.search(r"^oksconfig:", connection):
+            if not re.search(r"^oksconflibs:", connection):
                 raise RuntimeError(f"""
 {preamble}; one reason is that it looks
-like the database type wasn't specified in the name (i.e. \"oksconfig:<filename>\")
+like the database type wasn't specified in the name (i.e. \"oksconflibs:<filename>\")
 """)
             else:
-                dbfilename = connection[len("oksconfig:"):]
+                dbfilename = connection[len("oksconflibs:"):]
                 if not os.path.exists(dbfilename):
                     raise RuntimeError(f"{preamble}; one reason is that it looks like \"{dbfilename}\" doesn't exist")
                 elif not re.search(r".xml$", dbfilename):

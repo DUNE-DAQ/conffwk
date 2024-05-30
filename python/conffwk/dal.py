@@ -670,7 +670,7 @@ def generate(configuration, other_dals=[]):
     return klasses
 
 
-def module(name, schema, other_dals=[], backend='oksconfig', db=None):
+def module(name, schema, other_dals=[], backend='oksconflibs', db=None):
     """Creates a new python module with the OKS schema files passed as
     parameter.
 
@@ -704,7 +704,7 @@ def module(name, schema, other_dals=[], backend='oksconfig', db=None):
     In other words creating twice the same DAL implies in almost no overhead.
 
     backend -- This is the OKS backend to use when retrieving the schemas. By
-    default it is set to 'oksconfig', which is what we
+    default it is set to 'oksconflibs', which is what we
     """
     import types
     from .Configuration import Configuration
