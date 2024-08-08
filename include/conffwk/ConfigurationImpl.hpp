@@ -5,8 +5,8 @@
    *  \brief abstract Configuration implementation
    */
 
-#ifndef OKSDB_INTERFACE_CONFIGURATIONIMPL_H_
-#define OKSDB_INTERFACE_CONFIGURATIONIMPL_H_
+#ifndef CONFFWK_CONFIGURATIONIMPL_H_
+#define CONFFWK_CONFIGURATIONIMPL_H_
 
 #include <string>
 #include <vector>
@@ -14,16 +14,16 @@
 #include <set>
 #include <map>
 
-#include "oksdbinterfaces/map.hpp"
-#include "oksdbinterfaces/set.hpp"
-#include "oksdbinterfaces/ConfigVersion.hpp"
+#include "conffwk/map.hpp"
+#include "conffwk/set.hpp"
+#include "conffwk/ConfigVersion.hpp"
 
 class ConfigurationChange;
 class ConfigObject;
 class ConfigObjectImpl;
 
 namespace dunedaq {
-namespace oksdbinterfaces {
+namespace conffwk {
 
 
 struct class_t;
@@ -36,7 +36,7 @@ struct class_t;
    *  access database information, subscribe and receive notification on data changes.
    *  Any database implementation inherits from this class and implements it's methods. 
 
-   *  The methods may throw dunedaq::oksdbinterfaces::Exception exception (like Generic, NotFound) in
+   *  The methods may throw dunedaq::conffwk::Exception exception (like Generic, NotFound) in
    *  case of an error unless \b noexcept is explicitly used in their specification.
    */
 
@@ -115,11 +115,11 @@ class ConfigurationImpl {
 
       /// Get newly available versions
 
-    virtual std::vector<dunedaq::oksdbinterfaces::Version> get_changes() = 0;
+    virtual std::vector<dunedaq::conffwk::Version> get_changes() = 0;
 
       /// Get archived versions
 
-    virtual std::vector<dunedaq::oksdbinterfaces::Version> get_versions(const std::string& since, const std::string& until, dunedaq::oksdbinterfaces::Version::QueryType type, bool skip_irrelevant) = 0;
+    virtual std::vector<dunedaq::conffwk::Version> get_versions(const std::string& since, const std::string& until, dunedaq::conffwk::Version::QueryType type, bool skip_irrelevant) = 0;
 
 
     // methods to get data from database
@@ -166,11 +166,11 @@ class ConfigurationImpl {
 
       /// Get description of class in accordance with parameters.
 
-    virtual dunedaq::oksdbinterfaces::class_t * get(const std::string& class_name, bool direct_only) = 0;
+    virtual dunedaq::conffwk::class_t * get(const std::string& class_name, bool direct_only) = 0;
 
       /// Get inheritance hierarchy
 
-    virtual void get_superclasses(oksdbinterfaces::fmap<oksdbinterfaces::fset>& schema) = 0;
+    virtual void get_superclasses(conffwk::fmap<conffwk::fset>& schema) = 0;
 
 
     // notification
@@ -206,7 +206,7 @@ class ConfigurationImpl {
 
   private:
 
-    oksdbinterfaces::pmap<oksdbinterfaces::map<ConfigObjectImpl *> * > m_impl_objects;
+    conffwk::pmap<conffwk::map<ConfigObjectImpl *> * > m_impl_objects;
     std::vector<ConfigObjectImpl *> m_tangled_objects; // deleted and replaced by others as result of rename
 
     mutable unsigned long p_number_of_cache_hits;
@@ -241,7 +241,7 @@ class ConfigurationImpl {
           else
             {
               static_cast<T *>(p)->set(obj);
-              p->m_state = dunedaq::oksdbinterfaces::Valid;
+              p->m_state = dunedaq::conffwk::Valid;
             }
 
           return static_cast<T *>(p);
@@ -280,7 +280,7 @@ class ConfigurationImpl {
 
 };
 
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq
 
-#endif // OKSDB_INTERFACE_CONFIGURATIONIMPL_H_
+#endif // CONFFWK_CONFIGURATIONIMPL_H_

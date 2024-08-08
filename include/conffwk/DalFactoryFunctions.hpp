@@ -7,7 +7,7 @@
 #include <boost/compute/functional/identity.hpp>
 
 namespace dunedaq {
-namespace oksdbinterfaces {
+namespace conffwk {
 
 
 class Configuration;
@@ -23,7 +23,7 @@ class CacheBase;
  *  It is used by the referenced_by() method returning DAL object.
  *
  *  \param db    reference on configuration
- *  \param obj   oksdbinterfaces object
+ *  \param obj   conffwk object
  *  \param uid   uid for generated objects
  *  \return      the DAL object
  */
@@ -84,7 +84,7 @@ struct DalFactoryFunctions
   template<class T>
     DalFactoryFunctions(boost::compute::identity<T>, const std::set<std::string> algorithms);
 };
-} // namespace oksdbinterfaces
+} // namespace conffwk
 } // namespace dunedaq
 
 #endif

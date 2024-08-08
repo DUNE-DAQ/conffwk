@@ -24,34 +24,34 @@ echo ''
 ###############################################################################
 
 echo '**********************************************************************'
-echo '******************** tests using oksconfig plug-in *******************'
+echo '******************** tests using oksconflibs plug-in *******************'
 echo '**********************************************************************'
 echo ''
 
-echo "${1}/oksdbinterfaces_time_test -d oksconfig:daq/segments/setup-initial.data.xml"
+echo "${1}/conffwk_time_test -d oksconflibs:daq/segments/setup-initial.data.xml"
 echo ''
 
-if ${1}/oksdbinterfaces_time_test -d "oksconfig:daq/segments/setup-initial.data.xml"
+if ${1}/conffwk_time_test -d "oksconflibs:daq/segments/setup-initial.data.xml"
 then
   echo '' 
-  echo 'oksdbinterfaces_time_test test passed' 
+  echo 'conffwk_time_test test passed' 
 else
   echo '' 
-  echo 'oksdbinterfaces_time_test test failed'
+  echo 'conffwk_time_test test failed'
   exit 1
 fi
 
 echo ''
-echo "${1}/oksdbinterfaces_dump -d oksconfig:${test_data_file} -c Employee"
+echo "${1}/conffwk_dump -d oksconflibs:${test_data_file} -c Employee"
 echo ''
 
-if ${1}/oksdbinterfaces_dump -d "oksconfig:${test_data_file}" -c "Employee"
+if ${1}/conffwk_dump -d "oksconflibs:${test_data_file}" -c "Employee"
 then
   echo ''
-  echo 'oksdbinterfaces_dump test passed'
+  echo 'conffwk_dump test passed'
 else
   echo ''
-  echo 'oksdbinterfaces_dump test failed'
+  echo 'conffwk_dump test failed'
   exit 1
 fi
 
@@ -65,25 +65,25 @@ rm -f ${test_schema_file} ${test_data_file}
 ###############################################################################
 
 schema_file="${2}/test/test.schema.xml"
-data_file="/tmp/test-oksdbinterfaces-by-`whoami`.$$"
+data_file="/tmp/test-conffwk-by-`whoami`.$$"
 
 echo ''
 echo ''
 echo '**********************************************************************'
-echo '************* oksdbinterfaces_test_rw test using oksconfig plug-in ************'
+echo '************* conffwk_test_rw test using oksconflibs plug-in ************'
 echo '**********************************************************************'
 echo ''
 
-echo "${1}/oksdbinterfaces_test_rw -d ${data_file} -s ${schema_file} -p oksconfig"
+echo "${1}/conffwk_test_rw -d ${data_file} -s ${schema_file} -p oksconflibs"
 echo ''
 
-if ${1}/oksdbinterfaces_test_rw -d ${data_file} -s ${schema_file} -p oksconfig
+if ${1}/conffwk_test_rw -d ${data_file} -s ${schema_file} -p oksconflibs
 then
   echo '' 
-  echo 'oksdbinterfaces_test_rw test passed' 
+  echo 'conffwk_test_rw test passed' 
 else
   echo '' 
-  echo 'oksdbinterfaces_test_rw test failed'
+  echo 'conffwk_test_rw test failed'
   exit 1
 fi
 
@@ -95,7 +95,7 @@ echo '**********************************************************************'
 echo ''
 echo ''
 echo '**********************************************************************'
-echo '************* oksdbinterfaces_test_rw test using rdboksdbinterfaces plug-in ************'
+echo '************* conffwk_test_rw test using rdbconffwk plug-in ************'
 echo '**********************************************************************'
 echo ''
 
@@ -103,8 +103,8 @@ ipc_file="/tmp/ipc_root.$$.ref"
 TDAQ_IPC_INIT_REF="file:${ipc_file}"
 export TDAQ_IPC_INIT_REF
 
-write_server_name='oksdbinterfaces_w'
-read_server_name='oksdbinterfaces_r'
+write_server_name='conffwk_w'
+read_server_name='conffwk_r'
 cleanup='ipc_rm -i ".*" -n ".*" -f'
 startup_timeout='10'
 
@@ -183,16 +183,16 @@ fi
 echo ""
 echo ''
 
-echo "${1}/oksdbinterfaces_test_rw -d ${data_file} -s ${schema_file} -p rdboksdbinterfaces:${write_server_name}"
+echo "${1}/conffwk_test_rw -d ${data_file} -s ${schema_file} -p rdbconffwk:${write_server_name}"
 echo ''
 
-if ${1}/oksdbinterfaces_test_rw -d ${data_file} -s ${schema_file} -p "rdboksdbinterfaces:${write_server_name}"
+if ${1}/conffwk_test_rw -d ${data_file} -s ${schema_file} -p "rdbconffwk:${write_server_name}"
 then
   echo '' 
-  echo 'oksdbinterfaces_test_rw test passed' 
+  echo 'conffwk_test_rw test passed' 
 else
   echo '' 
-  echo 'oksdbinterfaces_test_rw test failed'
+  echo 'conffwk_test_rw test failed'
   exit 1
 fi
 
@@ -200,18 +200,18 @@ echo ''
 echo ''
 echo ''
 echo '**********************************************************************'
-echo '************ oksdbinterfaces_dump java test using rdboksdbinterfaces plug-in ***********'
+echo '************ conffwk_dump java test using rdbconffwk plug-in ***********'
 echo '**********************************************************************'
 echo ''
 
-echo $TDAQ_JAVA_HOME/bin/java -classpath ${1}/oksdbinterfaces.jar:'$CLASSPATH' oksdbinterfaces.ConfigDump -d "rdboksdbinterfaces:${read_server_name}" -C OnlineSegment -O -r
-if $TDAQ_JAVA_HOME/bin/java -classpath ${1}/oksdbinterfaces.jar:$CLASSPATH oksdbinterfaces.ConfigDump -d "rdboksdbinterfaces:${read_server_name}" -C OnlineSegment -O -r
+echo $TDAQ_JAVA_HOME/bin/java -classpath ${1}/conffwk.jar:'$CLASSPATH' conffwk.ConfigDump -d "rdbconffwk:${read_server_name}" -C OnlineSegment -O -r
+if $TDAQ_JAVA_HOME/bin/java -classpath ${1}/conffwk.jar:$CLASSPATH conffwk.ConfigDump -d "rdbconffwk:${read_server_name}" -C OnlineSegment -O -r
 then
   echo '' 
-  echo 'java oksdbinterfaces_dump test passed' 
+  echo 'java conffwk_dump test passed' 
 else
   echo '' 
-  echo 'java oksdbinterfaces_dump test failed'
+  echo 'java conffwk_dump test failed'
   exit 1
 fi
 

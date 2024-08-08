@@ -1,15 +1,15 @@
 /**
- * @file oksdbinterfaces.cpp
+ * @file conffwk.cpp
  *
  * This is part of the DUNE DAQ Software Suite, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "oksdbinterfaces/Configuration.hpp"
-#include "oksdbinterfaces/ConfigObject.hpp"
-#include "oksdbinterfaces/Schema.hpp"
-#include "oksdbinterfaces/set.hpp"
+#include "conffwk/Configuration.hpp"
+#include "conffwk/ConfigObject.hpp"
+#include "conffwk/Schema.hpp"
+#include "conffwk/set.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -21,10 +21,10 @@
 
 namespace py = pybind11;
 
-namespace dunedaq::oksdbinterfaces::python {
+namespace dunedaq::conffwk::python {
 
 void
-register_oksdbinterfaces(py::module& m)
+register_conffwk(py::module& m)
 {
 
   py::class_<Configuration>(m, "_Configuration")
@@ -47,9 +47,9 @@ register_oksdbinterfaces(py::module& m)
     .def("destroy_obj",
 	 &Configuration::destroy_obj, "The method tries to destroy given object.", py::arg("object"))
     .def("get_impl_param",
-	 &Configuration::get_impl_param, "Get implementation plug-in parameter used to build oksdbinterfaces object")
+	 &Configuration::get_impl_param, "Get implementation plug-in parameter used to build conffwk object")
     .def("get_impl_spec",
-	 &Configuration::get_impl_spec, "Get implementation plug-in and its parameter used to build oksdbinterfaces object")
+	 &Configuration::get_impl_spec, "Get implementation plug-in and its parameter used to build conffwk object")
     .def("get_includes",
 	 &Configuration::return_includes_pybind, "Returns list of files included by given database.", py::arg("db_name"))
     .def("get_obj",
@@ -76,7 +76,7 @@ register_oksdbinterfaces(py::module& m)
 }
 
 void
-register_oksdbinterfacesobject(py::module& m)
+register_conffwkobject(py::module& m)
 {
 
   py::class_<ConfigObject>(m, "_ConfigObject")
@@ -217,4 +217,4 @@ register_oksdbinterfacesobject(py::module& m)
 }
 
 
-} // namespace dunedaq::oksdbinterfaces::python
+} // namespace dunedaq::conffwk::python
