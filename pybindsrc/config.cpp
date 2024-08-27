@@ -201,15 +201,15 @@ register_conffwkobject(py::module& m)
     .def("set_double_vec",
 	 &ConfigObject::set_list_pybind<double>, "Setter function for list", py::arg("attrname"), py::arg("l"))
     .def("set_class_vec",
-	 &ConfigObject::set_class_list, "Set class names", py::arg("co"), py::arg("attrname"), py::arg("l"))
+	 &ConfigObject::set_list_pybind<std::string>, "Set list of classes", py::arg("attrname"), py::arg("l"))
     .def("set_date_vec",
-	 &ConfigObject::set_date_list, "Set dates", py::arg("co"), py::arg("attrname"), py::arg("l"))
+	 &ConfigObject::set_list_pybind<std::string>, "Set list of dates", py::arg("attrname"), py::arg("l"))
     .def("set_enum_vec",
-	 &ConfigObject::set_enum_list, "Set enums", py::arg("co"), py::arg("attrname"), py::arg("l"))
+	 &ConfigObject::set_list_pybind<std::string>, "Set list of enums", py::arg("attrname"), py::arg("l"))
     .def("set_string_vec",
 	 &ConfigObject::set_list_pybind<std::string>, "Set list of strings", py::arg("attrname"), py::arg("l"))
     .def("set_time_vec",
-	 &ConfigObject::set_time_list, "Set times", py::arg("co"), py::arg("attrname"), py::arg("l"))
+	 &ConfigObject::set_list_pybind<std::string>, "Set list of times", py::arg("attrname"), py::arg("l"))
     .def("UID",
 	 &ConfigObject::UID, "Return object identity")
     ;
