@@ -108,19 +108,19 @@
   <relationship name="ProcessEnvironment" description="Define application specific process environment." class-type="Parameter" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <method name="get_host" description="">
    <method-implementation language="c++" prototype="const daq::core::Computer * get_host() const" body="ADD_ALGO_1"/>
-   <method-implementation language="java" prototype="dal.Computer get_host() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_app_conffwk(false).get_host();"/>
+   <method-implementation language="java" prototype="dal.Computer get_host() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_host();"/>
   </method>
   <method name="get_segment" description="Get generated segment object this application belongs to.">
    <method-implementation language="c++" prototype="const daq::core::Segment * get_segment() const" body="ADD_ALGO_1"/>
-   <method-implementation language="java" prototype="dal.Segment get_segment() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_app_conffwk(false).get_segment();"/>
+   <method-implementation language="java" prototype="dal.Segment get_segment() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_segment();"/>
   </method>
-  <method name="get_backup_hosts" description="Get backup hosts for this application.&#xA;&#xA;The method returns vector of computers where the application can be restarted in case of problems.&#xA;&#xA;For normal applications the backup hosts are defined via &quot;BackupHosts&quot; relationship.&#xA;For template applications with &quot;RunsOn&quot; attribute set to &quot;FirstHostWithBackup&quot; the backup hosts are randomly chosen from list of segment hosts; there are no backup hosts for other types of template &quot;RunsOn&quot;.&#xA;&#xA;\throw daq::conffwk::Exception in case of problems">
+  <method name="get_backup_hosts" description="Get backup hosts for this application.&#xA;&#xA;The method returns vector of computers where the application can be restarted in case of problems.&#xA;&#xA;For normal applications the backup hosts are defined via &quot;BackupHosts&quot; relationship.&#xA;For template applications with &quot;RunsOn&quot; attribute set to &quot;FirstHostWithBackup&quot; the backup hosts are randomly chosen from list of segment hosts; there are no backup hosts for other types of template &quot;RunsOn&quot;.&#xA;&#xA;\throw daq::config::Exception in case of problems">
    <method-implementation language="c++" prototype="std::vector&lt;const daq::core::Computer *&gt; get_backup_hosts() const" body="ADD_ALGO_N"/>
-   <method-implementation language="java" prototype="dal.Computer[] get_backup_hosts() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_app_conffwk(false).get_backup_hosts();"/>
+   <method-implementation language="java" prototype="dal.Computer[] get_backup_hosts() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_backup_hosts();"/>
   </method>
   <method name="get_base_app" description="Return original base application object, i.e. not created by DAL algorithms">
    <method-implementation language="c++" prototype="const daq::core::BaseApplication * get_base_app() const" body=""/>
-   <method-implementation language="java" prototype="dal.BaseApplication get_base_app() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_app_conffwk(false).get_base_app();"/>
+   <method-implementation language="java" prototype="dal.BaseApplication get_base_app() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_base_app();"/>
   </method>
   <method name="get_initialization_depends_from" description="Get applications initialization depends from.&#xA;&#xA;If this application is normal (i.e. non-templated), the algorithm returns all dependent normal applications and templated applications which belong to the segment of the application.&#xA;If this application is templated, then the algorithm returns all dependent applications belonging to the same segment and running on the same host.&#xA;&#xA;By performance efficiency reasons the algorithm needs to know all applications running in this segment.&#xA;The all_apps input parameter should contain result returned by get_all_applications() algorithm running for the segment of this application (preferable) or it&apos;s partition.&#xA;&#xA;\param all_apps  all applications in this segment or whole partition&#xA;\return result containing initialization dependent applications&#xA;\throw Throw daq::core::NotInitedObject if the object was not initialized and cannot be used">
    <method-implementation language="c++" prototype="std::vector&lt;const daq::core::BaseApplication *&gt; get_initialization_depends_from(const std::vector&lt;const daq::core::BaseApplication *&gt;&amp; all_apps) const" body=""/>
@@ -130,15 +130,15 @@
   </method>
   <method name="get_info" description="Get full information about application.&#xA;&#xA;The method returns vector of allowed tags, process environment, possible program names and command line arguments.&#xA;The root_segment has to be a reference on online segment returned by the partition&apos;s get_segment() invoked on the online segment.&#xA;\param environment   output map of process environment name:value pairs&#xA;\param program_names output vector of possible program names&#xA;\param partition     reference on partition&#xA;\param root_segment  reference on online segment (as returned by daq::core::Partition::get_segment() invoked on the online segment)&#xA;\param host          reference on host where to run application (may override host set in AppConfig)&#xA;\param startArgs     output string with command line arguments to start application&#xA;\param restartArgs   output string with command line arguments to re-start application&#xA;\return tag for this application&#xA;\throw  daq::core::AlgorithmError in case of problems">
    <method-implementation language="c++" prototype="const daq::core::Tag * get_info(std::map&lt;std::string, std::string&gt;&amp; environment, std::vector&lt;std::string&gt;&amp; program_names, std::string &amp; startArgs, std::string &amp; restartArgs) const" body=""/>
-   <method-implementation language="java" prototype="dal.Tag get_info(java.util.Map&lt;String, String&gt; environment, java.util.List&lt;String&gt; program_names, StringBuilder startArgs, StringBuilder restartArgs) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return dal.AppConfig.get_info(this, environment,program_names, startArgs, restartArgs);"/>
+   <method-implementation language="java" prototype="dal.Tag get_info(java.util.Map&lt;String, String&gt; environment, java.util.List&lt;String&gt; program_names, StringBuilder startArgs, StringBuilder restartArgs) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return dal.AppConfig.get_info(this, environment,program_names, startArgs, restartArgs);"/>
   </method>
   <method name="is_templated" description="Return true if application is templated">
    <method-implementation language="c++" prototype="bool is_templated() const" body=""/>
-   <method-implementation language="java" prototype="boolean get_is_templated() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_app_conffwk(false).get_is_templated();"/>
+   <method-implementation language="java" prototype="boolean get_is_templated() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_app_config(false).get_is_templated();"/>
   </method>
-  <method name="get_app_conffwk" description="">
-   <method-implementation language="c++" prototype="const AppConfig * get_app_conffwk(bool no_except = false) const" body="BEGIN_HEADER_PROLOGUE&#xA;#include &lt;atomic&gt;&#xA;#include &lt;dal/app-conffwk.h&gt;&#xA;namespace daq { namespace core { class AlgorithmUtils; } }&#xA;END_HEADER_PROLOGUE&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;std::unique_ptr&lt;AppConfig&gt; p_app_conffwk;&#xA;mutable std::atomic&lt;const BaseApplication *&gt; p_gen_obj;&#xA;friend class daq::core::AlgorithmUtils;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;p_gen_obj(nullptr)&#xA;END_MEMBER_INITIALIZER_LIST&#xA;"/>
-   <method-implementation language="java" prototype="dal.AppConfig get_app_conffwk(boolean no_except) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="BEGIN_PRIVATE_SECTION&#xA;dal.AppConfig p_app_conffwk;&#xA;dal.BaseApplication p_gen_obj;&#xA;END_PRIVATE_SECTION&#xA;&#xA;return dal.ApplicationConfig.get_app_conffwk(this, no_except);&#xA;"/>
+  <method name="get_app_config" description="">
+   <method-implementation language="c++" prototype="const AppConfig * get_app_config(bool no_except = false) const" body="BEGIN_HEADER_PROLOGUE&#xA;#include &lt;atomic&gt;&#xA;#include &lt;dal/app-config.h&gt;&#xA;namespace daq { namespace core { class AlgorithmUtils; } }&#xA;END_HEADER_PROLOGUE&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;std::unique_ptr&lt;AppConfig&gt; p_app_config;&#xA;mutable std::atomic&lt;const BaseApplication *&gt; p_gen_obj;&#xA;friend class daq::core::AlgorithmUtils;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;p_gen_obj(nullptr)&#xA;END_MEMBER_INITIALIZER_LIST&#xA;"/>
+   <method-implementation language="java" prototype="dal.AppConfig get_app_config(boolean no_except) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="BEGIN_PRIVATE_SECTION&#xA;dal.AppConfig p_app_config;&#xA;dal.BaseApplication p_gen_obj;&#xA;END_PRIVATE_SECTION&#xA;&#xA;return dal.ApplicationConfig.get_app_config(this, no_except);&#xA;"/>
   </method>
  </class>
 
@@ -162,14 +162,14 @@
  <class name="Component" description="Abstract base class for Segment and Resource classes. It is only used to allow objects of derived classes to be put into list of disabled items. For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_4_Resource_Classes" is-abstract="yes">
   <method name="get_parents" description="The algorithm calculates a vector of segments which are parents of given segment.&#xA;If the segment has parents referenced by the partition object, then:&#xA;- in case of C++ it fills parents parameter&#xA;- in case of Java it returns parents; otherwise it throws {@link NotFoundException} exception">
    <method-implementation language="c++" prototype="void get_parents(const daq::core::Partition&amp; partition, std::list&lt; std::vector&lt;const daq::core::Component *&gt; &gt;&amp; parents) const" body=""/>
-   <method-implementation language="java" prototype="Component[][] get_parents(Partition partition) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return dal.Algorithms.get_parents(this, partition);"/>
+   <method-implementation language="java" prototype="Component[][] get_parents(Partition partition) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return dal.Algorithms.get_parents(this, partition);"/>
   </method>
   <method name="disabled" description="The algorithm checks if the segment / resource is disabled in the partition that uses it.&#xA;@param partition      partition object containing this resource or segment&#xA;">
    <method-implementation language="c++" prototype="bool disabled(const daq::core::Partition&amp; partition, bool skip_check = false) const" body=""/>
-   <method-implementation language="java" prototype="boolean disabled(Partition partition) throws conffwk.GenericException, conffwk.SystemException, conffwk.NotFoundException, conffwk.NotValidException" body="return partition.resources().get_disabled(this, partition, false);"/>
+   <method-implementation language="java" prototype="boolean disabled(Partition partition) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return partition.resources().get_disabled(this, partition, false);"/>
   </method>
   <method name="why_disabled" description="">
-   <method-implementation language="java" prototype="String why_disabled(Partition partition, String prefix, boolean full_report) throws conffwk.GenericException, conffwk.SystemException, conffwk.NotFoundException, conffwk.NotValidException" body="return partition.resources().why_disabled(this, prefix, full_report);"/>
+   <method-implementation language="java" prototype="String why_disabled(Partition partition, String prefix, boolean full_report) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return partition.resources().why_disabled(this, prefix, full_report);"/>
   </method>
  </class>
 
@@ -193,7 +193,7 @@
   <relationship name="ProcessEnvironment" class-type="Parameter" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <method name="get_info" description="Calculates computer program parameters:&#xA;- list of possible program files&#xA;- process environment&#xA; &#xA;Requires:&#xA;- partition reference&#xA;- tag reference&#xA;- computer reference&#xA;- optional partition pointer&#xA;">
    <method-implementation language="c++" prototype="void get_info(std::map&lt;std::string, std::string&gt;&amp; environment, std::vector&lt;std::string&gt;&amp; program_names, const daq::core::Partition&amp; partition, const daq::core::Tag&amp; tag, const daq::core::Computer&amp; host) const" body=""/>
-   <method-implementation language="java" prototype="void get_info(java.util.Map&lt;String, String&gt; environment, java.util.List&lt;String&gt; program_names, dal.Partition partition, dal.Tag tag, dal.Computer host) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="dal.Algorithms.get_info(this, environment, program_names, partition, tag, host);"/>
+   <method-implementation language="java" prototype="void get_info(java.util.Map&lt;String, String&gt; environment, java.util.List&lt;String&gt; program_names, dal.Partition partition, dal.Tag tag, dal.Computer host) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="dal.Algorithms.get_info(this, environment, program_names, partition, tag, host);"/>
   </method>
  </class>
 
@@ -225,7 +225,7 @@
  </class>
 
  <class name="CustomLifetimeApplicationBase">
-  <attribute name="Lifetime" description="Defines the transitions at which the application shall be started/stopped." type="enum" range="Boot_Shutdown,Configure_Unconffwkure,SOR_EOR,EOR_SOR,UserDefined_Shutdown" init-value="Boot_Shutdown"/>
+  <attribute name="Lifetime" description="Defines the transitions at which the application shall be started/stopped." type="enum" range="Boot_Shutdown,Configure_Unconfigure,SOR_EOR,EOR_SOR,UserDefined_Shutdown" init-value="Boot_Shutdown"/>
   <attribute name="AllowSpontaneousExit" description="Allow the application to exit when it has finished its task.&#xA;The exit code will be checked and if it is !=0 then the system will behave as specified by the IfExitsUnexpectedly attribute." type="bool" init-value="false"/>
  </class>
 
@@ -396,7 +396,7 @@
   <superclass name="Interface"/>
   <attribute name="IPAddress" description="The hostname or dotted IP address for this interface." type="string"/>
   <attribute name="Label" description="TDAQ network label. CTRL, DC* and EF to be used on Point-1. The DATA to be used on external testbeds." type="enum" range="NONE,CTRL,DC1,DC2,EF,DATA"/>
-  <attribute name="InterfaceName" description="Value returned by /sbin/conffwk for this NIC." type="string" is-not-null="yes"/>
+  <attribute name="InterfaceName" description="Value returned by /sbin/config for this NIC." type="string" is-not-null="yes"/>
  </class>
 
  <class name="OnlineSegment">
@@ -418,7 +418,7 @@
   <attribute name="DBPath" description="Defines locations of database repositories (i.e. OKS_DB_ROOT). By default, it is copied from the variable TDAQ_DB_PATH defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_PATH)"/>
   <attribute name="DBName" description="Defines database name, e.g. name of the OKS data file. By default, it is copied from the variable TDAQ_DB_DATA defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_DATA)"/>
   <attribute name="DBVersion" description="Defines database version (SHA key) if GIT repository is used . By default, it is copied from the variable TDAQ_DB_VERSION defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_VERSION)"/>
-  <attribute name="DBTechnology" description="Defines conffwk database technology implementation to be used by all processes running in given partition. Defines TDAQ_DB variable to be passed to all applications of the partition." type="enum" range="rdbconffwk,oksconflibs" init-value="rdbconffwk"/>
+  <attribute name="DBTechnology" description="Defines config database technology implementation to be used by all processes running in given partition. Defines TDAQ_DB variable to be passed to all applications of the partition." type="enum" range="rdbconfig,oksconflibs" init-value="rdbconfig"/>
   <attribute name="LogRoot" description="Defines root directory for log files." type="string" init-value="/tmp"/>
   <attribute name="WorkingDirectory" description="Defines directory, where a new process run by pmg will be started." type="string" init-value="/tmp"/>
   <attribute name="RunTypes" type="string" is-multi-value="yes"/>
@@ -439,30 +439,30 @@
   <relationship name="OnlineInfrastructureApplications" description="Extension of OnlineSegment applications" class-type="Application" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <method name="get_all_applications" description="Returns all templated and non-templated applications defined in the partition with their parameters to be used by the data collection and message passing configurations.">
    <method-implementation language="c++" prototype="std::vector&lt;const daq::core::BaseApplication *&gt; get_all_applications(std::set&lt;std::string&gt; * app_types = nullptr, std::set&lt;std::string&gt; * use_segments = nullptr, std::set&lt;const Computer *&gt; * use_hosts = nullptr) const" body="ADD_ALGO_N"/>
-   <method-implementation language="java" prototype="dal.BaseApplication[] get_all_applications(String[] app_types, String[] use_segments, dal.Computer[] use_hosts) throws conffwk.GenericException, conffwk.SystemException, conffwk.NotFoundException, conffwk.NotValidException" body="return get_segment(get_OnlineInfrastructure().UID()).get_all_applications(app_types, use_segments, use_hosts);"/>
+   <method-implementation language="java" prototype="dal.BaseApplication[] get_all_applications(String[] app_types, String[] use_segments, dal.Computer[] use_hosts) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return get_segment(get_OnlineInfrastructure().UID()).get_all_applications(app_types, use_segments, use_hosts);"/>
   </method>
-  <method name="set_disabled" description="In addition to persistently disabled components, dynamically disable these components. It will be taken into account by disabled() algorithm of Component class. This information is not committed to the database and will be overwritten by next set_disabled() call or erased by any conffwk action (DB load, unload, reload).">
+  <method name="set_disabled" description="In addition to persistently disabled components, dynamically disable these components. It will be taken into account by disabled() algorithm of Component class. This information is not committed to the database and will be overwritten by next set_disabled() call or erased by any config action (DB load, unload, reload).">
    <method-implementation language="c++" prototype="void set_disabled(const std::set&lt;const daq::core::Component *&gt;&amp; objs) const" body="BEGIN_PRIVATE_SECTION&#xA;friend class DisabledComponents;&#xA;friend class Component;&#xA;mutable daq::core::DisabledComponents m_disabled_components; &#xA;END_PRIVATE_SECTION&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;m_disabled_components(p_db)&#xA;END_MEMBER_INITIALIZER_LIST&#xA;BEGIN_HEADER_PROLOGUE&#xA;#include &quot;dal/disabled-components.h&quot;&#xA;END_HEADER_PROLOGUE"/>
-   <method-implementation language="java" prototype="void set_disabled(Component objs[]) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="BEGIN_PUBLIC_SECTION&#xA;Resources resources() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException;&#xA;END_PUBLIC_SECTION&#xA;BEGIN_PRIVATE_SECTION&#xA;private Resources p_resources;&#xA;&#xA;public Resources resources() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException {&#xA;  if(p_was_read == false) {init();}&#xA;  return p_resources;&#xA;}&#xA;END_PRIVATE_SECTION&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;if(p_resources == null) p_resources = new Resources(p_db);&#xA;END_MEMBER_INITIALIZER_LIST&#xA;resources().set_disabled(objs);"/>
+   <method-implementation language="java" prototype="void set_disabled(Component objs[]) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="BEGIN_PUBLIC_SECTION&#xA;Resources resources() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException;&#xA;END_PUBLIC_SECTION&#xA;BEGIN_PRIVATE_SECTION&#xA;private Resources p_resources;&#xA;&#xA;public Resources resources() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException {&#xA;  if(p_was_read == false) {init();}&#xA;  return p_resources;&#xA;}&#xA;END_PRIVATE_SECTION&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;if(p_resources == null) p_resources = new Resources(p_db);&#xA;END_MEMBER_INITIALIZER_LIST&#xA;resources().set_disabled(objs);"/>
   </method>
-  <method name="set_enabled" description="Dynamically enable these persistently disabled components. It will be taken into account by disabled() algorithm of the Component class. This information is not committed to the database and will be overwritten by next set_enabled() call or erased by any conffwk action (DB load, unload, reload).">
+  <method name="set_enabled" description="Dynamically enable these persistently disabled components. It will be taken into account by disabled() algorithm of the Component class. This information is not committed to the database and will be overwritten by next set_enabled() call or erased by any config action (DB load, unload, reload).">
    <method-implementation language="c++" prototype="void set_enabled(const std::set&lt;const daq::core::Component *&gt;&amp; objs) const" body=""/>
-   <method-implementation language="java" prototype="void set_enabled(Component objs[]) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="resources().set_enabled(objs);"/>
+   <method-implementation language="java" prototype="void set_enabled(Component objs[]) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="resources().set_enabled(objs);"/>
   </method>
   <method name="get_segment" description="The DAL algorithm to access segment by name. It generates templated segments and applications objects dynamically">
-   <method-implementation language="c++" prototype="const daq::core::Segment * get_segment(const std::string&amp; name) const" body="BEGIN_PRIVATE_SECTION&#xA;mutable daq::core::ApplicationConfig m_app_conffwk; &#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;m_app_conffwk(p_db)&#xA;END_MEMBER_INITIALIZER_LIST&#xA;&#xA;BEGIN_HEADER_PROLOGUE&#xA;#include &quot;dal/application-conffwk.h&quot;&#xA;END_HEADER_PROLOGUE"/>
-   <method-implementation language="java" prototype="dal.Segment get_segment(String id) throws conffwk.GenericException, conffwk.SystemException, conffwk.NotFoundException, conffwk.NotValidException" body="return p_application_conffwk.get_segment(this, id);&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;private ApplicationConfig p_application_conffwk;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;if(p_application_conffwk == null) p_application_conffwk = new ApplicationConfig(p_db);&#xA;END_MEMBER_INITIALIZER_LIST&#xA;"/>
+   <method-implementation language="c++" prototype="const daq::core::Segment * get_segment(const std::string&amp; name) const" body="BEGIN_PRIVATE_SECTION&#xA;mutable daq::core::ApplicationConfig m_app_config; &#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;m_app_config(p_db)&#xA;END_MEMBER_INITIALIZER_LIST&#xA;&#xA;BEGIN_HEADER_PROLOGUE&#xA;#include &quot;dal/application-config.h&quot;&#xA;END_HEADER_PROLOGUE"/>
+   <method-implementation language="java" prototype="dal.Segment get_segment(String id) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return p_application_config.get_segment(this, id);&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;private ApplicationConfig p_application_config;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;if(p_application_config == null) p_application_config = new ApplicationConfig(p_db);&#xA;END_MEMBER_INITIALIZER_LIST&#xA;"/>
   </method>
   <method name="get_log_directory" description="returns the directory in which to write log files. ">
    <method-implementation language="c++" prototype="std::string get_log_directory() const" body=""/>
   </method>
-  <method name="set_conffwk_version" description="Set configuration version, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
-   <method-implementation language="c++" prototype="void set_conffwk_version(const std::string&amp; name, bool reload)" body=""/>
-   <method-implementation language="java" prototype="void set_conffwk_version(final String version, boolean reload) throws conffwk.GenericException, conffwk.SystemException, conffwk.NotFoundException, conffwk.NotValidException" body="dal.Algorithms.set_conffwk_version(UID(), version, reload);"/>
+  <method name="set_config_version" description="Set configuration version, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
+   <method-implementation language="c++" prototype="void set_config_version(const std::string&amp; name, bool reload)" body=""/>
+   <method-implementation language="java" prototype="void set_config_version(final String version, boolean reload) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="dal.Algorithms.set_config_version(UID(), version, reload);"/>
   </method>
-  <method name="get_conffwk_version" description="Return configuration version used by given partition, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
-   <method-implementation language="c++" prototype="std::string get_conffwk_version()" body=""/>
-   <method-implementation language="java" prototype="String get_conffwk_version() throws conffwk.GenericException, conffwk.SystemException, conffwk.NotFoundException, conffwk.NotValidException" body="return dal.Algorithms.get_conffwk_version(UID());"/>
+  <method name="get_config_version" description="Return configuration version used by given partition, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
+   <method-implementation language="c++" prototype="std::string get_config_version()" body=""/>
+   <method-implementation language="java" prototype="String get_config_version() throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return dal.Algorithms.get_config_version(UID());"/>
   </method>
  </class>
 
@@ -532,7 +532,7 @@
  <class name="ResourcesInfoConfig" description="Describes full configuration of ResourceInfo service. An instance of that class to be linked with Partition object to enable the service.">
   <attribute name="ArchiveInCOOL" description="If true, the resources info is stored on COOL. Otherwise the resources info is only published in IS." type="bool" init-value="false"/>
   <relationship name="DetectorFolders" description="Defines detectors folders." class-type="ResourcesInfoDetectorConfig" low-cc="one" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
-  <relationship name="GlobalFolder" description="Mandatory relationship on folder collecting resources shared by several detectors. The mix and max ID values are ignored, but sub-folders conffwk is used." class-type="ResourcesInfoDetectorConfig" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="GlobalFolder" description="Mandatory relationship on folder collecting resources shared by several detectors. The mix and max ID values are ignored, but sub-folders config is used." class-type="ResourcesInfoDetectorConfig" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <relationship name="DefaultDetectorSubFolders" description="Defines sub-folders for all detectors" class-type="ResourcesInfoDetectorFolderConfig" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
  </class>
 
@@ -616,7 +616,7 @@
   <attribute name="Shell" description="Specify shell script interpreter." type="string"/>
  </class>
 
- <class name="Segment" description="A segment is self-sufficient part of the system which can be conffwkured and controlled independently from the rest of the TDAQ system. A segment represents a detector, a system or their part. A segment can include other segments. A segment is controlled by associated RC controller application.&#xA;To be used by the partition it has to be added to the partition&apos;s Segments relationship. To be temporary ignored a segment can be disabled, i.e. added to the partition&apos;s Disabled relationship. When a segment is disabled, all nested segments are also disabled.&#xA;A segment can include applications and resources.&#xA;For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_2_Segment_Classes">
+ <class name="Segment" description="A segment is self-sufficient part of the system which can be configured and controlled independently from the rest of the TDAQ system. A segment represents a detector, a system or their part. A segment can include other segments. A segment is controlled by associated RC controller application.&#xA;To be used by the partition it has to be added to the partition&apos;s Segments relationship. To be temporary ignored a segment can be disabled, i.e. added to the partition&apos;s Disabled relationship. When a segment is disabled, all nested segments are also disabled.&#xA;A segment can include applications and resources.&#xA;For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_2_Segment_Classes">
   <superclass name="Component"/>
   <relationship name="Segments" description="Nested segments of given segment." class-type="Segment" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
   <relationship name="UsesObjects" description="A segment state depends on state of hw objects it uses." class-type="HW_Object" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
@@ -640,43 +640,43 @@
   </method>
   <method name="get_all_applications" description="Get all application of this and nested segments.&#xA;In the parameters one can precise types of applications, names of segments and hosts the applications run on. The method is used to implement partition&apos;s get_all_applications() algorithm returning description of all applications running in the partition; in this case it is run on partition&apos;s online segment.">
    <method-implementation language="c++" prototype="std::vector&lt;const daq::core::BaseApplication *&gt; get_all_applications(std::set&lt;std::string&gt; * app_types = nullptr, std::set&lt;std::string&gt; * use_segments = nullptr, std::set&lt;const Computer *&gt; * use_hosts = nullptr) const" body="ADD_ALGO_N"/>
-   <method-implementation language="java" prototype="dal.BaseApplication[] get_all_applications(String[] app_types, String[] use_segments, dal.Computer[] use_hosts) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return dal.SegConfig.get_all_applications(this, app_types, use_segments, use_hosts);"/>
+   <method-implementation language="java" prototype="dal.BaseApplication[] get_all_applications(String[] app_types, String[] use_segments, dal.Computer[] use_hosts) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return dal.SegConfig.get_all_applications(this, app_types, use_segments, use_hosts);"/>
   </method>
   <method name="get_controller" description="">
    <method-implementation language="c++" prototype="const daq::core::BaseApplication * get_controller() const" body="ADD_ALGO_1"/>
-   <method-implementation language="java" prototype="dal.BaseApplication get_controller() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_seg_conffwk(false,false).get_controller();"/>
+   <method-implementation language="java" prototype="dal.BaseApplication get_controller() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_controller();"/>
   </method>
   <method name="get_infrastructure" description="">
    <method-implementation language="c++" prototype="const std::vector&lt;const daq::core::BaseApplication *&gt;&amp; get_infrastructure() const" body="ADD_ALGO_N"/>
-   <method-implementation language="java" prototype="dal.BaseApplication[] get_infrastructure() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_seg_conffwk(false,false).get_infrastructure();"/>
+   <method-implementation language="java" prototype="dal.BaseApplication[] get_infrastructure() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_infrastructure();"/>
   </method>
   <method name="get_applications" description="">
    <method-implementation language="c++" prototype="const std::vector&lt;const daq::core::BaseApplication *&gt;&amp; get_applications() const" body="ADD_ALGO_N"/>
-   <method-implementation language="java" prototype="dal.BaseApplication[] get_applications() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_seg_conffwk(false,false).get_applications();"/>
+   <method-implementation language="java" prototype="dal.BaseApplication[] get_applications() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_applications();"/>
   </method>
   <method name="get_nested_segments" description="The algorithm calculates a vector of nested segments including templated ones.&#xA;">
    <method-implementation language="c++" prototype="const std::vector&lt;const daq::core::Segment*&gt;&amp; get_nested_segments() const" body="ADD_ALGO_N"/>
-   <method-implementation language="java" prototype="dal.Segment[] get_nested_segments() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_seg_conffwk(false,false).get_nested_segments();"/>
+   <method-implementation language="java" prototype="dal.Segment[] get_nested_segments() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_nested_segments();"/>
   </method>
   <method name="get_hosts" description="">
    <method-implementation language="c++" prototype="const std::vector&lt;const daq::core::Computer*&gt;&amp; get_hosts() const" body="ADD_ALGO_N"/>
-   <method-implementation language="java" prototype="Computer[] get_hosts() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_seg_conffwk(false,false).get_hosts();"/>
+   <method-implementation language="java" prototype="Computer[] get_hosts() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_hosts();"/>
   </method>
   <method name="get_base_segment" description="">
    <method-implementation language="c++" prototype="const Segment * get_base_segment() const" body="ADD_ALGO_1"/>
-   <method-implementation language="java" prototype="dal.Segment get_base_segment() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_seg_conffwk(false,false).get_base_segment();"/>
+   <method-implementation language="java" prototype="dal.Segment get_base_segment() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).get_base_segment();"/>
   </method>
   <method name="is_disabled" description="">
    <method-implementation language="c++" prototype="bool is_disabled() const" body=""/>
-   <method-implementation language="java" prototype="boolean is_disabled() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_seg_conffwk(false,false).is_disabled();"/>
+   <method-implementation language="java" prototype="boolean is_disabled() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).is_disabled();"/>
   </method>
   <method name="is_templated" description="">
    <method-implementation language="c++" prototype="bool is_templated() const" body=""/>
-   <method-implementation language="java" prototype="boolean is_templated() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_seg_conffwk(false,false).is_templated();"/>
+   <method-implementation language="java" prototype="boolean is_templated() throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return get_seg_config(false,false).is_templated();"/>
   </method>
-  <method name="get_seg_conffwk" description="">
-   <method-implementation language="c++" prototype="SegConfig * get_seg_conffwk(bool check_disabled, bool no_except = false) const" body="BEGIN_HEADER_PROLOGUE&#xA;#include &lt;atomic&gt;&#xA;#include &lt;dal/seg-conffwk.h&gt;&#xA;END_HEADER_PROLOGUE&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;std::unique_ptr&lt;SegConfig&gt; p_seg_conffwk;&#xA;mutable std::atomic&lt;const Segment *&gt; p_gen_obj;&#xA;friend class Partition;&#xA;friend class AlgorithmUtils;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;p_gen_obj(nullptr)&#xA;END_MEMBER_INITIALIZER_LIST"/>
-   <method-implementation language="java" prototype="dal.SegConfig get_seg_conffwk(boolean check_disabled, boolean no_except) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="BEGIN_PRIVATE_SECTION&#xA;dal.SegConfig p_seg_conffwk;&#xA;dal.Segment p_gen_obj;&#xA;END_PRIVATE_SECTION&#xA;&#xA;return dal.ApplicationConfig.get_seg_conffwk(this, check_disabled, no_except);"/>
+  <method name="get_seg_config" description="">
+   <method-implementation language="c++" prototype="SegConfig * get_seg_config(bool check_disabled, bool no_except = false) const" body="BEGIN_HEADER_PROLOGUE&#xA;#include &lt;atomic&gt;&#xA;#include &lt;dal/seg-config.h&gt;&#xA;END_HEADER_PROLOGUE&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;std::unique_ptr&lt;SegConfig&gt; p_seg_config;&#xA;mutable std::atomic&lt;const Segment *&gt; p_gen_obj;&#xA;friend class Partition;&#xA;friend class AlgorithmUtils;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;p_gen_obj(nullptr)&#xA;END_MEMBER_INITIALIZER_LIST"/>
+   <method-implementation language="java" prototype="dal.SegConfig get_seg_config(boolean check_disabled, boolean no_except) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="BEGIN_PRIVATE_SECTION&#xA;dal.SegConfig p_seg_config;&#xA;dal.Segment p_gen_obj;&#xA;END_PRIVATE_SECTION&#xA;&#xA;return dal.ApplicationConfig.get_seg_config(this, check_disabled, no_except);"/>
   </method>
  </class>
 
@@ -718,7 +718,7 @@
   <relationship name="l1" description="The L1 configuration parameters" class-type="L1TriggerConfiguration" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <relationship name="hlt" description="The L2 implementation to be loaded in Level-2 processors" class-type="HLTImplementation" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <relationship name="TriggerDBConnection" description="Object containing the database connection parameters for the TriggerDB." class-type="TriggerDBConnection" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
-  <relationship name="DBConnections" description="Links the description of DB connections needed to conffwkure the Trigger to the TriggerConfiguration object.&#xA;This relationship excludes the TriggerDB connection which is linked via the TriggerDBConnections relationship. " class-type="DBConnection" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="DBConnections" description="Links the description of DB connections needed to configure the Trigger to the TriggerConfiguration object.&#xA;This relationship excludes the TriggerDB connection which is linked via the TriggerDBConnections relationship. " class-type="DBConnection" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
  </class>
 
  <class name="TriggerDBConnection" description="Describes the database connection to be used to obtain trigger-configuration parameters">
@@ -733,7 +733,7 @@
   <relationship name="TagValues" description="Defines value of variable for given tag." class-type="TagMapping" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <method name="get_value" description="The method returns value of variable depending on the application context (if tag is provided).">
    <method-implementation language="c++" prototype="const std::string&amp; get_value(const Tag * = 0) const" body=""/>
-   <method-implementation language="java" prototype="String get_value(Tag tag) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return dal.Algorithms.get_value(this, tag);"/>
+   <method-implementation language="java" prototype="String get_value(Tag tag) throws config.GenericException, config.NotFoundException, config.NotValidException, config.SystemException" body="return dal.Algorithms.get_value(this, tag);"/>
   </method>
  </class>
 

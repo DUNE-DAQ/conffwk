@@ -1839,14 +1839,27 @@ Configuration::print(std::ostream &s) const noexcept
     }
 }
 
+
 bool
 Configuration::try_cast(const std::string& target, const std::string& source) noexcept
 {
-  return try_cast(&DalFactory::instance().get_known_class_name_ref(target), &DalFactory::instance().get_known_class_name_ref(source));
+  return is_subclass_of(target, source);
 }
 
 bool
 Configuration::try_cast(const std::string *target, const std::string *source) noexcept
+{
+  return is_subclass_of(target, source);
+}
+
+bool
+Configuration::is_subclass_of(const std::string& target, const std::string& source) noexcept
+{
+  return is_subclass_of(&DalFactory::instance().get_known_class_name_ref(target), &DalFactory::instance().get_known_class_name_ref(source));
+}
+
+bool
+Configuration::is_subclass_of(const std::string *target, const std::string *source) noexcept
 {
   if (target == source)
     {
@@ -2130,12 +2143,17 @@ DalObject::p_hdr(std::ostream &s, unsigned int indent, const std::string &cl, co
   s << cl << " object:\n" << str << "  id: \'" << UID() << "\', class name: \'" << DalObject::class_name() << "\'\n";
 }
 
-  void
-  p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject *obj)
-  {
-    s << str << name << ": " << obj << '\n';
-  }
+void
+p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject *obj)
+{
+  s << str << name << ": " << obj << '\n';
+}
 
+void
+p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject2g *obj)
+{
+  s << str << name << ": " << obj << '\n';
+}
 
 
 void DalObject::throw_init_ex(dunedaq::conffwk::Exception& ex)

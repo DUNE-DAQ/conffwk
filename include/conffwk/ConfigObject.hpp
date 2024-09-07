@@ -55,6 +55,9 @@ class ConfigObject {
   friend class Configuration;
   friend class ConfigurationImpl;
   friend class DalObject;
+  friend class DalObject2g;
+  friend class DalRegistry;
+
   friend class dalpool::DalObject2g;
   friend class dalpool::DalRegistry;
 

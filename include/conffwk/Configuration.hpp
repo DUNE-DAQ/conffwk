@@ -45,6 +45,8 @@ class DalObject;
 class ConfigAction;
 class ConfigurationImpl;
 class ConfigurationChange;
+class DalObject2g;
+class DalRegistry;
 
 
 struct class_t;
@@ -228,6 +230,8 @@ class Configuration {
   friend class ConfigObject;
   friend class ConfigurationImpl;
   friend class CacheBase;
+  friend class DalObject2g;
+  friend class DalRegistry;
   friend class dalpool::DalObject2g;
   friend class dalpool::DalRegistry;
 
@@ -1045,6 +1049,9 @@ class Configuration {
 
     bool try_cast(const std::string* target, const std::string* source) noexcept;
 
+    bool is_subclass_of(const std::string& target, const std::string& source) noexcept;
+
+    bool is_subclass_of(const std::string* target, const std::string* source) noexcept;
 
   private:
 

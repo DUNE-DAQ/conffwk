@@ -19,10 +19,13 @@ namespace dalpool {
 
 namespace conffwk {
 
+class DalObject2g;
+
 class DalFactory
 {
 
   typedef std::function<dalpool::DalObject2g *(dalpool::DalRegistry& db, ConfigObject& obj)> dal_object_instatiator;
+  typedef std::function<DalObject2g *(DalRegistry& db, ConfigObject& obj)> dal_object_instatiator_3g;
 
 public:
 
@@ -55,6 +58,21 @@ public:
       TLOG() << "register class " << name;
 
       if (m_instantiators.emplace(name, [](dalpool::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
+        {
+          TLOG() << "class " << name << " was already registered";
+        }
+    }
+
+  /** register DAL object creator by class name*/
+  template<class T>
+    void
+    register_dal_class_3g(const std::string & name)
+    {
+      std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
+
+      TLOG() << "register class " << name;
+
+      if (m_instantiators_3g.emplace(name, [](conffwk::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
         {
           TLOG() << "class " << name << " was already registered";
         }
@@ -134,12 +152,33 @@ dalpool::DalObject2g* make(dalpool::DalRegistry& db, conffwk::ConfigObject& o) {
   
 }
 
+/**
+ * \brief Create a new DaqOnject2g
+ */
+conffwk::DalObject2g* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o) {
+
+
+  TLOG() << "Building object " << o.UID() << " of class " << o.class_name();
+
+  auto it = m_instantiators_3g.find(o.class_name());
+  if (it == m_instantiators_3g.end()) {
+    throw std::runtime_error("XXXXXXXXX");
+  }
+
+  auto dal_obj =  it->second(db,o);
+  TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
+
+  return dal_obj;
+  
+}
+
 private:
 
   std::mutex m_class_mutex;
   std::map<std::string, DalFactoryFunctions> m_classes;
 
   std::map<std::string, dal_object_instatiator> m_instantiators;
+  std::map<std::string, dal_object_instatiator_3g> m_instantiators_3g;
 
   std::mutex m_known_class_mutex;
   conffwk::set m_known_classes;

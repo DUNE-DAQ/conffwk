@@ -28,6 +28,8 @@ class ConfigObject;
 class Configuration;
 class ConfigurationImpl;
 class DalObject;
+class DalObject2g;
+class DalRegistry;
 
   /** Possible states of configuration objects. */
   enum ObjectState
@@ -57,6 +59,8 @@ class ConfigObjectImpl {
   friend class Configuration;
   friend class ConfigurationImpl;
   friend class DalObject;
+  friend class DalObject2g;
+  friend class DalRegistry;
   friend class dalpool::DalObject2g;
   friend class dalpool::DalRegistry;
 
