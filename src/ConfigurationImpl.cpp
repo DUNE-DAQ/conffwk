@@ -43,7 +43,7 @@ namespace dunedaq {
         case string_type: return "string";
         case enum_type:   return "enumeration";
         case class_type:  return "class reference";
-	default:          return "unknown";
+        default:          return "unknown";
       }
     }
 
@@ -76,7 +76,7 @@ namespace dunedaq {
         case oct_int_format:   return "octal";
         case dec_int_format:   return "decimal";
         case hex_int_format:   return "hexadecimal";
-	default:               return "not applicable";
+        default:               return "not applicable";
       }
     }
 
@@ -115,7 +115,7 @@ namespace dunedaq {
                             (can_be_null  && !is_multi_value) ? zero_or_one  :
                             (can_be_null  && is_multi_value ) ? zero_or_many :
                             (!can_be_null && is_multi_value ) ? one_or_many  :
-	                    only_one
+                            only_one
                          ),
       p_is_aggregation   (is_aggregation),
       p_description      (description)
@@ -128,7 +128,7 @@ namespace dunedaq {
         case zero_or_many:   return "zero or many";
         case only_one:       return "one";
         case one_or_many:    return "one or many";
-	default:             return "unknown";
+        default:             return "unknown";
       }
     }
 
@@ -170,9 +170,9 @@ namespace dunedaq {
       }
       else {
         out << prefix << "  " << p_superclasses.size() << " superclass(es):\n";
-	for(std::vector<std::string>::const_iterator i = p_superclasses.begin(); i != p_superclasses.end(); ++i) {
-	  out << prefix << "    \'" << *i << "\'\n";
-	}
+        for(std::vector<std::string>::const_iterator i = p_superclasses.begin(); i != p_superclasses.end(); ++i) {
+          out << prefix << "    \'" << *i << "\'\n";
+        }
       }
 
       if(p_subclasses.empty()) {
@@ -180,9 +180,9 @@ namespace dunedaq {
       }
       else {
         out << prefix << "  " << p_subclasses.size() << " subclass(es):\n";
-	for(std::vector<std::string>::const_iterator i = p_subclasses.begin(); i != p_subclasses.end(); ++i) {
-	  out << prefix << "    \'" << *i << "\'\n";
-	}
+        for(std::vector<std::string>::const_iterator i = p_subclasses.begin(); i != p_subclasses.end(); ++i) {
+          out << prefix << "    \'" << *i << "\'\n";
+        }
       }
 
       std::string new_prefix(prefix);
@@ -193,10 +193,10 @@ namespace dunedaq {
       }
       else {
         out << prefix << "  " << p_attributes.size() << " attribute(s):\n";
-	for(std::vector<attribute_t>::const_iterator i = p_attributes.begin(); i != p_attributes.end(); ++i) {
-	  (*i).print(out, new_prefix.c_str());
-	  out << std::endl;
-	}
+        for(std::vector<attribute_t>::const_iterator i = p_attributes.begin(); i != p_attributes.end(); ++i) {
+          (*i).print(out, new_prefix.c_str());
+          out << std::endl;
+        }
       }
 
       if(p_relationships.empty()) {
@@ -204,10 +204,10 @@ namespace dunedaq {
       }
       else {
         out << prefix << "  " << p_relationships.size() << " relationship(s):\n";
-	for(std::vector<relationship_t>::const_iterator i = p_relationships.begin(); i != p_relationships.end(); ++i) {
-	  (*i).print(out, new_prefix.c_str());
-	  out << std::endl;
-	}
+        for(std::vector<relationship_t>::const_iterator i = p_relationships.begin(); i != p_relationships.end(); ++i) {
+          (*i).print(out, new_prefix.c_str());
+          out << std::endl;
+        }
       }
     }
 
@@ -279,7 +279,7 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
       CONFFWK_ADD_DEBUG_MSG( dbg_text , "\n  * there is no object with id = \'" << id << "\' found in the class \'" << name << "\' that has " << i->second->size() << " objects in cache: " )
       for(j=i->second->begin(); j != i->second->end();++j) {
         if(j != i->second->begin()) { CONFFWK_ADD_DEBUG_MSG( dbg_text , ", " ) }
-	CONFFWK_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
+        CONFFWK_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
       }
       CONFFWK_ADD_DEBUG_MSG( dbg_text , '\n' )
     }
@@ -305,8 +305,8 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
 
           if(j != i->second->end()) {
             p_number_of_cache_hits++;
-  	    CONFFWK_ADD_DEBUG_MSG( dbg_text , "  * found the object with id = \'" << id << "\' in class \'" << *k << '\'' )
-	      TLOG_DEBUG(4) << dbg_text->str() ;
+              CONFFWK_ADD_DEBUG_MSG( dbg_text , "  * found the object with id = \'" << id << "\' in class \'" << *k << '\'' )
+              TLOG_DEBUG(4) << dbg_text->str() ;
             return j->second;
           }
 
@@ -318,9 +318,9 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
             CONFFWK_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << *k << "\' that has " << i->second->size() << " objects in cache: " )
             for(j=i->second->begin(); j != i->second->end();++j) {
               if(j != i->second->begin()) { CONFFWK_ADD_DEBUG_MSG( dbg_text , ", " ) }
-	      CONFFWK_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
+              CONFFWK_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
             }
-  	    CONFFWK_ADD_DEBUG_MSG( dbg_text , '\n' )
+              CONFFWK_ADD_DEBUG_MSG( dbg_text , '\n' )
           }
 
 #endif

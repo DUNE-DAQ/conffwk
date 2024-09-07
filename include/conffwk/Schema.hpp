@@ -83,7 +83,7 @@ namespace dunedaq {
 
       void print(
         std::ostream& out,               /*!< the output stream */
-	const std::string& prefix = ""   /*!< optional shift output using prefix */
+        const std::string& prefix = ""   /*!< optional shift output using prefix */
       ) const;
 
         /** Return string corresponding to given data type */
@@ -123,8 +123,8 @@ namespace dunedaq {
       relationship_t(
         const std::string& name,
         const std::string& type,
-	bool can_be_null,
-	bool is_multi_value,
+        bool can_be_null,
+        bool is_multi_value,
         bool is_aggregation,
         const std::string& description
       );
@@ -139,7 +139,7 @@ namespace dunedaq {
 
       void print(
         std::ostream& out,               /*!< the output stream */
-	const std::string& prefix = ""   /*!< optional shift output using prefix */
+        const std::string& prefix = ""   /*!< optional shift output using prefix */
       ) const;
 
 
@@ -167,7 +167,7 @@ namespace dunedaq {
       class_t(
         const std::string& name,
         const std::string& description,
-	bool is_abstract
+        bool is_abstract
       );
 
 
@@ -180,7 +180,7 @@ namespace dunedaq {
 
       void print(
         std::ostream& out,               /*!< the output stream */
-	const std::string& prefix = ""   /*!< optional shift output using prefix */
+        const std::string& prefix = ""   /*!< optional shift output using prefix */
       ) const;
 
     };

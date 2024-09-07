@@ -163,8 +163,9 @@ Configuration::Configuration(const std::string& spec) :
 
   if (m_impl)
     {
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
       m_impl->set(this);
     }
 
@@ -341,8 +342,9 @@ Configuration::load(const std::string& db_name)
   if (m_impl)
     {
       m_impl->open_db(name);
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
       m_impl->set(this);
 
       if(check_prefetch_needs())
@@ -376,20 +378,19 @@ Configuration::unload()
         }
     }
 
-  for(auto & i : m_cache_map)
-    {
+    for (auto& i : m_cache_map) {
       delete i.second;
     }
 
-  m_cache_map.clear();
+    m_cache_map.clear();
 
     {
       std::lock_guard<std::mutex> scoped_lock3(m_else_mutex);
 
-      for(auto& cb : m_callbacks)
+      for (auto& cb : m_callbacks)
         delete cb;
 
-      for(auto& cb : m_pre_callbacks)
+      for (auto& cb : m_pre_callbacks)
         delete cb;
 
       m_callbacks.clear();
@@ -397,13 +398,12 @@ Configuration::unload()
 
       m_impl->unsubscribe();
 
-      for(auto& l : m_convert_map)
-        {
-          for(auto& a : *l.second)
-            delete a;
+      for (auto& l : m_convert_map) {
+        for (auto& a : *l.second)
+          delete a;
 
-          delete l.second;
-        }
+        delete l.second;
+      }
 
       m_convert_map.clear();
     }
@@ -433,8 +433,9 @@ Configuration::create(const std::string& db_name, const std::list<std::string>& 
   try
     {
       m_impl->create(db_name, includes);
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
     }
   catch(dunedaq::conffwk::Generic & ex)
     {
@@ -477,8 +478,9 @@ Configuration::add_include(const std::string& db_name, const std::string& includ
   try
     {
       m_impl->add_include(db_name, include);
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
     }
   catch(dunedaq::conffwk::Generic & ex)
     {
@@ -500,8 +502,9 @@ Configuration::remove_include(const std::string& db_name, const std::string& inc
   try
     {
       m_impl->remove_include(db_name, include);
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
     }
   catch(dunedaq::conffwk::Generic & ex)
     {
@@ -607,8 +610,10 @@ Configuration::abort()
       m_impl->abort();
       _unread_implementation_objects(dunedaq::conffwk::Unknown);
       _unread_template_objects();
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
+
     }
   catch (dunedaq::conffwk::Generic & ex)
     {
@@ -677,6 +682,79 @@ Configuration::set_subclasses() noexcept
   for (const auto &i : p_superclasses)
     for (const auto &j : i.second)
       p_subclasses[j].insert(i.first);
+}
+
+
+void
+Configuration::update_classes() noexcept
+{
+  m_impl->get_superclasses(p_superclasses);
+  this->set_subclasses();
+  this->set_class_domain_map();
+}
+
+std::deque<std::set<std::string>>
+Configuration::find_class_domains()
+{
+  std::deque<std::set<std::string>> domains;
+
+  std::deque<dunedaq::conffwk::class_t> seeds;
+  for (const auto& c : get_class_list()) {
+    auto ci = get_class_info(c);
+    if (ci.p_superclasses.empty())
+      seeds.push_back(ci);
+  }
+
+  for (const auto& ci : seeds) {
+    // Make a candidate domain based using the seed subclasses
+    std::set<std::string> class_domain;
+    class_domain.insert(ci.p_name);
+    class_domain.insert(ci.p_subclasses.begin(), ci.p_subclasses.end());
+
+    // Look for overlaps with other domains
+    std::deque<std::set<std::string>> overlapping;
+    for (auto& d : domains) {
+      std::set<std::string> intersection;
+      std::set_intersection(d.begin(), d.end(), class_domain.begin(), class_domain.end(), std::inserter(intersection, intersection.begin()));
+      // non-zero intersection, overlap found
+      if (intersection.size() > 0) {
+        overlapping.push_back(d);
+      }
+    }
+
+    // If overlapping are found, add all overlapping to 
+    // the new domain and remove them from the domain list
+    if ( !overlapping.empty() ) {
+      for( auto& d : overlapping ) {
+        // merge the existing cluster in class_domain
+        class_domain.insert(d.begin(), d.end());
+        // Remove the old cluster from the list
+        auto it = std::find(domains.begin(), domains.end(), d);
+        if (it!= domains.end()) {
+            domains.erase(it);
+        }
+      }
+    }
+
+    domains.push_back(class_domain);
+  }
+
+  return domains;
+}
+
+
+void
+Configuration::set_class_domain_map() {
+  
+  p_class_domain_map.clear();
+  
+  auto domains = this->find_class_domains();
+  for( size_t i(0); i<domains.size(); ++i ) {
+    const auto& dom = domains[i];
+    for( const auto& class_name : dom ) {
+      p_class_domain_map[&conffwk::DalFactory::instance().get_known_class_name_ref(class_name)] = i;
+    }
+  }
 }
 
 
@@ -1900,7 +1978,7 @@ Configuration::attributes_pybind(const std::string& class_name, bool all) {
 }
 
 std::vector<std::string> 
-Configuration::classes_pybind() const {
+Configuration::get_class_list() const {
   std::vector<std::string> classes;
   for (const auto& it : this->superclasses()) {
     classes.push_back(*it.first);

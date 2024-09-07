@@ -34,6 +34,12 @@
 #include "conffwk/set.hpp"
 
 namespace dunedaq {
+
+namespace dalpool {
+class DalObject2g;
+class DalRegistry;
+}
+
 namespace conffwk {
 class DalObject;
 class ConfigAction;
@@ -222,6 +228,9 @@ class Configuration {
   friend class ConfigObject;
   friend class ConfigurationImpl;
   friend class CacheBase;
+  friend class dalpool::DalObject2g;
+  friend class dalpool::DalRegistry;
+
 
   public:
 
@@ -1417,8 +1426,15 @@ class Configuration {
 
     conffwk::fmap<conffwk::fset> p_superclasses;
     conffwk::fmap<conffwk::fset> p_subclasses;
+    conffwk::fmap<uint> p_class_domain_map;
 
     void set_subclasses() noexcept;
+    
+    void set_class_domain_map();
+
+    void update_classes() noexcept;
+
+    std::deque<std::set<std::string>> find_class_domains();
 
   public:
 
@@ -1430,10 +1446,8 @@ class Configuration {
       /** Get names of subclasses for each class **/
 
     const conffwk::fmap<conffwk::fset>& subclasses() const {return p_subclasses;}
-
-  std::vector<std::string> classes_in_python() const;
   
-  
+ 
   private:
 
     conffwk::map<std::list<AttributeConverterBase*> * > m_convert_map;
@@ -1700,7 +1714,7 @@ class Configuration {
   // JCF, Jan-1-2023: a set of functions written specifically for Python bindings
 
   std::unordered_map<std::string, std::unordered_map<std::string, std::string>> attributes_pybind(const std::string& class_name, bool all);
-  std::vector<std::string> classes_pybind() const;
+  std::vector<std::string> get_class_list() const;
   ConfigObject* create_and_return_obj_pybind(const std::string& at, const std::string& class_name, const std::string& id);
   ConfigObject* create_and_return_obj_pybind(const ConfigObject& at, const std::string& class_name, const std::string& id);
   ConfigObject* get_obj_pybind(const std::string& class_name, const std::string& id);

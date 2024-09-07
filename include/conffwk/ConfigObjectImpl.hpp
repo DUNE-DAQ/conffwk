@@ -16,6 +16,12 @@
 #include "conffwk/Errors.hpp"
 
 namespace dunedaq {
+
+namespace dalpool {
+class DalObject2g;
+class DalRegistry;
+}
+
 namespace conffwk {
 
 class ConfigObject;
@@ -51,6 +57,8 @@ class ConfigObjectImpl {
   friend class Configuration;
   friend class ConfigurationImpl;
   friend class DalObject;
+  friend class dalpool::DalObject2g;
+  friend class dalpool::DalRegistry;
 
 
   public:
