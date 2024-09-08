@@ -1,6 +1,7 @@
 #ifndef __DUNEDAQ_CONFFWK_DALREGISTRY_HXX__
 #define __DUNEDAQ_CONFFWK_DALREGISTRY_HXX__
 
+
 namespace dunedaq {
 namespace conffwk {
 
@@ -132,7 +133,7 @@ DalRegistry::_ref(ConfigObject& obj, const std::string& name, bool read_children
   return ((!res.is_null()) ? this->get<T>(res, read_children, read_children) : nullptr);
 }
 
-} // namespace daqpool
+} // namespace conffwk
 } // namespace dunedaq
 
 #endif /*__DUNEDAQ_CONFFWK_DALREGISTRY_HXX__ */

@@ -94,9 +94,13 @@ check_prefetch_needs()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+Configuration::Configuration() :
+  p_number_of_cache_hits(0), p_number_of_template_object_created(0), p_number_of_template_object_read(0), m_impl(nullptr), m_shlib_h(nullptr), m_registry(*this){
+    
+  }
 
 Configuration::Configuration(const std::string& spec) :
-    p_number_of_cache_hits(0), p_number_of_template_object_created(0), p_number_of_template_object_read(0), m_impl(nullptr), m_shlib_h(nullptr)
+  p_number_of_cache_hits(0), p_number_of_template_object_created(0), p_number_of_template_object_read(0), m_impl(nullptr), m_shlib_h(nullptr), m_registry(*this)
 {
   std::string s;
 
@@ -129,7 +133,6 @@ Configuration::Configuration(const std::string& spec) :
   std::string impl_creator = std::string("_") + m_impl_name + "_creator_";
 
   // load plug-in
-
   m_shlib_h = dlopen(plugin_name.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 
   if (!m_shlib_h)
@@ -691,6 +694,7 @@ Configuration::update_classes() noexcept
   m_impl->get_superclasses(p_superclasses);
   this->set_subclasses();
   this->set_class_domain_map();
+  m_registry.update_class_domain_map();
 }
 
 std::deque<std::set<std::string>>

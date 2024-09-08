@@ -20,12 +20,13 @@ namespace dalpool {
 namespace conffwk {
 
 class DalObject2g;
+class DalRegistry;
 
 class DalFactory
 {
 
-  typedef std::function<dalpool::DalObject2g *(dalpool::DalRegistry& db, ConfigObject& obj)> dal_object_instatiator;
-  typedef std::function<DalObject2g *(DalRegistry& db, ConfigObject& obj)> dal_object_instatiator_3g;
+  // typedef std::function<dalpool::DalObject2g *(dalpool::DalRegistry& db, ConfigObject& obj)> dal_object_instatiator;
+  typedef std::function<DalObject2g *(DalRegistry& db, ConfigObject& obj)> dal_object_instatiator_2g;
 
 public:
 
@@ -36,55 +37,55 @@ public:
   /** register DAL object creator by class name*/
   template<class T>
     void
-    register_dal_class(const std::string & name, const std::set<std::string>& algorithms)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
+    register_dal_class(const std::string & name, const std::set<std::string>& algorithms);
+    // {
+    //   std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
 
-      TLOG_DEBUG(1) << "register class " << name;
+    //   TLOG_DEBUG(1) << "register class " << name;
 
-      if (m_classes.emplace(name, DalFactoryFunctions(boost::compute::identity<T>(), algorithms)).second == false)
-        {
-          TLOG_DEBUG(0) << "class " << name << " was already registered";
-        }
-    }
+    //   if (m_classes.emplace(name, DalFactoryFunctions(boost::compute::identity<T>(), algorithms)).second == false)
+    //     {
+    //       TLOG_DEBUG(0) << "class " << name << " was already registered";
+    //     }
+    // }
+
+  // /** register DAL object creator by class name*/
+  // template<class T>
+  //   void
+  //   register_dal_class_2g(const std::string & name)
+  //   {
+  //     std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
+
+  //     TLOG() << "register class " << name;
+
+  //     if (m_instantiators.emplace(name, [](dalpool::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
+  //       {
+  //         TLOG() << "class " << name << " was already registered";
+  //       }
+  //   }
 
   /** register DAL object creator by class name*/
   template<class T>
     void
-    register_dal_class_2g(const std::string & name)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
+    register_dal_class_2g(const std::string & name);
+    // {
+    //   std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
 
-      TLOG() << "register class " << name;
+    //   TLOG() << "register class " << name;
 
-      if (m_instantiators.emplace(name, [](dalpool::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
-        {
-          TLOG() << "class " << name << " was already registered";
-        }
-    }
-
-  /** register DAL object creator by class name*/
-  template<class T>
-    void
-    register_dal_class_3g(const std::string & name)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
-
-      TLOG() << "register class " << name;
-
-      if (m_instantiators_3g.emplace(name, [](conffwk::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
-        {
-          TLOG() << "class " << name << " was already registered";
-        }
-    }
+    //   if (m_instantiators_2g.emplace(name, [](conffwk::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
+    //     {
+    //       TLOG() << "class " << name << " was already registered";
+    //     }
+    // }
 
   const std::string&
-  get_known_class_name_ref(const std::string& name)
-  {
+  get_known_class_name_ref(const std::string& name);
+  // {
 
-    std::lock_guard<std::mutex> scoped_lock(m_known_class_mutex);
-    return *m_known_classes.emplace(name).first;
-  }
+  //   std::lock_guard<std::mutex> scoped_lock(m_known_class_mutex);
+  //   return *m_known_classes.emplace(name).first;
+  // }
 
 
   /**
@@ -132,53 +133,54 @@ public:
   const DalFactoryFunctions&
   functions(const std::string& name) const;
 
+// /**
+//  * \brief Create a new DalObject2g
+//  */
+// dalpool::DalObject2g* make(dalpool::DalRegistry& db, conffwk::ConfigObject& o) {
+
+
+//   TLOG() << "Building object " << o.UID() << " of class " << o.class_name();
+
+//   auto it = m_instantiators.find(o.class_name());
+//   if (it == m_instantiators.end()) {
+//     throw std::runtime_error("XXXXXXXXX");
+//   }
+
+//   auto dal_obj =  it->second(db,o);
+//   TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
+
+//   return dal_obj;
+  
+// }
+
 /**
  * \brief Create a new DaqOnject2g
  */
-dalpool::DalObject2g* make(dalpool::DalRegistry& db, conffwk::ConfigObject& o) {
+conffwk::DalObject2g* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o);
+//  {
 
 
-  TLOG() << "Building object " << o.UID() << " of class " << o.class_name();
+//   TLOG() << "Building object " << o.UID() << " of class " << o.class_name();
 
-  auto it = m_instantiators.find(o.class_name());
-  if (it == m_instantiators.end()) {
-    throw std::runtime_error("XXXXXXXXX");
-  }
+//   auto it = m_instantiators_2g.find(o.class_name());
+//   if (it == m_instantiators_2g.end()) {
+//     throw std::runtime_error("XXXXXXXXX");
+//   }
 
-  auto dal_obj =  it->second(db,o);
-  TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
+//   auto dal_obj =  it->second(db,o);
+//   TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
 
-  return dal_obj;
+//   return dal_obj;
   
-}
-
-/**
- * \brief Create a new DaqOnject2g
- */
-conffwk::DalObject2g* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o) {
-
-
-  TLOG() << "Building object " << o.UID() << " of class " << o.class_name();
-
-  auto it = m_instantiators_3g.find(o.class_name());
-  if (it == m_instantiators_3g.end()) {
-    throw std::runtime_error("XXXXXXXXX");
-  }
-
-  auto dal_obj =  it->second(db,o);
-  TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
-
-  return dal_obj;
-  
-}
+// }
 
 private:
 
   std::mutex m_class_mutex;
   std::map<std::string, DalFactoryFunctions> m_classes;
 
-  std::map<std::string, dal_object_instatiator> m_instantiators;
-  std::map<std::string, dal_object_instatiator_3g> m_instantiators_3g;
+  // std::map<std::string, dal_object_instatiator> m_instantiators;
+  std::map<std::string, dal_object_instatiator_2g> m_instantiators_2g;
 
   std::mutex m_known_class_mutex;
   conffwk::set m_known_classes;
@@ -186,5 +188,8 @@ private:
 
 } // namespace conffwk
 } // namespace dunedaq
+
+
+#include "details/DalFactory.hxx"
 
 #endif

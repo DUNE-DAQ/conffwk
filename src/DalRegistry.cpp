@@ -7,7 +7,7 @@ namespace conffwk {
 DalRegistry::DalRegistry( conffwk::Configuration& confdb ) : 
   m_confdb(confdb) {
 
-  load_class_domain_map();
+  // update_class_domain_map();
 
 }
 
@@ -61,7 +61,7 @@ DalRegistry::find_class_domains()
 }
 
 void
-DalRegistry::load_class_domain_map()
+DalRegistry::update_class_domain_map()
 {
 
   m_class_domain_map.clear();
