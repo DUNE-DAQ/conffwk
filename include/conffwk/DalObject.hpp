@@ -168,8 +168,9 @@ public:
   template<class TARGET> const TARGET *
   cast() const noexcept
     {
-      std::lock_guard<std::mutex> scoped_lock(m_mutex);
-      return const_cast<Configuration&>(p_db).cast<TARGET>(this);
+      // std::lock_guard<std::mutex> scoped_lock(m_mutex);
+      // return const_cast<Configuration&>(p_db).cast<TARGET>(this);
+      return dynamic_cast<TARGET*>(this);
     }
 
 

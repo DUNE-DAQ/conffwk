@@ -189,19 +189,20 @@ Configuration::print_profiling_info() noexcept
       "  number of read template objects: " << p_number_of_template_object_read << "\n"
       "  number of cache hits: " << p_number_of_cache_hits << std::endl;
 
-  const char * s = ::getenv("TDAQ_DUMP_CONFFWK_PROFILER_INFO");
-  if (s && !strcmp(s, "DEBUG"))
-    {
-      std::cout << "  Details of accessed objects:\n";
+  // FIXME: re-implement for the dal registry
+  // const char * s = ::getenv("TDAQ_DUMP_CONFFWK_PROFILER_INFO");
+  // if (s && !strcmp(s, "DEBUG"))
+  //   {
+  //     std::cout << "  Details of accessed objects:\n";
 
-      for (auto & i : m_cache_map)
-        {
-          Cache<DalObject> *c = static_cast<Cache<DalObject>*>(i.second);
-          std::cout << "    *** " << c->m_cache.size() << " objects is class \'" << *i.first << "\' were accessed ***\n";
-          for (auto & j : c->m_cache)
-            std::cout << "     - object \'" << j.first << '\'' << std::endl;
-        }
-    }
+  //     for (auto & i : m_cache_map)
+  //       {
+  //         Cache<DalObject> *c = static_cast<Cache<DalObject>*>(i.second);
+  //         std::cout << "    *** " << c->m_cache.size() << " objects is class \'" << *i.first << "\' were accessed ***\n";
+  //         for (auto & j : c->m_cache)
+  //           std::cout << "     - object \'" << j.first << '\'' << std::endl;
+  //       }
+  //   }
 
   if (m_impl)
     {
@@ -381,11 +382,12 @@ Configuration::unload()
         }
     }
 
-    for (auto& i : m_cache_map) {
-      delete i.second;
-    }
+    // for (auto& i : m_cache_map) {
+    //   delete i.second;
+    // }
 
-    m_cache_map.clear();
+    // m_cache_map.clear();
+    m_registry.clear();
 
     {
       std::lock_guard<std::mutex> scoped_lock3(m_else_mutex);
@@ -650,11 +652,11 @@ Configuration::unread_all_objects(bool unread_implementation_objs) noexcept
 }
 
 
+// FIXME: find better name?
 void
 Configuration::_unread_template_objects() noexcept
 {
-  for (auto &j : m_cache_map)
-    j.second->m_functions.m_unread_object_fn(j.second);
+  m_registry.unread_all();
 }
 
 void
@@ -694,7 +696,7 @@ Configuration::update_classes() noexcept
   m_impl->get_superclasses(p_superclasses);
   this->set_subclasses();
   this->set_class_domain_map();
-  m_registry.update_class_domain_map();
+  m_registry.update_class_maps();
 }
 
 std::deque<std::set<std::string>>
@@ -854,20 +856,22 @@ Configuration::rename_object(ConfigObject& obj, const std::string& new_id)
 
   TLOG_DEBUG(3) << " * call rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << obj.class_name() << "\')";
 
-  conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(&obj.class_name());
-  if (j != m_cache_map.end())
-    j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
+  m_registry._rename_object(obj.class_name(), old_id, new_id);
 
-  conffwk::fmap<conffwk::fset>::const_iterator sc = p_superclasses.find(&obj.class_name());
+  // conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(&obj.class_name());
+  // if (j != m_cache_map.end())
+  //   j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
 
-  if (sc != p_superclasses.end())
-    for (conffwk::fset::const_iterator c = sc->second.begin(); c != sc->second.end(); ++c)
-      {
-        conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(*c);
+  // conffwk::fmap<conffwk::fset>::const_iterator sc = p_superclasses.find(&obj.class_name());
 
-        if (j != m_cache_map.end())
-          j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
-      }
+  // if (sc != p_superclasses.end())
+  //   for (conffwk::fset::const_iterator c = sc->second.begin(); c != sc->second.end(); ++c)
+  //     {
+  //       conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(*c);
+
+  //       if (j != m_cache_map.end())
+  //         j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
+  //     }
 }
 
 
@@ -1497,61 +1501,64 @@ Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcep
 
   for (const auto& i : changes)
     {
-      const std::string * class_name = &DalFactory::instance().get_known_class_name_ref(i->get_class_name()); // FIXME: optimise with above
 
-      // invoke configuration update if there are template objects of given class
+      m_registry.update(i->get_class_name(), i->get_modified_objs(), i->get_removed_objs(), i->get_created_objs());
 
-        {
-          conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(class_name);
+      // const std::string * class_name = &DalFactory::instance().get_known_class_name_ref(i->get_class_name()); // FIXME: optimise with above
 
-          if (j != m_cache_map.end())
-            {
-              TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects";
-              j->second->m_functions.m_update_fn(*this, i);
-            }
-        }
+      // // invoke configuration update if there are template objects of given class
 
+      //   {
+      //     conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(class_name);
 
-      // invoke configuration update if there are template objects in super-classes
-
-        {
-          conffwk::fmap<conffwk::fset>::const_iterator sc = p_superclasses.find(class_name);
-
-          if (sc != p_superclasses.end())
-            {
-              for (const auto& c : sc->second)
-                {
-                  conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
-
-                  if (j != m_cache_map.end())
-                    {
-                      TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as super-class of \'" << *class_name << "\')";
-                      j->second->m_functions.m_update_fn(*this, i);
-                    }
-                }
-            }
-        }
+      //     if (j != m_cache_map.end())
+      //       {
+      //         TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects";
+      //         j->second->m_functions.m_update_fn(*this, i);
+      //       }
+      //   }
 
 
-      // invoke configuration update if there are template objects in sub-classes
+      // // invoke configuration update if there are template objects in super-classes
 
-        {
-          conffwk::fmap<conffwk::fset>::const_iterator sc = p_subclasses.find(class_name);
+      //   {
+      //     conffwk::fmap<conffwk::fset>::const_iterator sc = p_superclasses.find(class_name);
 
-          if (sc != p_subclasses.end())
-            {
-              for (const auto& c : sc->second)
-                {
-                  conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
+      //     if (sc != p_superclasses.end())
+      //       {
+      //         for (const auto& c : sc->second)
+      //           {
+      //             conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
 
-                  if (j != m_cache_map.end())
-                    {
-                      TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as sub-class of \'" << *class_name << "\')";
-                      j->second->m_functions.m_update_fn(*this, i);
-                    }
-                }
-            }
-        }
+      //             if (j != m_cache_map.end())
+      //               {
+      //                 TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as super-class of \'" << *class_name << "\')";
+      //                 j->second->m_functions.m_update_fn(*this, i);
+      //               }
+      //           }
+      //       }
+      //   }
+
+
+      // // invoke configuration update if there are template objects in sub-classes
+
+      //   {
+      //     conffwk::fmap<conffwk::fset>::const_iterator sc = p_subclasses.find(class_name);
+
+      //     if (sc != p_subclasses.end())
+      //       {
+      //         for (const auto& c : sc->second)
+      //           {
+      //             conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
+
+      //             if (j != m_cache_map.end())
+      //               {
+      //                 TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as sub-class of \'" << *class_name << "\')";
+      //                 j->second->m_functions.m_update_fn(*this, i);
+      //               }
+      //           }
+      //       }
+      //   }
 
     }
 
@@ -1857,35 +1864,35 @@ Configuration::try_cast(const std::string *target, const std::string *source) no
 }
 
 bool
-Configuration::is_subclass_of(const std::string& target, const std::string& source) noexcept
+Configuration::is_subclass_of(const std::string& target_class, const std::string& base_class) noexcept
 {
-  return is_subclass_of(&DalFactory::instance().get_known_class_name_ref(target), &DalFactory::instance().get_known_class_name_ref(source));
+  return is_subclass_of(&DalFactory::instance().get_known_class_name_ref(target_class), &DalFactory::instance().get_known_class_name_ref(base_class));
 }
 
 bool
-Configuration::is_subclass_of(const std::string *target, const std::string *source) noexcept
+Configuration::is_subclass_of(const std::string *target_class, const std::string *base_class) noexcept
 {
-  if (target == source)
+  if (target_class == base_class)
     {
-      TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is allowed (equal classes)";
+      TLOG_DEBUG(2) << "cast \'" << *base_class << "\' => \'" << *target_class << "\' is allowed (equal classes)";
       return true;
     }
 
-  conffwk::fmap<conffwk::fset>::iterator i = p_superclasses.find(source);
+  conffwk::fmap<conffwk::fset>::iterator i = p_superclasses.find(base_class);
 
   if (i == p_superclasses.end())
     {
-      TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is not possible (source class is not loaded)";
+      TLOG_DEBUG(2) << "cast \'" << *base_class << "\' => \'" << *target_class << "\' is not possible (base class is not loaded)";
       return false;
     }
 
-  if (i->second.find(target) != i->second.end())
+  if (i->second.find(target_class) != i->second.end())
     {
-      TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is allowed (use inheritance)";
+      TLOG_DEBUG(2) << "cast \'" << *base_class << "\' => \'" << *target_class << "\' is allowed (use inheritance)";
       return true;
     }
 
-  TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is not allowed (class \'" << *source << "\' has no \'" << *target << "\' as a superclass)";
+  TLOG_DEBUG(2) << "cast \'" << *base_class << "\' => \'" << *target_class << "\' is not allowed (class \'" << *base_class << "\' has no \'" << *target_class << "\' as a superclass)";
 
   return false;
 }

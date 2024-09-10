@@ -6,14 +6,26 @@ namespace conffwk {
 
 DalRegistry::DalRegistry( conffwk::Configuration& confdb ) : 
   m_confdb(confdb) {
+}
 
-  // update_class_domain_map();
+DalRegistry::~DalRegistry() {
+}
 
+void
+DalRegistry::clear() {
+  for( const auto& [index, domain] : m_cache_domains ) {
+
+    for(const auto& [uid, ptr] : domain.cache ) {
+      delete ptr;
+    }
+  }
+
+  m_class_domain_map.clear();
 }
 
 std::deque<std::set<std::string>>
-DalRegistry::find_class_domains()
-{
+DalRegistry::find_class_domains() {
+  
   std::deque<std::set<std::string>> domains;
 
   std::deque<dunedaq::conffwk::class_t> seeds;
@@ -61,8 +73,7 @@ DalRegistry::find_class_domains()
 }
 
 void
-DalRegistry::update_class_domain_map()
-{
+DalRegistry::update_class_domain_map() {
 
   m_class_domain_map.clear();
 
@@ -75,6 +86,87 @@ DalRegistry::update_class_domain_map()
     }
   }
 }
+
+
+void
+DalRegistry::update(
+            const std::string& class_name,
+            const std::vector<std::string>& modified,
+            const std::vector<std::string>& removed,
+            const std::vector<std::string>& created) {
+  
+  // Find the class domain of T
+  auto it_dom = m_class_domain_map.find(&DalFactory::instance().get_known_class_name_ref(class_name));
+
+  // Class not known, this should not happen
+  if ( it_dom == m_class_domain_map.end() ) {
+    throw dunedaq::conffwk::NotFound(ERS_HERE, class_name.c_str(), "<None>");
+  }
+
+  // get the correct cache domain
+  auto& domain = m_cache_domains[it_dom->second];
+
+  for( const auto& [uid, ptr] : domain.cache ) {
+
+    // Check if the ptr class is derived from class_name
+    m_confdb.is_subclass_of(ptr->class_name(), class_name);
+    
+    if (!ptr)
+      continue;
+
+    bool update = (
+      ( std::find(modified.begin(), modified.end(), ptr->UID()) != modified.end() ) or
+      ( std::find(removed.begin(), removed.end(), ptr->UID()) != removed.end() ) or
+      ( std::find(created.begin(), created.end(), ptr->UID()) != created.end() )
+    );
+
+    if (!update)
+      continue;
+
+    std::lock_guard<std::mutex> scoped_lock(domain.mutex);
+    ptr->p_was_read = false;
+  }
+}
+
+void
+DalRegistry::unread_all() {
+
+  for( const auto& [dom_id, domain] : m_cache_domains ) {
+  
+    std::lock_guard<std::mutex> scoped_lock(domain.mutex);
+
+    for( const auto& [id, ptr] : domain.cache ) {
+      ptr->p_was_read = false;
+    }
+
+  }
+}
+
+
+void
+DalRegistry::_rename_object(std::string class_name, std::string old_id, std::string new_id) {
+  // Find the class domain of T
+  auto it_dom = m_class_domain_map.find(&DalFactory::instance().get_known_class_name_ref(class_name));
+
+  // Class not known, this should not happen
+  if ( it_dom == m_class_domain_map.end() ) {
+    throw dunedaq::conffwk::NotFound(ERS_HERE, class_name.c_str(), old_id.c_str());
+  }
+
+  auto& domain = m_cache_domains[it_dom->second];
+
+  auto it = domain.cache.find(old_id);
+  if (it == domain.cache.end())
+    return;
+
+  domain.cache[new_id] = it->second;
+  domain.cache.erase(it);
+
+  std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
+  it->second->p_UID = new_id;
+  
+}
+
 
 } // namespace conffwk
 } // namespace dunedaq

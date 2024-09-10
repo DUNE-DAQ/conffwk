@@ -1,6 +1,5 @@
-#ifndef __DUNEDAQ_CONFFWK_DALREGISTRY_HXX__
-#define __DUNEDAQ_CONFFWK_DALREGISTRY_HXX__
-#endif /*__DUNEDAQ_CONFFWK_DALREGISTRY_HXX__ */
+#ifndef __DUNEDAQ_CONFFWK_CONFIGURATION_HXX__
+#define __DUNEDAQ_CONFFWK_CONFIGURATION_HXX__
 
 #include "conffwk/details/DalRegistry.hxx"
 
@@ -16,7 +15,7 @@ template<class T>
 
     std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
     create(at, T::s_class_name, id, obj);
-    return get_cache<T>()->get(*this, obj, false, init_object);
+    return m_registry.get<T>(obj, false, init_object);
   }
 
 
@@ -32,7 +31,7 @@ template<class T>
   const T *
   Configuration::_get(const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses)
   {
-    return get_cache<T>()->get(*this, name, init_children, init_object, rlevel, rclasses);
+    return m_registry.get<T>(name, init_children, init_object, rlevel, rclasses);
   }
 
 // Instantiate the template parameter using existing conffwk object.
@@ -40,22 +39,23 @@ template<class T>
   const T *
   Configuration::_get(ConfigObject& obj, bool init_children, bool init_object)
   {
-    return get_cache<T>()->get(*this, obj, init_children, init_object);
+    return m_registry.get<T>(obj, init_children, init_object);
   }
 
 template<class T>
   const T *
   Configuration::_get(ConfigObject& obj, const std::string& id)
   {
-    return get_cache<T>()->get(*this, obj, id);
+    return m_registry.get<T>(obj, id);
   }
 
 template<class T>
   const T *
   Configuration::_find(const std::string& id)
   {
-    auto it = m_cache_map.find(&T::s_class_name);
-    return (it != m_cache_map.end() ? static_cast<Cache<T>*>(it->second)->find(id) : nullptr);
+    // auto it = m_cache_map.find(&T::s_class_name);
+    // return (it != m_cache_map.end() ? static_cast<Cache<T>*>(it->second)->find(id) : nullptr);
+    return m_registry.find<T>(id);
   }
 
 // Get all objects the given class and instantiate a vector of the template parameters object with it.
@@ -94,18 +94,19 @@ template<class T>
   const T *
   Configuration::_ref(ConfigObject& obj, const std::string& name, bool read_children)
   {
-    ConfigObject res;
+    return m_registry._ref<T>(obj, name, read_children);
+    // ConfigObject res;
 
-    try
-      {
-        obj.get(name, res);
-      }
-    catch (dunedaq::conffwk::Generic & ex)
-      {
-        throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_ex_text("an object", T::s_class_name, name, obj).c_str(), ex ) );
-      }
+    // try
+    //   {
+    //     obj.get(name, res);
+    //   }
+    // catch (dunedaq::conffwk::Generic & ex)
+    //   {
+    //     throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_ex_text("an object", T::s_class_name, name, obj).c_str(), ex ) );
+    //   }
 
-    return ((!res.is_null()) ? get_cache<T>(res.class_name())->get(*this, res, read_children, read_children) : nullptr);
+    // return ((!res.is_null()) ? get_cache<T>(res.class_name())->get(*this, res, read_children, read_children) : nullptr);
   }
 
 
@@ -114,24 +115,26 @@ template<class T>
   void
   Configuration::_ref(ConfigObject& obj, const std::string& name, std::vector<const T*>& results, bool read_children)
   {
-    std::vector<ConfigObject> objs;
 
-    results.clear();
+    return m_registry._ref<T>(obj, name, results, read_children);
+    // std::vector<ConfigObject> objs;
 
-    try
-      {
-        obj.get(name, objs);
-        results.reserve(objs.size());
+    // results.clear();
 
-        for (auto& i : objs)
-          {
-            results.push_back(get_cache<T>(i.class_name())->get(*this, i, read_children, read_children));
-          }
-      }
-    catch (dunedaq::conffwk::Generic & ex)
-      {
-        throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_ex_text("objects", T::s_class_name, name, obj).c_str(), ex ) );
-      }
+    // try
+    //   {
+    //     obj.get(name, objs);
+    //     results.reserve(objs.size());
+
+    //     for (auto& i : objs)
+    //       {
+    //         results.push_back(get_cache<T>(i.class_name())->get(*this, i, read_children, read_children));
+    //       }
+    //   }
+    // catch (dunedaq::conffwk::Generic & ex)
+    //   {
+    //     throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_ex_text("objects", T::s_class_name, name, obj).c_str(), ex ) );
+    //   }
   }
 
 template<class T, class V>
@@ -152,7 +155,8 @@ template<class T, class V>
           {
             if (try_cast(V::s_class_name, i.class_name()) == true)
               {
-                if (const V * o = get_cache<V>()->get(*this, i, init, init))
+                // if (const V * o = get_cache<V>()->get(*this, i, init, init))
+                if (const V * o = m_registry.get<V>(i, init, init))
                   {
                     results.push_back(o);
                   }
@@ -177,117 +181,119 @@ template<class T>
   }
 
 
-template<class T>
-  T *
-Configuration::Cache<T>::get(Configuration& conffwk,
-                             ConfigObject& obj, bool init_children, bool init_object)
-  {
-    DalObject*& dalptr = m_cache[obj.m_impl->m_id];
-    T* result = dynamic_cast<T*>(dalptr);
-    if (dalptr == nullptr)
-      {
-        result = dynamic_cast<T*>(m_functions.m_instantiator_fn(conffwk, obj));
-        if (init_object)
-          {
-            std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
-            result->init(init_children);
-          }
-        dalptr = result;
-      }
-    else if(obj.m_impl != result->p_obj.m_impl)
-      {
-        std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
-        result->set(obj); // update implementation object; to be used in case if the object is re-created
-      }
-    increment_gets(conffwk);
-    return result;
-  }
+// template<class T>
+//   T *
+// Configuration::Cache<T>::get(Configuration& conffwk,
+//                              ConfigObject& obj, bool init_children, bool init_object)
+//   {
+//     DalObject*& dalptr = m_cache[obj.m_impl->m_id];
+//     T* result = dynamic_cast<T*>(dalptr);
+//     if (dalptr == nullptr)
+//       {
+//         result = dynamic_cast<T*>(m_functions.m_instantiator_fn(conffwk, obj));
+//         if (init_object)
+//           {
+//             std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
+//             result->init(init_children);
+//           }
+//         dalptr = result;
+//       }
+//     else if(obj.m_impl != result->p_obj.m_impl)
+//       {
+//         std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
+//         result->set(obj); // update implementation object; to be used in case if the object is re-created
+//       }
+//     increment_gets(conffwk);
+//     return result;
+//   }
 
-template<class T>
-  T *
-  Configuration::Cache<T>::find(const std::string& id)
-  {
-    auto it = m_cache.find(id);
-    return (it != m_cache.end() ? dynamic_cast<T*>(it->second) : nullptr);
-  }
+// template<class T>
+//   T *
+//   Configuration::Cache<T>::find(const std::string& id)
+//   {
+//     auto it = m_cache.find(id);
+//     return (it != m_cache.end() ? dynamic_cast<T*>(it->second) : nullptr);
+//   }
 
-template<class T>
-  T *
-  Configuration::Cache<T>::get(Configuration& db, ConfigObject& obj, const std::string& id)
-  {
+// template<class T>
+//   T *
+//   Configuration::Cache<T>::get(Configuration& db, ConfigObject& obj, const std::string& id)
+//   {
 
-    DalObject*& dalptr = m_cache[id];
-    T* result = dynamic_cast<T*>(dalptr);
-    if (dalptr == nullptr)
-      {
-        result = dynamic_cast<T*>(m_functions.m_instantiator_fn(db, obj));
-        if (id != obj.UID())
-          {
-            result->p_UID = id;
-            m_t_cache.emplace(obj.UID(), result);
-          }
-        dalptr = result;
-      }
-    else if(obj.m_impl != result->p_obj.m_impl)
-      {
-        std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
-        result->set(obj); // update implementation object; to be used in case if the object is re-created
-      }
-    increment_gets(db);
-    return result;
-  }
+//     DalObject*& dalptr = m_cache[id];
+//     T* result = dynamic_cast<T*>(dalptr);
+//     if (dalptr == nullptr)
+//       {
+//         result = dynamic_cast<T*>(m_functions.m_instantiator_fn(db, obj));
+//         if (id != obj.UID())
+//           {
+//             result->p_UID = id;
+//             m_t_cache.emplace(obj.UID(), result);
+//           }
+//         dalptr = result;
+//       }
+//     else if(obj.m_impl != result->p_obj.m_impl)
+//       {
+//         std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
+//         result->set(obj); // update implementation object; to be used in case if the object is re-created
+//       }
+//     increment_gets(db);
+//     return result;
+//   }
 
 
-  // Get object from cache or create it.
+//   // Get object from cache or create it.
 
-template<class T> T *
-Configuration::Cache<T>::get(Configuration& conffwk, const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses)
-{
+// template<class T> T *
+// Configuration::Cache<T>::get(Configuration& conffwk, const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses)
+// {
 
-  typename conffwk::map<DalObject*>::iterator i = m_cache.find(name);
-  if(i == m_cache.end()) {
-    try {
-      ConfigObject obj;
-      // class name should be the true cache class name
-      conffwk._get(m_class_name, name, obj, rlevel, rclasses);
-      return get(conffwk, obj, init_children, init_object);
-    }
-    catch(dunedaq::conffwk::NotFound & ex) {
-      if(!strcmp(ex.get_type(), "class")) {
-        std::ostringstream text;
-	      text << "wrong database schema, cannot find class \"" << ex.get_data() << '\"';
-	      throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
-      }
-      else {
-        return 0;
-      }
-    }
-  }
-  increment_gets(conffwk);
-  return dynamic_cast<T*>(i->second);
-}
+//   typename conffwk::map<DalObject*>::iterator i = m_cache.find(name);
+//   if(i == m_cache.end()) {
+//     try {
+//       ConfigObject obj;
+//       // class name should be the true cache class name
+//       conffwk._get(m_class_name, name, obj, rlevel, rclasses);
+//       return get(conffwk, obj, init_children, init_object);
+//     }
+//     catch(dunedaq::conffwk::NotFound & ex) {
+//       if(!strcmp(ex.get_type(), "class")) {
+//         std::ostringstream text;
+// 	      text << "wrong database schema, cannot find class \"" << ex.get_data() << '\"';
+// 	      throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
+//       }
+//       else {
+//         return 0;
+//       }
+//     }
+//   }
+//   increment_gets(conffwk);
+//   return dynamic_cast<T*>(i->second);
+// }
 
 
 template<class T>
   bool
   Configuration::is_valid(const T * object) noexcept
   {
-    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+    // std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
 
-    auto j = m_cache_map.find(&T::s_class_name);
+    // auto j = m_cache_map.find(&T::s_class_name);
 
-    if (j != m_cache_map.end())
-      {
-        Cache<T> *c = static_cast<Cache<T>*>(j->second);
+    // if (j != m_cache_map.end())
+    //   {
+    //     Cache<T> *c = static_cast<Cache<T>*>(j->second);
 
-        for (const auto& i : c->m_cache)
-          {
-            if (i->second == object)
-              return true;
-          }
-      }
+    //     for (const auto& i : c->m_cache)
+    //       {
+    //         if (i->second == object)
+    //           return true;
+    //       }
+    //   }
 
-    return false;
+    // return false;
+
+    return m_registry.is_valid(object);
   }
 
 
@@ -296,30 +302,33 @@ Configuration::update(const std::vector<std::string>& modified,
                       const std::vector<std::string>& removed,
                       const std::vector<std::string>& created) noexcept
   {
-    auto j = m_cache_map.find(&T::s_class_name);
+    // auto j = m_cache_map.find(&T::s_class_name);
 
-    TLOG_DEBUG(4) << "call for class \'" << T::s_class_name << '\'';
+    // TLOG_DEBUG(4) << "call for class \'" << T::s_class_name << '\'';
 
-    if (j != m_cache_map.end())
-      {
-        Cache<T> *c = static_cast<Cache<T>*>(j->second);
-        set_cache_unread(removed, *c);
-        set_cache_unread(created, *c);
-        set_cache_unread(modified, *c);
-      }
+    // if (j != m_cache_map.end())
+    //   {
+    //     Cache<T> *c = static_cast<Cache<T>*>(j->second);
+    //     set_cache_unread(removed, *c);
+    //     set_cache_unread(created, *c);
+    //     set_cache_unread(modified, *c);
+      // }
+    m_registry.update<T>(modified, removed, created);
   }
 
 template<class T> void
 Configuration::_reset_objects() noexcept
   {
-    auto j = m_cache_map.find(&T::s_class_name);
+    // auto j = m_cache_map.find(&T::s_class_name);
 
-    if (j != m_cache_map.end())
-      {
-        _unread_objects(static_cast<Cache<T>*>(j->second));
-      }
+    // if (j != m_cache_map.end())
+    //   {
+    //     _unread_objects(static_cast<Cache<T>*>(j->second));
+    //   }
+    m_registry._reset_objects<T>();
   }
 
+// FIXME: Delete ME
 template<class T>
   void
   Configuration::_unread_objects(CacheBase* x) noexcept
@@ -332,6 +341,7 @@ template<class T>
       }
   }
 
+// FIXME: Delete ME
 template<class T> void
 Configuration::_rename_object(CacheBase* x, const std::string& old_id, const std::string& new_id) noexcept
 {
@@ -410,3 +420,5 @@ CacheBase::increment_gets(Configuration& db) noexcept
 {
   ++db.p_number_of_cache_hits;
 }
+
+#endif /*__DUNEDAQ_CONFFWK_CONFIGURATION_HXX__ */

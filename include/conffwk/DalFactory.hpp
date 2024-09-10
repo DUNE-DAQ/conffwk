@@ -36,57 +36,16 @@ public:
 
   /** register DAL object creator by class name*/
   template<class T>
-    void
-    register_dal_class(const std::string & name, const std::set<std::string>& algorithms);
-    // {
-    //   std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
-
-    //   TLOG_DEBUG(1) << "register class " << name;
-
-    //   if (m_classes.emplace(name, DalFactoryFunctions(boost::compute::identity<T>(), algorithms)).second == false)
-    //     {
-    //       TLOG_DEBUG(0) << "class " << name << " was already registered";
-    //     }
-    // }
-
-  // /** register DAL object creator by class name*/
-  // template<class T>
-  //   void
-  //   register_dal_class_2g(const std::string & name)
-  //   {
-  //     std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
-
-  //     TLOG() << "register class " << name;
-
-  //     if (m_instantiators.emplace(name, [](dalpool::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
-  //       {
-  //         TLOG() << "class " << name << " was already registered";
-  //       }
-  //   }
+  void
+  register_dal_class(const std::string & name, const std::set<std::string>& algorithms);
 
   /** register DAL object creator by class name*/
   template<class T>
-    void
-    register_dal_class_2g(const std::string & name);
-    // {
-    //   std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
-
-    //   TLOG() << "register class " << name;
-
-    //   if (m_instantiators_2g.emplace(name, [](conffwk::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
-    //     {
-    //       TLOG() << "class " << name << " was already registered";
-    //     }
-    // }
+  void
+  register_dal_class_2g(const std::string & name);
 
   const std::string&
   get_known_class_name_ref(const std::string& name);
-  // {
-
-  //   std::lock_guard<std::mutex> scoped_lock(m_known_class_mutex);
-  //   return *m_known_classes.emplace(name).first;
-  // }
-
 
   /**
    * \brief Get DAL object from conffwk object
@@ -133,46 +92,11 @@ public:
   const DalFactoryFunctions&
   functions(const std::string& name) const;
 
-// /**
-//  * \brief Create a new DalObject2g
-//  */
-// dalpool::DalObject2g* make(dalpool::DalRegistry& db, conffwk::ConfigObject& o) {
-
-
-//   TLOG() << "Building object " << o.UID() << " of class " << o.class_name();
-
-//   auto it = m_instantiators.find(o.class_name());
-//   if (it == m_instantiators.end()) {
-//     throw std::runtime_error("XXXXXXXXX");
-//   }
-
-//   auto dal_obj =  it->second(db,o);
-//   TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
-
-//   return dal_obj;
-  
-// }
 
 /**
  * \brief Create a new DaqOnject2g
  */
 conffwk::DalObject2g* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o);
-//  {
-
-
-//   TLOG() << "Building object " << o.UID() << " of class " << o.class_name();
-
-//   auto it = m_instantiators_2g.find(o.class_name());
-//   if (it == m_instantiators_2g.end()) {
-//     throw std::runtime_error("XXXXXXXXX");
-//   }
-
-//   auto dal_obj =  it->second(db,o);
-//   TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
-
-//   return dal_obj;
-  
-// }
 
 private:
 
