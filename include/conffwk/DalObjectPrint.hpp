@@ -93,10 +93,6 @@ namespace conffwk {
 
   /// print weak single-value relationship
   void
-  p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject *obj);
-
-  /// print weak single-value relationship
-  void
   p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject2g *obj);
 
   /// print composite single-value relationship

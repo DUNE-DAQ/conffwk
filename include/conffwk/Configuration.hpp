@@ -42,7 +42,7 @@ namespace dunedaq {
 // }
 
 namespace conffwk {
-class DalObject;
+// class DalObject;
 class ConfigAction;
 class ConfigurationImpl;
 class ConfigurationChange;
@@ -944,8 +944,8 @@ class Configuration {
      *  \throw dunedaq::conffwk::Generic in case of an error
      */
 
-    std::vector<const DalObject*>
-    referenced_by(const DalObject& obj, const std::string& relationship_name = "*", bool check_composite_only = true, bool upcast_unregistered = true, bool init = false, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
+    std::vector<const DalObject2g*>
+    referenced_by(const DalObject2g& obj, const std::string& relationship_name = "*", bool check_composite_only = true, bool upcast_unregistered = true, bool init = false, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
 
 
       /**
@@ -971,8 +971,8 @@ class Configuration {
     /// \throw dunedaq::conffwk::Generic
     template<class T> const T * _get(ConfigObject& obj, bool init_children = false, bool init = true);
 
-    /// \throw dunedaq::conffwk::Generic
-    template<class T> const T * _get(ConfigObject& obj, const std::string& id);
+    // /// \throw dunedaq::conffwk::Generic
+    // template<class T> const T * _get(ConfigObject& obj, const std::string& id);
 
     /// \throw dunedaq::conffwk::Generic
     template<class T> void _get(std::vector<const T*>& objects, bool init_children = false, bool init = true, const std::string& query = "", unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
@@ -984,9 +984,9 @@ class Configuration {
       return const_cast<T*>(_get<T>(obj, uid));
     }
 
-    std::vector<const DalObject*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
+    std::vector<const DalObject2g*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
 
-    const DalObject* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
+    const DalObject2g* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
 
 
     // should be made private

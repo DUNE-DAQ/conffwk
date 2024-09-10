@@ -11,6 +11,7 @@
 
 #include "conffwk/Change.hpp"
 #include "conffwk/DalObject.hpp"
+#include "conffwk/DalObject2g.hpp"
 #include "conffwk/DalObjectPrint.hpp"
 #include "conffwk/DalFactory.hpp"
 #include "conffwk/ConfigObject.hpp"
@@ -1905,18 +1906,31 @@ operator<<(std::ostream &s, const Configuration &c)
   return s;
 }
 
-std::ostream&
-operator<<(std::ostream& s, const DalObject * obj)
-{
-  if (obj == nullptr)
-    DalObject::p_null(s);
-  else if (obj->is_deleted())
-    s << "(deleted object " << obj->UID() << '@' << obj->class_name() << ')';
-  else
-    s << '\'' << obj->UID() << '@' << obj->class_name() << '\'';
+// std::ostream&
+// operator<<(std::ostream& s, const DalObject * obj)
+// {
+//   if (obj == nullptr)
+//     DalObject::p_null(s);
+//   else if (obj->is_deleted())
+//     s << "(deleted object " << obj->UID() << '@' << obj->class_name() << ')';
+//   else
+//     s << '\'' << obj->UID() << '@' << obj->class_name() << '\'';
 
-  return s;
-}
+//   return s;
+// }
+
+// std::ostream&
+// operator<<(std::ostream& s, const DalObject2g * obj)
+// {
+//   if (obj == nullptr)
+//     DalObject2g::p_null(s);
+//   else if (obj->is_deleted())
+//     s << "(deleted object " << obj->UID() << '@' << obj->class_name() << ')';
+//   else
+//     s << '\'' << obj->UID() << '@' << obj->class_name() << '\'';
+
+//   return s;
+// }
 
 std::string
 Configuration::mk_ref_ex_text(const char * what, const std::string& cname, const std::string& rname, const ConfigObject& obj) noexcept
@@ -1935,27 +1949,29 @@ Configuration::mk_ref_by_ex_text(const std::string& cname, const std::string& rn
   return text.str();
 }
 
-std::vector<const DalObject*>
+std::vector<const DalObject2g*>
 Configuration::make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered)
 {
-  std::vector<const DalObject*> result;
+  std::vector<const DalObject2g*> result;
 
   for (auto &i : objs)
-    if (DalObject *o = DalFactory::instance().get(*this, i, i.UID(), upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
+    // if (DalObject *o = DalFactory::instance().get(*this, i, i.UID(), upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
+    if (DalObject2g *o = m_registry.get(i,upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
       result.push_back(o);
 
   return result;
 }
 
-const DalObject*
-Configuration::make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name)
-{
-  return DalFactory::instance().get(*this, obj, uid, class_name);
-}
+// const DalObject*
+// Configuration::make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name)
+// {
+  // return DalFactory::instance().get(*this, obj, uid, class_name);
+  // return m_registry.get(*this, obj, uid, class_name);
+// }
 
 
-std::vector<const DalObject*>
-Configuration::referenced_by(const DalObject& obj, const std::string& relationship_name,
+std::vector<const DalObject2g*>
+Configuration::referenced_by(const DalObject2g& obj, const std::string& relationship_name,
                              bool check_composite_only, bool upcast_unregistered,
                              bool /*init*/, unsigned long rlevel,
                              const std::vector<std::string> * rclasses)
@@ -1970,7 +1986,7 @@ Configuration::referenced_by(const DalObject& obj, const std::string& relationsh
     }
   catch (dunedaq::conffwk::Generic & ex)
     {
-      throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_by_ex_text("DalObject", relationship_name, obj.p_obj).c_str(), ex ) );
+      throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_by_ex_text("DalObject2g", relationship_name, obj.p_obj).c_str(), ex ) );
     }
 }
 
@@ -2089,173 +2105,6 @@ Configuration::superclasses_pybind(const std::string& class_name, bool all) {
   return c.p_superclasses;
 }
 
-bool
-DalObject::get_rel_objects(const std::string &name, bool upcast_unregistered, std::vector<const DalObject*> &objs) const
-{
-  std::vector<ConfigObject> c_objs;
-
-  if (const_cast<ConfigObject*>(&p_obj)->rel(name, c_objs))
-    {
-      std::lock_guard<std::mutex> scoped_lock(p_db.m_tmpl_mutex);
-      p_db.make_dal_objects(c_objs, upcast_unregistered).swap(objs);
-      return true;
-    }
-
-  return false;
-}
-
-
-bool
-DalObject::get_algo_objects(const std::string &name, std::vector<const DalObject*> &objs) const
-{
-  const std::string &suitable_dal_class = DalFactory::instance().class4algo(p_db, class_name(), name);
-
-  TLOG_DEBUG(2) << "suitable class for algorithm " << name << " on object " << this << " is " << suitable_dal_class;
-
-  if (!suitable_dal_class.empty())
-    if (const DalObject *obj = p_db.make_dal_object(const_cast<ConfigObject&>(p_obj), UID(), suitable_dal_class))
-      {
-        obj->get(name, false).swap(objs);
-        return true;
-      }
-
-  return false;
-}
-
-
-
-  // DalObject helper
-
-void
-DalObject::p_null(std::ostream &s)
-{
-  s << "(null)";
-}
-
-void
-DalObject::p_rm(std::ostream &s)
-{
-  s << "(deleted object)";
-}
-
-void
-DalObject::p_error(std::ostream &s, dunedaq::conffwk::Exception &ex)
-{
-  s << "ERROR in generated DAL print method:\n\twas caused by: " << ex << std::endl;
-}
-
-void
-DalObject::p_hdr(std::ostream &s, unsigned int indent, const std::string &cl, const char *nm) const
-{
-  const std::string str(indent, ' ');
-  s << str;
-  if (nm)
-    s << nm << ' ';
-  s << cl << " object:\n" << str << "  id: \'" << UID() << "\', class name: \'" << DalObject::class_name() << "\'\n";
-}
-
-void
-p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject *obj)
-{
-  s << str << name << ": " << obj << '\n';
-}
-
-void
-p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject2g *obj)
-{
-  s << str << name << ": " << obj << '\n';
-}
-
-
-void DalObject::throw_init_ex(dunedaq::conffwk::Exception& ex)
-{
-  std::ostringstream text;
-  text << "failed to init " << this << ":\n\twas caused by: " << ex << std::endl;
-  p_was_read = false;
-  throw dunedaq::conffwk::Generic (ERS_HERE, text.str().c_str());
-}
-
-void DalObject::throw_get_ex(const std::string& what, const std::string& class_name, const DalObject * obj)
-{
-  std::ostringstream text;
-  text << "cannot find relationship or algorithm \"" << what << "\" in c++ class \"" << class_name << "\" for object " << obj;
-  throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
-}
-
-
-DalFactory &
-DalFactory::instance()
-{
-  static DalFactory * instance = ers::SingletonCreator<DalFactory>::create();
-  return *instance;
-}
-
-
-DalObject *
-DalFactory::get(Configuration& db, ConfigObject& obj, const std::string& uid, bool upcast_unregistered) const
-{
-  return (*instance().functions(db, obj.class_name(), upcast_unregistered).m_creator_fn)(db, obj, uid);
-}
-
-DalObject *
-DalFactory::get(Configuration& db, ConfigObject& obj, const std::string& uid, const std::string& class_name) const
-{
-  return (*instance().functions(db, class_name, false).m_creator_fn)(db, obj, uid);
-}
-
-
-const DalFactoryFunctions&
-DalFactory::functions(const Configuration& db, const std::string& name, bool upcast_unregistered) const
-{
-  auto it = m_classes.find(name);
-
-  if (it == m_classes.end())
-    {
-      if (upcast_unregistered)
-        {
-          auto x = db.superclasses().find(&name);
-          if (x != db.superclasses().end())
-            {
-              for (auto c : x->second)
-                {
-                  auto sc = m_classes.find(*c);
-                  if (sc != m_classes.end())
-                    {
-                      TLOG_DEBUG(1) << "use first suitable base class " << c << " instead of unregistered DAL class " << name;
-                      return sc->second;
-                    }
-                }
-            }
-        }
-
-      std::string text(std::string("DAL class ") + name + " was not registered");
-      throw dunedaq::conffwk::Generic(ERS_HERE, text.c_str());
-    }
-
-  return it->second;
-}
-
-const std::string&
-DalFactory::class4algo(Configuration& db, const std::string& name, const std::string& algorithm) const
-{
-  for (const auto& x : m_classes)
-    if (x.second.m_algorithms.find(algorithm) != x.second.m_algorithms.end() && db.try_cast(x.first, name))
-      return x.first;
-
-  static const std::string empty;
-  return empty;
-}
-
-
-const DalFactoryFunctions&
-DalFactory::functions(const std::string& name) const
-{
-  auto it = m_classes.find(name);
-
-  ERS_ASSERT_MSG( (it != m_classes.end()), "writer lock was not initialized" );
-
-  return it->second;
-}
 
 } // namespace conffwk
 } // namespace dunedaq

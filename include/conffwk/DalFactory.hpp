@@ -96,7 +96,7 @@ public:
 /**
  * \brief Create a new DaqOnject2g
  */
-conffwk::DalObject2g* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o);
+conffwk::DalObject2g* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered=false);
 
 private:
 

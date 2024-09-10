@@ -8,7 +8,9 @@ namespace conffwk {
 template<class T> T *
 DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object) {
 
-  if ( !m_confdb.try_cast(T::s_class_name, obj.class_name()) ) {
+  // Ensure that T is a superclass of (or the same class as) obj.class_name()
+  if ( !m_confdb.is_subclass_of(obj.class_name(), T::s_class_name) ) {
+    // do nothing if this is the case
     return nullptr;
   }
 
@@ -65,10 +67,12 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
 
   if ( it_ptr == domain.cache.end()) {
     try {
+      // Search for an ConfigObject of id 'name' of class 'T'
       conffwk::ConfigObject obj;
       m_confdb._get(T::s_class_name, name, obj, rlevel, rclasses);
 
       DalObject2g*& dal_ptr(domain.cache[obj.m_impl->m_id]);
+
       T* result = dynamic_cast<T*>(dal_ptr);
       if (result == nullptr) {
         // result = new T(*this, obj);

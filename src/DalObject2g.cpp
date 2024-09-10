@@ -7,14 +7,14 @@ namespace conffwk {
 bool
 DalObject2g::get_rel_objects(const std::string &name, bool upcast_unregistered, std::vector<const DalObject2g*> &objs) const
 {
-//   std::vector<conffwk::ConfigObject> c_objs;
+  std::vector<conffwk::ConfigObject> c_objs;
 
-//   if (const_cast<conffwk::ConfigObject*>(&p_obj)->rel(name, c_objs))
-//     {
-//       std::lock_guard<std::mutex> scoped_lock(p_db.m_tmpl_mutex);
-//       p_db.make_dal_objects(c_objs, upcast_unregistered).swap(objs);
-//       return true;
-//     }
+  if (const_cast<conffwk::ConfigObject*>(&p_obj)->rel(name, c_objs))
+    {
+  //     std::lock_guard<std::mutex> scoped_lock(p_db.m_tmpl_mutex);
+  //     p_db.make_dal_objects(c_objs, upcast_unregistered).swap(objs);
+  //     return true;
+    }
 
   return false;
 }
@@ -99,7 +99,11 @@ operator<<(std::ostream& s, const DalObject2g * obj)
 }
 
 
-
+void
+p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject2g *obj)
+{
+  s << str << name << ": " << obj << '\n';
+}
 
     
 } // namespace conffwk

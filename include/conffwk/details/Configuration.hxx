@@ -42,12 +42,13 @@ template<class T>
     return m_registry.get<T>(obj, init_children, init_object);
   }
 
-template<class T>
-  const T *
-  Configuration::_get(ConfigObject& obj, const std::string& id)
-  {
-    return m_registry.get<T>(obj, id);
-  }
+// FIXME : not supported, delete
+// template<class T>
+//   const T *
+//   Configuration::_get(ConfigObject& obj, const std::string& id)
+//   {
+//     return m_registry.get<T>(obj, id);
+//   }
 
 template<class T>
   const T *

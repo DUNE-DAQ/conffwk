@@ -33,6 +33,8 @@ public:
    */
   void clear();
 
+  DalObject2g* get(ConfigObject& obj, bool upcast_unregistered=false);
+  
   /**
   *  \brief Get template object from cache by conffwk object.
   *
@@ -53,8 +55,8 @@ public:
   *
   *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
   */
-  template<class T> T *
-  get(ConfigObject& obj, bool init_children=false, bool init_object=true);
+  template<class T> 
+  T * get(ConfigObject& obj, bool init_children=false, bool init_object=true);
 
 
   /**
@@ -77,8 +79,8 @@ public:
   *
   *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
   */
-  template<class T> T *
-  get(const std::string& name, bool init_children=false, bool init_object=true, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
+  template<class T>
+  T * get(const std::string& name, bool init_children=false, bool init_object=true, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
 
 
   /**
@@ -95,8 +97,8 @@ public:
   *
   *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
   */
-  template<class T> T *
-  find(const std::string & id);
+  template<class T> 
+  T * find(const std::string & id);
 
   /**
    *  \brief Checks validity of pointer to an objects of given user class.

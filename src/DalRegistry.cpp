@@ -4,25 +4,16 @@
 namespace dunedaq {
 namespace conffwk {
 
+//-----------------------------------------------------------------------------
 DalRegistry::DalRegistry( conffwk::Configuration& confdb ) : 
   m_confdb(confdb) {
 }
 
+//-----------------------------------------------------------------------------
 DalRegistry::~DalRegistry() {
 }
 
-void
-DalRegistry::clear() {
-  for( const auto& [index, domain] : m_cache_domains ) {
-
-    for(const auto& [uid, ptr] : domain.cache ) {
-      delete ptr;
-    }
-  }
-
-  m_class_domain_map.clear();
-}
-
+//-----------------------------------------------------------------------------
 std::deque<std::set<std::string>>
 DalRegistry::find_class_domains() {
   
@@ -72,6 +63,7 @@ DalRegistry::find_class_domains() {
   return domains;
 }
 
+//-----------------------------------------------------------------------------
 void
 DalRegistry::update_class_domain_map() {
 
@@ -87,7 +79,50 @@ DalRegistry::update_class_domain_map() {
   }
 }
 
+//-----------------------------------------------------------------------------
+void
+DalRegistry::clear() {
+  for( const auto& [index, domain] : m_cache_domains ) {
 
+    for(const auto& [uid, ptr] : domain.cache ) {
+      delete ptr;
+    }
+  }
+
+  m_class_domain_map.clear();
+}
+
+//-----------------------------------------------------------------------------
+DalObject2g* 
+DalRegistry::get(ConfigObject& obj, bool upcast_unregistered) {
+  
+  // Find the class domain of T
+  auto it_dom = m_class_domain_map.find(&DalFactory::instance().get_known_class_name_ref(obj.class_name()));
+  
+  // Class not known, this should not happen
+  if ( it_dom == m_class_domain_map.end() ) {
+    throw dunedaq::conffwk::NotFound(ERS_HERE, obj.class_name().c_str(), "<None>");
+  }
+
+  auto& domain = m_cache_domains[it_dom->second];
+
+  DalObject2g*& result(domain.cache[obj.m_impl->m_id]);
+  if (result == nullptr) {
+
+    result = DalFactory::instance().make(*this, obj, upcast_unregistered);
+
+  } else if (obj.m_impl != result->p_obj.m_impl) {
+
+    std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
+    result->set(obj); // update implementation object; to be used in case if the object is re-created
+  
+  }
+
+  return result;   
+}
+
+
+//-----------------------------------------------------------------------------
 void
 DalRegistry::update(
             const std::string& class_name,
@@ -128,6 +163,8 @@ DalRegistry::update(
   }
 }
 
+
+//-----------------------------------------------------------------------------
 void
 DalRegistry::unread_all() {
 
@@ -143,6 +180,7 @@ DalRegistry::unread_all() {
 }
 
 
+//-----------------------------------------------------------------------------
 void
 DalRegistry::_rename_object(std::string class_name, std::string old_id, std::string new_id) {
   // Find the class domain of T
