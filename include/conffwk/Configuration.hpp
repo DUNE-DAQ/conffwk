@@ -984,9 +984,9 @@ class Configuration {
       return const_cast<T*>(_get<T>(obj, uid));
     }
 
-    std::vector<const DalObject2g*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
+    // std::vector<const DalObject2g*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
 
-    const DalObject2g* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
+    // const DalObject2g* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
 
 
     // should be made private

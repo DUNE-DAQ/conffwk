@@ -10,7 +10,7 @@
 #include "ers/internal/SingletonCreator.hpp"
 
 #include "conffwk/Change.hpp"
-#include "conffwk/DalObject.hpp"
+// #include "conffwk/DalObject.hpp"
 #include "conffwk/DalObject2g.hpp"
 #include "conffwk/DalObjectPrint.hpp"
 #include "conffwk/DalFactory.hpp"
@@ -1949,18 +1949,18 @@ Configuration::mk_ref_by_ex_text(const std::string& cname, const std::string& rn
   return text.str();
 }
 
-std::vector<const DalObject2g*>
-Configuration::make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered)
-{
-  std::vector<const DalObject2g*> result;
+// std::vector<const DalObject2g*>
+// Configuration::make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered)
+// {
+//   std::vector<const DalObject2g*> result;
 
-  for (auto &i : objs)
-    // if (DalObject *o = DalFactory::instance().get(*this, i, i.UID(), upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
-    if (DalObject2g *o = m_registry.get(i,upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
-      result.push_back(o);
+//   for (auto &i : objs)
+//     // if (DalObject *o = DalFactory::instance().get(*this, i, i.UID(), upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
+//     if (DalObject2g *o = m_registry.get(i,upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
+//       result.push_back(o);
 
-  return result;
-}
+//   return result;
+// }
 
 // const DalObject*
 // Configuration::make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name)
@@ -1982,7 +1982,8 @@ Configuration::referenced_by(const DalObject2g& obj, const std::string& relation
       std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
 
       obj.p_obj.referenced_by(objs, relationship_name, check_composite_only, rlevel, rclasses);
-      return make_dal_objects(objs, upcast_unregistered);
+      // return make_dal_objects(objs, upcast_unregistered);
+      return m_registry.get(objs, upcast_unregistered);
     }
   catch (dunedaq::conffwk::Generic & ex)
     {

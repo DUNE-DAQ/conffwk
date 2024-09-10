@@ -121,6 +121,18 @@ DalRegistry::get(ConfigObject& obj, bool upcast_unregistered) {
   return result;   
 }
 
+//-----------------------------------------------------------------------------
+std::vector<const DalObject2g*>
+DalRegistry::get(std::vector<ConfigObject>& objs, bool upcast_unregistered)
+{
+  std::vector<const DalObject2g*> result;
+
+  for (auto &i : objs)
+    if (DalObject2g *o = this->get(i,upcast_unregistered))
+      result.push_back(o);
+
+  return result;
+}
 
 //-----------------------------------------------------------------------------
 void

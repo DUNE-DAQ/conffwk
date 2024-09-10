@@ -34,7 +34,8 @@ public:
   void clear();
 
   DalObject2g* get(ConfigObject& obj, bool upcast_unregistered=false);
-  
+  std::vector<const DalObject2g*> get(std::vector<ConfigObject>& objs, bool upcast_unregistered=false);
+
   /**
   *  \brief Get template object from cache by conffwk object.
   *
