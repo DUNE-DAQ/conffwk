@@ -13,9 +13,6 @@
 #include "logging/Logging.hpp"
 
 namespace dunedaq {
-namespace dalpool {
-  class DalObject2g;
-}
 
 namespace conffwk {
 
@@ -25,7 +22,6 @@ class DalRegistry;
 class DalFactory
 {
 
-  // typedef std::function<dalpool::DalObject2g *(dalpool::DalRegistry& db, ConfigObject& obj)> dal_object_instatiator;
   typedef std::function<DalObject2g *(DalRegistry& db, ConfigObject& obj)> dal_object_instatiator_2g;
 
 public:
@@ -106,7 +102,7 @@ private:
   std::map<std::string, DalFactoryFunctions> m_classes;
 
   // std::map<std::string, dal_object_instatiator> m_instantiators;
-  std::map<std::string, dal_object_instatiator_2g> m_instantiators_2g;
+  std::map<std::string, dal_object_instatiator_2g> m_creators;
 
   std::mutex m_known_class_mutex;
   conffwk::set m_known_classes;

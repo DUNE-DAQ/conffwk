@@ -28,7 +28,7 @@ DalFactory::register_dal_class_2g(const std::string & name)
 
   TLOG() << "register class " << name;
 
-  if (m_instantiators_2g.emplace(name, [](conffwk::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
+  if (m_creators.emplace(name, [](conffwk::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
     {
       TLOG() << "class " << name << " was already registered";
     }
