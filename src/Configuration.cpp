@@ -1855,45 +1855,45 @@ Configuration::print(std::ostream &s) const noexcept
 bool
 Configuration::try_cast(const std::string& target, const std::string& source) noexcept
 {
-  return is_subclass_of(target, source);
+  return is_superclass_of(target, source);
 }
 
 bool
 Configuration::try_cast(const std::string *target, const std::string *source) noexcept
 {
-  return is_subclass_of(target, source);
+  return is_superclass_of(target, source);
 }
 
 bool
-Configuration::is_subclass_of(const std::string& target_class, const std::string& base_class) noexcept
+Configuration::is_superclass_of(const std::string& base_class, const std::string& child_class) noexcept
 {
-  return is_subclass_of(&DalFactory::instance().get_known_class_name_ref(target_class), &DalFactory::instance().get_known_class_name_ref(base_class));
+  return is_superclass_of(&DalFactory::instance().get_known_class_name_ref(base_class), &DalFactory::instance().get_known_class_name_ref(child_class));
 }
 
 bool
-Configuration::is_subclass_of(const std::string *target_class, const std::string *base_class) noexcept
+Configuration::is_superclass_of(const std::string *base_class, const std::string *child_class) noexcept
 {
-  if (target_class == base_class)
+  if (base_class == child_class)
     {
-      TLOG_DEBUG(2) << "cast \'" << *base_class << "\' => \'" << *target_class << "\' is allowed (equal classes)";
+      TLOG() << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is allowed (equal classes)";
       return true;
     }
 
-  conffwk::fmap<conffwk::fset>::iterator i = p_superclasses.find(base_class);
+  conffwk::fmap<conffwk::fset>::iterator i = p_superclasses.find(child_class);
 
   if (i == p_superclasses.end())
     {
-      TLOG_DEBUG(2) << "cast \'" << *base_class << "\' => \'" << *target_class << "\' is not possible (base class is not loaded)";
+      TLOG() << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is not possible (base class is not loaded)";
       return false;
     }
 
-  if (i->second.find(target_class) != i->second.end())
+  if (i->second.find(base_class) != i->second.end())
     {
-      TLOG_DEBUG(2) << "cast \'" << *base_class << "\' => \'" << *target_class << "\' is allowed (use inheritance)";
+      TLOG() << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is allowed (use inheritance)";
       return true;
     }
 
-  TLOG_DEBUG(2) << "cast \'" << *base_class << "\' => \'" << *target_class << "\' is not allowed (class \'" << *base_class << "\' has no \'" << *target_class << "\' as a superclass)";
+  TLOG() << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is not allowed (class \'" << *child_class << "\' has no \'" << *base_class << "\' as a superclass)";
 
   return false;
 }

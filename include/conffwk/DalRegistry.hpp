@@ -179,7 +179,7 @@ public:
    *  It is used by automatically generated data access libraries.
    */
   template<class T> 
-  void _reset_objects() noexcept;
+  void _reset_objects();
 
   /**
    *  \brief Rename object of given template class (multi-thread unsafe).

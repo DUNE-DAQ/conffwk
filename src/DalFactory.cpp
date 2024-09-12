@@ -23,11 +23,12 @@ conffwk::DalObject2g*
 DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered) {
 
 
-  TLOG() << "Building object " << o.UID() << " of class " << o.class_name();
+  TLOG() << "EEE Building object " << o.UID() << " of class " << o.class_name();
 
   auto it = m_instantiators_2g.find(o.class_name());
-  if (it == m_instantiators_2g.end()) {
 
+  if (it == m_instantiators_2g.end()) {
+    TLOG() << "EEE Constructor for class " << o.class_name() << " not found";
     if (upcast_unregistered) {
 
       auto sups = db.configuration().superclasses().find(&o.class_name());
@@ -45,8 +46,7 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast
       }
       
     }
-    throw dunedaq::conffwk::NotFound(ERS_HERE, o.class_name().c_str(), "<None>");
-
+    throw dunedaq::conffwk::NotFound(ERS_HERE, "class", o.class_name().c_str());
   }
 
   auto dal_obj = it->second(db,o);
@@ -54,7 +54,41 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast
 
   return dal_obj;
   
-}        
+}
+
+/**
+ * \brief Create a new DaqOnject2g
+ */
+conffwk::DalObject2g* 
+DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::string& fallback_unregistred) {
+
+
+  TLOG() << "EEE Building object " << o.UID() << " of class " << o.class_name();
+
+  auto it = m_instantiators_2g.find(o.class_name());
+
+  if (it == m_instantiators_2g.end()) {
+    TLOG() << "EEE Constructor for class " << o.class_name() << " not found";
+    if (!fallback_unregistred.empty()) {
+      it = m_instantiators_2g.find(fallback_unregistred); 
+      if (it == m_instantiators_2g.end()) {
+        throw dunedaq::conffwk::NotFound(ERS_HERE, "class", o.class_name().c_str());
+      }
+      TLOG_DEBUG(1) << "use first suitable base class " << fallback_unregistred << " instead of unregistered DAL class " << o.class_name();
+      auto dal_obj = it->second(db,o);
+      TLOG() << "Object " << o.UID() << " of class " << fallback_unregistred << " created " << (void*)dal_obj;
+
+      return dal_obj;
+    }
+    throw dunedaq::conffwk::NotFound(ERS_HERE, "class", o.class_name().c_str());
+  }
+
+  auto dal_obj = it->second(db,o);
+  TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
+
+  return dal_obj;
+  
+}    
 
 DalFactory &
 DalFactory::instance()

@@ -101,7 +101,7 @@ DalRegistry::get(ConfigObject& obj, bool upcast_unregistered) {
   
   // Class not known, this should not happen
   if ( it_dom == m_class_domain_map.end() ) {
-    throw dunedaq::conffwk::NotFound(ERS_HERE, obj.class_name().c_str(), "<None>");
+    throw dunedaq::conffwk::NotFound(ERS_HERE, "class", obj.class_name().c_str());
   }
 
   auto& domain = m_cache_domains[it_dom->second];
@@ -147,7 +147,7 @@ DalRegistry::update(
 
   // Class not known, this should not happen
   if ( it_dom == m_class_domain_map.end() ) {
-    throw dunedaq::conffwk::NotFound(ERS_HERE, class_name.c_str(), "<None>");
+    throw dunedaq::conffwk::NotFound(ERS_HERE, "class", class_name.c_str());
   }
 
   // get the correct cache domain
@@ -156,7 +156,7 @@ DalRegistry::update(
   for( const auto& [uid, ptr] : domain.cache ) {
 
     // Check if the ptr class is derived from class_name
-    m_confdb.is_subclass_of(ptr->class_name(), class_name);
+    m_confdb.is_superclass_of(ptr->class_name(), class_name);
     
     if (!ptr)
       continue;

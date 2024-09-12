@@ -1050,9 +1050,9 @@ class Configuration {
 
     bool try_cast(const std::string* target, const std::string* source) noexcept;
 
-    bool is_subclass_of(const std::string& target, const std::string& source) noexcept;
+    bool is_superclass_of(const std::string& target, const std::string& source) noexcept;
 
-    bool is_subclass_of(const std::string* target, const std::string* source) noexcept;
+    bool is_superclass_of(const std::string* target, const std::string* source) noexcept;
 
   private:
 

@@ -147,7 +147,7 @@ public:
 
   bool castable(const std::string& target) const noexcept
     {
-      return p_db.configuration().is_subclass_of(target, *p_obj.m_impl->m_class_name);
+      return p_db.configuration().is_superclass_of(target, *p_obj.m_impl->m_class_name);
     }
 
   /**
@@ -156,7 +156,7 @@ public:
 
   bool castable(const std::string * target) const noexcept
     {
-      return p_db.configuration().is_subclass_of(target, p_obj.m_impl->m_class_name);
+      return p_db.configuration().is_superclass_of(target, p_obj.m_impl->m_class_name);
     }
 
   /**
