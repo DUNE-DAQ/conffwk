@@ -33,7 +33,7 @@ DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object) {
 
   auto& domain = m_cache_domains[it_dom->second];
 
-  DalObject2g*& dal_ptr(domain.cache[obj.m_impl->m_id]);
+  DalObject*& dal_ptr(domain.cache[obj.m_impl->m_id]);
   T* result = dynamic_cast<T*>(dal_ptr);
 
   if (result == nullptr) {
@@ -102,7 +102,7 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
 
       TLOG() << "AAA 2";
 
-      DalObject2g*& dal_ptr(domain.cache[obj.m_impl->m_id]);
+      DalObject*& dal_ptr(domain.cache[obj.m_impl->m_id]);
 
       TLOG() << "AAA 3";
 

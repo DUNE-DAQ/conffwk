@@ -17,18 +17,13 @@
 
 namespace dunedaq {
 
-namespace dalpool {
-class DalObject2g;
-class DalRegistry;
-}
-
 namespace conffwk {
 
 class ConfigObject;
 class Configuration;
 class ConfigurationImpl;
 class DalObject;
-class DalObject2g;
+class DalObject;
 class DalRegistry;
 
   /** Possible states of configuration objects. */
@@ -59,11 +54,8 @@ class ConfigObjectImpl {
   friend class Configuration;
   friend class ConfigurationImpl;
   friend class DalObject;
-  friend class DalObject2g;
+  friend class DalObject;
   friend class DalRegistry;
-  friend class dalpool::DalObject2g;
-  friend class dalpool::DalRegistry;
-
 
   public:
 

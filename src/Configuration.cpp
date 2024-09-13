@@ -11,7 +11,7 @@
 
 #include "conffwk/Change.hpp"
 // #include "conffwk/DalObject.hpp"
-#include "conffwk/DalObject2g.hpp"
+#include "conffwk/DalObject.hpp"
 #include "conffwk/DalObjectPrint.hpp"
 #include "conffwk/DalFactory.hpp"
 #include "conffwk/ConfigObject.hpp"
@@ -1920,10 +1920,10 @@ operator<<(std::ostream &s, const Configuration &c)
 // }
 
 // std::ostream&
-// operator<<(std::ostream& s, const DalObject2g * obj)
+// operator<<(std::ostream& s, const DalObject * obj)
 // {
 //   if (obj == nullptr)
-//     DalObject2g::p_null(s);
+//     DalObject::p_null(s);
 //   else if (obj->is_deleted())
 //     s << "(deleted object " << obj->UID() << '@' << obj->class_name() << ')';
 //   else
@@ -1949,14 +1949,14 @@ Configuration::mk_ref_by_ex_text(const std::string& cname, const std::string& rn
   return text.str();
 }
 
-// std::vector<const DalObject2g*>
+// std::vector<const DalObject*>
 // Configuration::make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered)
 // {
-//   std::vector<const DalObject2g*> result;
+//   std::vector<const DalObject*> result;
 
 //   for (auto &i : objs)
 //     // if (DalObject *o = DalFactory::instance().get(*this, i, i.UID(), upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
-//     if (DalObject2g *o = m_registry.get(i,upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
+//     if (DalObject *o = m_registry.get(i,upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
 //       result.push_back(o);
 
 //   return result;
@@ -1970,8 +1970,8 @@ Configuration::mk_ref_by_ex_text(const std::string& cname, const std::string& rn
 // }
 
 
-std::vector<const DalObject2g*>
-Configuration::referenced_by(const DalObject2g& obj, const std::string& relationship_name,
+std::vector<const DalObject*>
+Configuration::referenced_by(const DalObject& obj, const std::string& relationship_name,
                              bool check_composite_only, bool upcast_unregistered,
                              bool /*init*/, unsigned long rlevel,
                              const std::vector<std::string> * rclasses)
@@ -1987,7 +1987,7 @@ Configuration::referenced_by(const DalObject2g& obj, const std::string& relation
     }
   catch (dunedaq::conffwk::Generic & ex)
     {
-      throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_by_ex_text("DalObject2g", relationship_name, obj.p_obj).c_str(), ex ) );
+      throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_by_ex_text("DalObject", relationship_name, obj.p_obj).c_str(), ex ) );
     }
 }
 

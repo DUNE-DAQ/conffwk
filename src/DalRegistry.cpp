@@ -1,5 +1,5 @@
 #include "conffwk/Schema.hpp"
-#include "conffwk/DalObject2g.hpp"
+#include "conffwk/DalObject.hpp"
 
 namespace dunedaq {
 namespace conffwk {
@@ -70,11 +70,12 @@ DalRegistry::update_class_domain_map() {
   m_class_domain_map.clear();
 
   auto domains = this->find_class_domains();
+  // TODO: keep a local copy of the domains
   for (size_t i(0); i < domains.size(); ++i) {
     const auto& dom = domains[i];
     for (const auto& class_name : dom) {
       m_class_domain_map[&conffwk::DalFactory::instance().get_known_class_name_ref(class_name)] = i;
-      std::cout << " - " << class_name << " : " <<  i << std::endl;
+      TLOG_DEBUG(9) << " - " << class_name << " : " <<  i;
     }
   }
 }
@@ -93,7 +94,7 @@ DalRegistry::clear() {
 }
 
 //-----------------------------------------------------------------------------
-DalObject2g* 
+DalObject* 
 DalRegistry::get(ConfigObject& obj, bool upcast_unregistered) {
   
   // Find the class domain of T
@@ -106,7 +107,7 @@ DalRegistry::get(ConfigObject& obj, bool upcast_unregistered) {
 
   auto& domain = m_cache_domains[it_dom->second];
 
-  DalObject2g*& result(domain.cache[obj.m_impl->m_id]);
+  DalObject*& result(domain.cache[obj.m_impl->m_id]);
   if (result == nullptr) {
 
     result = DalFactory::instance().make(*this, obj, upcast_unregistered);
@@ -122,13 +123,13 @@ DalRegistry::get(ConfigObject& obj, bool upcast_unregistered) {
 }
 
 //-----------------------------------------------------------------------------
-std::vector<const DalObject2g*>
+std::vector<const DalObject*>
 DalRegistry::get(std::vector<ConfigObject>& objs, bool upcast_unregistered)
 {
-  std::vector<const DalObject2g*> result;
+  std::vector<const DalObject*> result;
 
   for (auto &i : objs)
-    if (DalObject2g *o = this->get(i,upcast_unregistered))
+    if (DalObject *o = this->get(i,upcast_unregistered))
       result.push_back(o);
 
   return result;

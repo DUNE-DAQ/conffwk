@@ -49,7 +49,7 @@ class ConfigObject {
   friend class Configuration;
   friend class ConfigurationImpl;
   friend class DalObject;
-  friend class DalObject2g;
+  friend class DalObject;
   friend class DalRegistry;
 
   public:

@@ -1,5 +1,5 @@
 #include "conffwk/SubscriptionCriteria.hpp"
-#include "conffwk/DalObject2g.hpp"
+#include "conffwk/DalObject.hpp"
 
 namespace dunedaq {
 namespace conffwk {
@@ -17,7 +17,7 @@ ConfigurationSubscriptionCriteria::add(const std::string& class_name, const std:
 }
 
 void
-ConfigurationSubscriptionCriteria::add(const DalObject2g& object)
+ConfigurationSubscriptionCriteria::add(const DalObject& object)
 {
   add(object.class_name(), object.UID());
 }
@@ -43,7 +43,7 @@ ConfigurationSubscriptionCriteria::remove(const std::string& class_name, const s
 }
 
 void
-ConfigurationSubscriptionCriteria::remove(const DalObject2g& object)
+ConfigurationSubscriptionCriteria::remove(const DalObject& object)
 {
   remove(object.class_name(), object.UID());
 }

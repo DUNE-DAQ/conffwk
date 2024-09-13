@@ -19,7 +19,7 @@ DalFactory::get_known_class_name_ref(const std::string& name)
 /**
  * \brief Create a new DaqOnject2g
  */
-conffwk::DalObject2g* 
+conffwk::DalObject* 
 DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered) {
 
 
@@ -59,7 +59,7 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast
 /**
  * \brief Create a new DaqOnject2g
  */
-conffwk::DalObject2g* 
+conffwk::DalObject* 
 DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::string& fallback_unregistred) {
 
 

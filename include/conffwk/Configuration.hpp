@@ -36,17 +36,12 @@
 
 namespace dunedaq {
 
-// namespace dalpool {
-// class DalObject2g;
-// class DalRegistry;
-// }
-
 namespace conffwk {
 // class DalObject;
 class ConfigAction;
 class ConfigurationImpl;
 class ConfigurationChange;
-class DalObject2g;
+class DalObject;
 class DalRegistry;
 
 
@@ -231,11 +226,8 @@ class Configuration {
   friend class ConfigObject;
   friend class ConfigurationImpl;
   friend class CacheBase;
-  friend class DalObject2g;
+  friend class DalObject;
   friend class DalRegistry;
-  // friend class dalpool::DalObject2g;
-  // friend class dalpool::DalRegistry;
-
 
   public:
 
@@ -944,8 +936,8 @@ class Configuration {
      *  \throw dunedaq::conffwk::Generic in case of an error
      */
 
-    std::vector<const DalObject2g*>
-    referenced_by(const DalObject2g& obj, const std::string& relationship_name = "*", bool check_composite_only = true, bool upcast_unregistered = true, bool init = false, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
+    std::vector<const DalObject*>
+    referenced_by(const DalObject& obj, const std::string& relationship_name = "*", bool check_composite_only = true, bool upcast_unregistered = true, bool init = false, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
 
 
       /**
@@ -984,9 +976,9 @@ class Configuration {
       return const_cast<T*>(_get<T>(obj, uid));
     }
 
-    // std::vector<const DalObject2g*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
+    // std::vector<const DalObject*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
 
-    // const DalObject2g* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
+    // const DalObject* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
 
 
     // should be made private

@@ -1,5 +1,5 @@
 /**
- *  \file DalObject2g.h This file contains DalObject2g class,
+ *  \file DalObject.h This file contains DalObject class,
  *  that is the base class for generated DAL classes.
  *  \author Igor Soloviev
  *  \brief base class for generated template objects
@@ -41,7 +41,7 @@ namespace conffwk {
  *  - set() assign conffwk object
  */
 
-class DalObject2g
+class DalObject
 {
 
   friend class Configuration;
@@ -49,7 +49,7 @@ class DalObject2g
   friend class DalRegistry;
 
   friend std::ostream&
-  operator<<(std::ostream& s, const DalObject2g * obj);
+  operator<<(std::ostream& s, const DalObject * obj);
 
 protected:
 
@@ -57,13 +57,13 @@ protected:
    *  The constructor of DAL object.
    */
 
-  DalObject2g(DalRegistry& db, const ConfigObject& o) noexcept :
+  DalObject(DalRegistry& db, const ConfigObject& o) noexcept :
     p_was_read(false), p_db(db), p_obj(o), p_UID(p_obj.UID())
     {
       increment_created();
     }
 
-  virtual ~DalObject2g()
+  virtual ~DalObject()
     {
       ;
     }
@@ -258,7 +258,7 @@ public:
       p_obj.rename(new_id);
     }
 
-  virtual std::vector<const DalObject2g *> get(const std::string& name, bool upcast_unregistered = true) const = 0;
+  virtual std::vector<const DalObject *> get(const std::string& name, bool upcast_unregistered = true) const = 0;
 
 
   // helper methods used by generated DALs
@@ -291,13 +291,13 @@ public:
   /// print object details
   std::ostream& print_object(std::ostream& s) const
     {
-      if(DalObject2g::is_null(this))
+      if(DalObject::is_null(this))
         {
-          DalObject2g::p_null(s);
+          DalObject::p_null(s);
         }
       else if(p_obj.m_impl->m_state != dunedaq::conffwk::Valid)
         {
-          DalObject2g::p_rm(s);
+          DalObject::p_rm(s);
         }
       else
         {
@@ -311,11 +311,11 @@ public:
   void throw_init_ex(dunedaq::conffwk::Exception& ex);
 
   /// throw exception in generated get method (i.e. \throw dunedaq::conffwk::Generic)
-  static void throw_get_ex(const std::string& what, const std::string& class_name, const DalObject2g * obj);
+  static void throw_get_ex(const std::string& what, const std::string& class_name, const DalObject * obj);
 
   /// check a pointer on DAL object is null
   static bool
-  is_null(const DalObject2g * ref) noexcept
+  is_null(const DalObject * ref) noexcept
     {
       return (ref == nullptr);
     }
@@ -348,8 +348,8 @@ protected:
 private:
 
   // prevent copy constructor and operator=
-  DalObject2g(const DalObject2g&) = delete;
-  DalObject2g& operator=(const DalObject2g&) = delete;
+  DalObject(const DalObject&) = delete;
+  DalObject& operator=(const DalObject&) = delete;
 
   // template<typename T>
   // static void update(Configuration& db, const ConfigurationChange * change) noexcept
@@ -370,14 +370,14 @@ private:
   //   }
 
   // template<typename T>
-  //   static DalObject2g *
+  //   static DalObject *
   //   create_instance(Configuration& db, ConfigObject& obj, const std::string& uid)
   //   {
   //     return db._make_instance<T>(obj, uid);
   //   }
 
   // template<typename T>
-  //   static DalObject2g *
+  //   static DalObject *
   //   new_instance(Configuration& db, ConfigObject& obj)
   //   {
   //     return new T(db, obj);
@@ -397,7 +397,7 @@ protected:
       if(!p_was_read)
         {
           std::lock_guard<std::mutex> scoped_lock(this->p_db.m_mutex);
-          const_cast<DalObject2g*>(this)->init(false);
+          const_cast<DalObject*>(this)->init(false);
         }
     }
 
@@ -429,27 +429,27 @@ protected:
 
   /// Read relationship values as DAL objects using DAL factory
   bool
-  get_rel_objects(const std::string& name, bool upcast_unregistered, std::vector<const DalObject2g*>& objs) const;
+  get_rel_objects(const std::string& name, bool upcast_unregistered, std::vector<const DalObject*>& objs) const;
 
   /// Run algorithm and return result as DAL objects using DAL factory
   bool
-  get_algo_objects(const std::string& name, std::vector<const DalObject2g*>& objs) const;
+  get_algo_objects(const std::string& name, std::vector<const DalObject*>& objs) const;
 
 };
 
 /** Operator to print any template's object pointer in 'obj-id\@class-name' format **/
 
 std::ostream&
-operator<<(std::ostream&, const DalObject2g *);
+operator<<(std::ostream&, const DalObject *);
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
 // template<class T>
 //   DalFactoryFunctions::DalFactoryFunctions(boost::compute::identity<T>, const std::set<std::string> algorithms) :
-//       m_update_fn(DalObject2g::update<T>),
-//       m_creator_fn(DalObject2g::create_instance<T>),
-//       m_instantiator_fn(DalObject2g::new_instance<T>),
+//       m_update_fn(DalObject::update<T>),
+//       m_creator_fn(DalObject::create_instance<T>),
+//       m_instantiator_fn(DalObject::new_instance<T>),
 //   {
 //     ;
 //   }
@@ -457,7 +457,7 @@ operator<<(std::ostream&, const DalObject2g *);
 
 // template<class T>
 //   const T *
-//   Configuration::create(const DalObject2g& at, const std::string& id, bool init_object)
+//   Configuration::create(const DalObject& at, const std::string& id, bool init_object)
 //   {
 //     return create<T>(at.config_object().contained_in(), id, init_object);
 //   }

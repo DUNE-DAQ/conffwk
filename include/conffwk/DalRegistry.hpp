@@ -7,21 +7,30 @@
 namespace dunedaq {
 namespace conffwk {
 
-class DalObject2g;
+class DalObject;
 class Configuration;
 
 
-
+/**
+ * @brief DalRegistry: A registry of DalObjects
+ *        It provides a single interface to create, cache and manage DalObjecs
+ * 
+ */
 class DalRegistry {
 
-  friend class DalObject2g;
+  friend class DalObject;
 
 struct DalDomain {
   mutable std::mutex mutex; // mutex used to access template objects (i.e. generated DAL
-  conffwk::map<DalObject2g*> cache;
+  conffwk::map<DalObject*> cache;
 };
 
 public:
+  /**
+   * @brief Construct a new Dal Registry object
+   * 
+   * @param confdb Reference to a Configuration object;
+   */
   DalRegistry(Configuration& confdb);
   ~DalRegistry();
 
@@ -33,8 +42,8 @@ public:
    */
   void clear();
 
-  DalObject2g* get(ConfigObject& obj, bool upcast_unregistered=false);
-  std::vector<const DalObject2g*> get(std::vector<ConfigObject>& objs, bool upcast_unregistered=false);
+  DalObject* get(ConfigObject& obj, bool upcast_unregistered=false);
+  std::vector<const DalObject*> get(std::vector<ConfigObject>& objs, bool upcast_unregistered=false);
 
   /**
   *  \brief Get template object from cache by conffwk object.
@@ -194,6 +203,10 @@ public:
    */
   void _rename_object(std::string class_name, std::string old_id, std::string new_id);
 
+  /**
+   * @brief Update the internal class domains map
+   * 
+   */
   void update_class_maps() {
     this->update_class_domain_map();
   }

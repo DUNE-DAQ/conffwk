@@ -16,13 +16,13 @@ namespace dunedaq {
 
 namespace conffwk {
 
-class DalObject2g;
+class DalObject;
 class DalRegistry;
 
 class DalFactory
 {
 
-  typedef std::function<DalObject2g *(DalRegistry& db, ConfigObject& obj)> dal_object_instatiator_2g;
+  typedef std::function<DalObject *(DalRegistry& db, ConfigObject& obj)> dal_object_instatiator_2g;
 
 public:
 
@@ -92,9 +92,9 @@ public:
 /**
  * \brief Create a new DaqOnject2g
  */
-conffwk::DalObject2g* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered);
+conffwk::DalObject* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered);
 
-conffwk::DalObject2g* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::string& fallback_class="");
+conffwk::DalObject* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::string& fallback_class="");
 
 private:
 
