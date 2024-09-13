@@ -11,7 +11,7 @@ template<class T>
 T *
 DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object) {
 
-  TLOG() << "DDD Building object " << obj.UID() << " of class " << obj.class_name() << " and returning class " << T::s_class_name;
+  TLOG_DEBUG(50) << "Building object " << obj.UID() << " of class " << obj.class_name() << " and returning class " << T::s_class_name;
 
   // Ensure that T is a superclass of (or the same class as) obj.class_name()
   if ( not (
@@ -40,9 +40,9 @@ DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object) {
     // result = new T(*this, obj);
     dal_ptr = DalFactory::instance().make(*this, obj, T::s_class_name);
 
-    TLOG() << "ZZZ Casting " << obj.UID() << " of class " << obj.class_name() << " to " << T::s_class_name;
+    TLOG_DEBUG(50) << "Casting " << obj.UID() << " of class " << obj.class_name() << " to " << T::s_class_name;
     result = dynamic_cast<T*>(dal_ptr);
-    TLOG() << "ZZZ From " << (void*)dal_ptr << " to " << (void*)result;
+    TLOG_DEBUG(50) << "From " << (void*)dal_ptr << " to " << (void*)result;
 
     if (init_object) {
       std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
@@ -56,7 +56,7 @@ DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object) {
   
   }
 
-  TLOG() << "ZZZ Returning " << (void*)result;
+  TLOG_DEBUG(50) << "Returning " << (void*)result;
 
   return result;
 }
@@ -66,11 +66,11 @@ DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object) {
 template<class T> T *
 DalRegistry::get(const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses) {
 
-  TLOG() << "AAA Building object " << name;
+  TLOG_DEBUG(50) << "Building object " << name;
 
   const std::string& ref_name = DalFactory::instance().get_known_class_name_ref(T::s_class_name);
 
-  TLOG() << "AAA Ref name is " << ref_name;
+  TLOG_DEBUG(50) << "Ref name is " << ref_name;
 
 
   // Find the class domain of T
@@ -84,27 +84,19 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
 
   auto& domain = m_cache_domains[it_dom->second];
 
-  TLOG() << "AAA Class domain for " << ref_name << " is " << it_dom->second;
+  TLOG_DEBUG(50) << "Class domain for " << ref_name << " is " << it_dom->second;
 
   auto it_ptr = domain.cache.find(ref_name);
 
-  TLOG() << "AAA Cache found";
+  TLOG_DEBUG(50) << "Cache found";
 
   if ( it_ptr == domain.cache.end()) {
     try {
-      TLOG() << "AAA 0";
-
       // Search for an ConfigObject of id 'name' of class 'T'
       conffwk::ConfigObject obj;
-
-      TLOG() << "AAA 1";
       m_confdb._get(T::s_class_name, name, obj, rlevel, rclasses);
 
-      TLOG() << "AAA 2";
-
       DalObject*& dal_ptr(domain.cache[obj.m_impl->m_id]);
-
-      TLOG() << "AAA 3";
 
       T* result = dynamic_cast<T*>(dal_ptr);
 
@@ -113,9 +105,9 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
         // result = new T(*this, obj);
         dal_ptr = DalFactory::instance().make(*this, obj, T::s_class_name);
 
-        TLOG() << "Casting " << obj.UID() << " of class " << obj.class_name() << " to " << T::s_class_name;
+        TLOG_DEBUG(50) << "Casting " << obj.UID() << " of class " << obj.class_name() << " to " << T::s_class_name;
         result = dynamic_cast<T*>(dal_ptr);
-        TLOG() << "From " << (void*)dal_ptr << " to " << (void*)result;
+        TLOG_DEBUG(50) << "From " << (void*)dal_ptr << " to " << (void*)result;
 
         if (init_object) {
           std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
@@ -126,7 +118,6 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
         result->set(obj); // update implementation object; to be used in case if the object is re-created
       }
       
-      TLOG() << "Returning " << (void*)result;
       return result;
 
     } catch (dunedaq::conffwk::NotFound& ex) {
@@ -201,7 +192,6 @@ DalRegistry::_ref(ConfigObject& obj, const std::string& name, std::vector<const 
 
     for (auto& i : objs) {
       auto ptr = this->get<T>(i, read_children, read_children);
-      TLOG() << "KKK " << ptr;
       results.push_back(ptr);
     }
   } catch (dunedaq::conffwk::Generic& ex) {

@@ -23,12 +23,12 @@ conffwk::DalObject*
 DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered) {
 
 
-  TLOG() << "EEE Building object " << o.UID() << " of class " << o.class_name();
+  TLOG_DEBUG(50) << "Building object " << o.UID() << " of class " << o.class_name();
 
   auto it = m_creators.find(o.class_name());
 
   if (it == m_creators.end()) {
-    TLOG() << "EEE Constructor for class " << o.class_name() << " not found";
+    TLOG_DEBUG(50) << "Constructor for class " << o.class_name() << " not found";
     if (upcast_unregistered) {
 
       auto sups = db.configuration().superclasses().find(&o.class_name());
@@ -38,7 +38,7 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast
           if (it != m_creators.end()) {
             TLOG_DEBUG(1) << "use first suitable base class " << c << " instead of unregistered DAL class " << o.class_name();
             auto dal_obj = it->second(db,o);
-            TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
+            TLOG_DEBUG(50) << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
 
             return dal_obj;
           }
@@ -50,7 +50,7 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast
   }
 
   auto dal_obj = it->second(db,o);
-  TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
+  TLOG_DEBUG(50) << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
 
   return dal_obj;
   
@@ -63,12 +63,12 @@ conffwk::DalObject*
 DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::string& fallback_unregistred) {
 
 
-  TLOG() << "EEE Building object " << o.UID() << " of class " << o.class_name();
+  TLOG_DEBUG(50) << "Building object " << o.UID() << " of class " << o.class_name();
 
   auto it = m_creators.find(o.class_name());
 
   if (it == m_creators.end()) {
-    TLOG() << "EEE Constructor for class " << o.class_name() << " not found";
+    TLOG_DEBUG(50) << "Constructor for class " << o.class_name() << " not found";
     if (!fallback_unregistred.empty()) {
       it = m_creators.find(fallback_unregistred); 
       if (it == m_creators.end()) {
@@ -76,7 +76,7 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::
       }
       TLOG_DEBUG(1) << "use first suitable base class " << fallback_unregistred << " instead of unregistered DAL class " << o.class_name();
       auto dal_obj = it->second(db,o);
-      TLOG() << "Object " << o.UID() << " of class " << fallback_unregistred << " created " << (void*)dal_obj;
+      TLOG_DEBUG(50) << "Object " << o.UID() << " of class " << fallback_unregistred << " created " << (void*)dal_obj;
 
       return dal_obj;
     }
@@ -84,7 +84,7 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::
   }
 
   auto dal_obj = it->second(db,o);
-  TLOG() << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
+  TLOG_DEBUG(50) << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
 
   return dal_obj;
   

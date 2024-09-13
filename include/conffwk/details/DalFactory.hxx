@@ -26,7 +26,7 @@ DalFactory::register_dal_class_2g(const std::string & name)
 {
   std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
 
-  TLOG() << "register class " << name;
+  TLOG_DEBUG(50) << "register class " << name;
 
   if (m_creators.emplace(name, [](conffwk::DalRegistry& db, const conffwk::ConfigObject& o){ return new T(db, o);}).second == false)
     {

@@ -1875,7 +1875,7 @@ Configuration::is_superclass_of(const std::string *base_class, const std::string
 {
   if (base_class == child_class)
     {
-      TLOG() << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is allowed (equal classes)";
+      TLOG_DEBUG(50) << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is allowed (equal classes)";
       return true;
     }
 
@@ -1883,17 +1883,17 @@ Configuration::is_superclass_of(const std::string *base_class, const std::string
 
   if (i == p_superclasses.end())
     {
-      TLOG() << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is not possible (base class is not loaded)";
+      TLOG_DEBUG(50) << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is not possible (base class is not loaded)";
       return false;
     }
 
   if (i->second.find(base_class) != i->second.end())
     {
-      TLOG() << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is allowed (use inheritance)";
+      TLOG_DEBUG(50) << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is allowed (use inheritance)";
       return true;
     }
 
-  TLOG() << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is not allowed (class \'" << *child_class << "\' has no \'" << *base_class << "\' as a superclass)";
+  TLOG_DEBUG(50) << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is not allowed (class \'" << *child_class << "\' has no \'" << *base_class << "\' as a superclass)";
 
   return false;
 }
