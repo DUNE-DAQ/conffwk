@@ -93,7 +93,7 @@ class DalBase(object):
 
     @staticmethod
     def updated():
-        """Returns a set of DAL objects that were modified in this DB session
+        """Returns a set of DAL objects that were modified in this DB system
         """
         return set(DalBase._updated)
 
