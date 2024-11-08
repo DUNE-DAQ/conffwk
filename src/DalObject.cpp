@@ -12,8 +12,8 @@ DalObject::get_rel_objects(const std::string &name, bool upcast_unregistered, st
   if (const_cast<conffwk::ConfigObject*>(&p_obj)->rel(name, c_objs))
     {
       // Fixme: what about the lock?
-      // std::lock_guard<std::mutex> scoped_lock(p_db.m_tmpl_mutex);
-      p_db.get(c_objs, upcast_unregistered).swap(objs);
+      // std::lock_guard<std::mutex> scoped_lock(p_registry.m_tmpl_mutex);
+      p_registry.get(c_objs, upcast_unregistered).swap(objs);
       return true;
     }
 
@@ -25,12 +25,12 @@ bool
 DalObject::get_algo_objects(const std::string& /* name */, std::vector<const DalObject*>& /* objs */) const
 {
     // FIXME: Remove
-//   const std::string &suitable_dal_class = DalFactory::instance().class4algo(p_db, class_name(), name);
+//   const std::string &suitable_dal_class = DalFactory::instance().class4algo(p_registry, class_name(), name);
 
 //   TLOG_DEBUG(2) << "suitable class for algorithm " << name << " on object " << this << " is " << suitable_dal_class;
 
 //   if (!suitable_dal_class.empty())
-//     if (const DalObject *obj = p_db.make_dal_object(const_cast<conffwk::ConfigObject&>(p_obj), UID(), suitable_dal_class))
+//     if (const DalObject *obj = p_registry.make_dal_object(const_cast<conffwk::ConfigObject&>(p_obj), UID(), suitable_dal_class))
 //       {
 //         obj->get(name, false).swap(objs);
 //         return true;

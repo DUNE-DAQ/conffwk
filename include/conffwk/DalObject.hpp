@@ -58,7 +58,7 @@ protected:
    */
 
   DalObject(DalRegistry& db, const ConfigObject& o) noexcept :
-    p_was_read(false), p_db(db), p_obj(o), p_UID(p_obj.UID())
+    p_was_read(false), p_registry(db), p_obj(o), p_UID(p_obj.UID())
     {
       increment_created();
     }
@@ -111,7 +111,7 @@ protected:
   bool p_was_read;
 
   /// Configuration object
-  DalRegistry& p_db;
+  DalRegistry& p_registry;
 
   /// Config object used by given template object
   ConfigObject p_obj;
@@ -147,7 +147,7 @@ public:
 
   bool castable(const std::string& target) const noexcept
     {
-      return p_db.configuration().is_superclass_of(target, *p_obj.m_impl->m_class_name);
+      return p_registry.configuration().is_superclass_of(target, *p_obj.m_impl->m_class_name);
     }
 
   /**
@@ -156,7 +156,7 @@ public:
 
   bool castable(const std::string * target) const noexcept
     {
-      return p_db.configuration().is_superclass_of(target, p_obj.m_impl->m_class_name);
+      return p_registry.configuration().is_superclass_of(target, p_obj.m_impl->m_class_name);
     }
 
   /**
@@ -172,7 +172,7 @@ public:
   cast() const noexcept
     {
       // std::lock_guard<std::mutex> scoped_lock(m_mutex);
-      // return const_cast<Configuration&>(p_db).cast<TARGET>(this);
+      // return const_cast<Configuration&>(p_registry).cast<TARGET>(this);
       return dynamic_cast<const TARGET*>(this);
     }
 
@@ -209,8 +209,18 @@ public:
 
   DalRegistry& registry() const noexcept
     {
-      return p_db;
+      return p_registry;
     }
+
+  /**
+   *  Returns reference on the configuration object.
+   */
+
+  Configuration& configuration() const noexcept
+    {
+      return p_registry.configuration();
+    }
+
 
   /**
    *  Is used to mark template object as non-read,
@@ -332,7 +342,7 @@ protected:
 
   void increment_created() noexcept
     {
-      // ++(p_db.p_number_of_template_object_created);
+      // ++(p_registry.p_number_of_template_object_created);
     }
 
   /**
@@ -341,7 +351,7 @@ protected:
 
   void increment_read() noexcept
     {
-      // ++(p_db.p_number_of_template_object_read);
+      // ++(p_registry.p_number_of_template_object_read);
     }
 
 
@@ -396,7 +406,7 @@ protected:
     {
       if(!p_was_read)
         {
-          std::lock_guard<std::mutex> scoped_lock(this->p_db.m_mutex);
+          std::lock_guard<std::mutex> scoped_lock(this->p_registry.m_mutex);
           const_cast<DalObject*>(this)->init(false);
         }
     }
