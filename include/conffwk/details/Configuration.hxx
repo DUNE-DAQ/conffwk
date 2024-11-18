@@ -80,16 +80,13 @@ template<class T>
       // FIXME
       assert(false);
 
-    // if (!objs.empty())
-    //   {
-    //     if (Configuration::Cache<T> * the_cache = get_cache<T>())
-    //       {
-    //         for (auto& i : objs)
-    //           {
-    //             result.push_back(the_cache->get(*this, i, init_children, init_object));
-    //           }
-    //       }
-    //   }
+    if (!objs.empty())
+      {
+        for (auto& i : objs)
+          {
+            result.push_back(this->_get<T>(i, init_children, init_object));
+          }
+      }
   }
 
 
