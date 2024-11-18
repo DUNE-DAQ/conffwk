@@ -77,16 +77,19 @@ template<class T>
         throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
       }
 
-    if (!objs.empty())
-      {
-        if (Configuration::Cache<T> * the_cache = get_cache<T>())
-          {
-            for (auto& i : objs)
-              {
-                result.push_back(the_cache->get(*this, i, init_children, init_object));
-              }
-          }
-      }
+      // FIXME
+      assert(false);
+
+    // if (!objs.empty())
+    //   {
+    //     if (Configuration::Cache<T> * the_cache = get_cache<T>())
+    //       {
+    //         for (auto& i : objs)
+    //           {
+    //             result.push_back(the_cache->get(*this, i, init_children, init_object));
+    //           }
+    //       }
+    //   }
   }
 
 
@@ -171,15 +174,15 @@ template<class T, class V>
   }
 
 
-template<class T>
-  Configuration::Cache<T>::~Cache() noexcept
-  {
-    // delete each object in cache
-    for (const auto& i : m_cache)
-      {
-        delete i.second;
-      }
-  }
+// template<class T>
+//   Configuration::Cache<T>::~Cache() noexcept
+//   {
+//     // delete each object in cache
+//     for (const auto& i : m_cache)
+//       {
+//         delete i.second;
+//       }
+//   }
 
 
 // template<class T>
@@ -329,46 +332,46 @@ Configuration::_reset_objects() noexcept
     m_registry._reset_objects<T>();
   }
 
-// FIXME: Delete ME
-template<class T>
-  void
-  Configuration::_unread_objects(CacheBase* x) noexcept
-  {
-    Cache<T> *c = static_cast<Cache<T>*>(x);
+// // FIXME: Delete ME
+// template<class T>
+//   void
+//   Configuration::_unread_objects(CacheBase* x) noexcept
+//   {
+//     Cache<T> *c = static_cast<Cache<T>*>(x);
 
-    for (auto& i : c->m_cache)
-      {
-        i.second->p_was_read = false;
-      }
-  }
+//     for (auto& i : c->m_cache)
+//       {
+//         i.second->p_was_read = false;
+//       }
+//   }
 
-// FIXME: Delete ME
-template<class T> void
-Configuration::_rename_object(CacheBase* x, const std::string& old_id, const std::string& new_id) noexcept
-{
-  Cache<T> *c = static_cast<Cache<T>*>(x);
+// // FIXME: Delete ME
+// template<class T> void
+// Configuration::_rename_object(CacheBase* x, const std::string& old_id, const std::string& new_id) noexcept
+// {
+//   Cache<T> *c = static_cast<Cache<T>*>(x);
 
-  // rename template object
-  auto it = c->m_cache.find(old_id);
-  if (it != c->m_cache.end())
-    {
-      TLOG_DEBUG(3) << " * rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << T::s_class_name << "\')";
-      c->m_cache[new_id] = it->second;
-      c->m_cache.erase(it);
+//   // rename template object
+//   auto it = c->m_cache.find(old_id);
+//   if (it != c->m_cache.end())
+//     {
+//       TLOG_DEBUG(3) << " * rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << T::s_class_name << "\')";
+//       c->m_cache[new_id] = it->second;
+//       c->m_cache.erase(it);
 
-      std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
-      it->second->p_UID = new_id;
-    }
+//       std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
+//       it->second->p_UID = new_id;
+//     }
 
-  // rename generated objects if any
-  auto range = c->m_t_cache.equal_range(old_id);
-  for (auto it = range.first; it != range.second;)
-    {
-      T * o = dynamic_cast<T*>(it->second);
-      it = c->m_t_cache.erase(it);
-      c->m_t_cache.emplace(new_id, o);
-    }
-}
+//   // rename generated objects if any
+//   auto range = c->m_t_cache.equal_range(old_id);
+//   for (auto it = range.first; it != range.second;)
+//     {
+//       T * o = dynamic_cast<T*>(it->second);
+//       it = c->m_t_cache.erase(it);
+//       c->m_t_cache.emplace(new_id, o);
+//     }
+// }
 
 
 template<class T> void
@@ -416,10 +419,16 @@ template<class T>
       }
   }
 
-inline void
-CacheBase::increment_gets(Configuration& db) noexcept
-{
-  ++db.p_number_of_cache_hits;
-}
+// inline void
+// CacheBase::increment_gets(Configuration& db) noexcept
+// {
+//   ++db.p_number_of_cache_hits;
+// }
+
+
+
+
+} // namespace conffwk
+} // namespace dunedaq
 
 #endif /*__DUNEDAQ_CONFFWK_CONFIGURATION_HXX__ */

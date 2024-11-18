@@ -57,39 +57,39 @@ class Configuration;
  *  - DAL factory functions
  */
 
-class CacheBase
-{
+// class CacheBase
+// {
 
-  friend class Configuration;
+//   friend class Configuration;
 
-protected:
+// protected:
 
-  CacheBase(const DalFactoryFunctions& f) :
-      m_functions(f)
-  {
-    ;
-  }
+//   CacheBase(const DalFactoryFunctions& f) :
+//       m_functions(f)
+//   {
+//     ;
+//   }
 
-  /** Method for configuration profiling */
+//   /** Method for configuration profiling */
 
-  void
-  increment_gets(Configuration& db) noexcept;
+//   void
+//   increment_gets(Configuration& db) noexcept;
 
-  virtual
-  ~CacheBase() noexcept
-  {
-    ;
-  }
+//   virtual
+//   ~CacheBase() noexcept
+//   {
+//     ;
+//   }
 
-protected:
+// protected:
 
-  const DalFactoryFunctions& m_functions;
+//   const DalFactoryFunctions& m_functions;
 
-private:
+// private:
 
-  conffwk::map<DalObject*> m_cache;
-  conffwk::multimap<DalObject*> m_t_cache;
-};
+//   conffwk::map<DalObject*> m_cache;
+//   conffwk::multimap<DalObject*> m_t_cache;
+// };
 
 
   /**
@@ -223,7 +223,7 @@ class Configuration {
   friend class DalObject;
   friend class ConfigObject;
   friend class ConfigurationImpl;
-  friend class CacheBase;
+  // friend class CacheBase;
   friend class DalObject;
   friend class DalRegistry;
 
@@ -463,41 +463,41 @@ class Configuration {
     template<class T> void _reset_objects() noexcept;
 
 
-      /**
-       *  \brief Mark object of given template class as unread (multi-thread unsafe).
-       *
-       *  Is used by automatically generated data access libraries code after reading parameters for substitution,
-       *  since cache contains objects with non-substituted attributes. Should not be explicitly used by user.
-       *
-       *  The method is used by the unread_all_objects() method.
-       *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
-       */
+    //   /**
+    //    *  \brief Mark object of given template class as unread (multi-thread unsafe).
+    //    *
+    //    *  Is used by automatically generated data access libraries code after reading parameters for substitution,
+    //    *  since cache contains objects with non-substituted attributes. Should not be explicitly used by user.
+    //    *
+    //    *  The method is used by the unread_all_objects() method.
+    //    *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
+    //    */
 
-    template<class T> static void _unread_objects(CacheBase * cache_ptr) noexcept;
-
-
-      /**
-       *  \brief Rename object of given template class (multi-thread unsafe).
-       *
-       *  Is used by automatically generated data access libraries when an object has been renamed by user's code.
-       *  Should not be explicitly used by user.
-       *
-       *  The method is used by the unread_all_objects() method.
-       *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
-       *  \param  old_id old object ID
-       *  \param  new_id new object ID
-       */
-
-    template<class T> static void _rename_object(CacheBase* cache_ptr, const std::string& old_id, const std::string& new_id) noexcept;
+    // template<class T> static void _unread_objects(CacheBase * cache_ptr) noexcept;
 
 
-      /**
-       *  \brief Update state of all objects in cache after abort / commit operations.
-       *
-       *  It is used by automatically generated data access libraries.
-       */
+    //   /**
+    //    *  \brief Rename object of given template class (multi-thread unsafe).
+    //    *
+    //    *  Is used by automatically generated data access libraries when an object has been renamed by user's code.
+    //    *  Should not be explicitly used by user.
+    //    *
+    //    *  The method is used by the unread_all_objects() method.
+    //    *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
+    //    *  \param  old_id old object ID
+    //    *  \param  new_id new object ID
+    //    */
 
-    void _reset_all_objects() noexcept;
+    // template<class T> static void _rename_object(CacheBase* cache_ptr, const std::string& old_id, const std::string& new_id) noexcept;
+
+
+    //   /**
+    //    *  \brief Update state of all objects in cache after abort / commit operations.
+    //    *
+    //    *  It is used by automatically generated data access libraries.
+    //    */
+
+    // void _reset_all_objects() noexcept;
 
 
       /**
@@ -1470,20 +1470,20 @@ class Configuration {
        *
        */
 
-    template<class T> class Cache : public CacheBase {
+    // template<class T> class Cache : public CacheBase {
     
-      friend class Configuration;
+    //   friend class Configuration;
     
-      public:
+    //   public:
 
-        Cache() :
-            CacheBase(DalFactory::instance().functions(T::s_class_name))
-        {
-          ;
-        }
+    //     Cache() :
+    //         CacheBase(DalFactory::instance().functions(T::s_class_name))
+    //     {
+    //       ;
+    //     }
 
 
-        virtual ~Cache() noexcept;
+    //     virtual ~Cache() noexcept;
 
 
       //      /**
@@ -1584,55 +1584,55 @@ class Configuration {
       //   conffwk::multimap<T*> m_t_cache;
 
 
-    };
+    // };
 
   private:
 
-      // Get cache for this type of objects.
+    // Get cache for this type of objects.
 
-    template<class T> Cache<T> * get_cache() noexcept;
+    // template<class T> Cache<T> * get_cache() noexcept;
 
-    template<class T> Cache<T> * get_cache( const std::string& class_name ) {
+    // template<class T> Cache<T> * get_cache( const std::string& class_name ) {
 
-      const std::string& class_name_ref = DalFactory::instance().get_known_class_name_ref(class_name);
-      CacheBase*& c(m_cache_map[&class_name_ref]);
+    //   const std::string& class_name_ref = DalFactory::instance().get_known_class_name_ref(class_name);
+    //   CacheBase*& c(m_cache_map[&class_name_ref]);
 
-      if (c == nullptr)
-        // c = new CacheBase(DalFactory::instance().functions(class_name_ref));
-        c = new CacheBase(class_name_ref, DalFactory::instance().functions(*this, class_name_ref, true));
+    //   if (c == nullptr)
+    //     // c = new CacheBase(DalFactory::instance().functions(class_name_ref));
+    //     c = new CacheBase(class_name_ref, DalFactory::instance().functions(*this, class_name_ref, true));
   
-      return static_cast<Cache<T>*>(c);
+    //   return static_cast<Cache<T>*>(c);
 
-      // return c;
-    }
+    //   // return c;
+    // }
 
-    conffwk::fmap<CacheBase*> m_cache_map;
+    // conffwk::fmap<CacheBase*> m_cache_map;
 
     void rename_object(ConfigObject& obj, const std::string& new_id);
 
-    template<class T>
-    void
-    set_cache_unread(const std::vector<std::string>& objects, Cache<T>& c) noexcept
-    {
-      for (const auto& i : objects)
-        {
-          // unread template objects
-          auto x = c.m_cache.find(i);
-          if (x != c.m_cache.end())
-            {
-              std::lock_guard<std::mutex> scoped_lock(x->second->m_mutex);
-              x->second->p_was_read = false;
-            }
+    // template<class T>
+    // void
+    // set_cache_unread(const std::vector<std::string>& objects, Cache<T>& c) noexcept
+    // {
+    //   for (const auto& i : objects)
+    //     {
+    //       // unread template objects
+    //       auto x = c.m_cache.find(i);
+    //       if (x != c.m_cache.end())
+    //         {
+    //           std::lock_guard<std::mutex> scoped_lock(x->second->m_mutex);
+    //           x->second->p_was_read = false;
+    //         }
 
-          // unread generated objects if any
-          auto range = c.m_t_cache.equal_range(i);
-          for (auto it = range.first; it != range.second; it++)
-            {
-              std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
-              it->second->p_was_read = false;
-            }
-        }
-    }
+    //       // unread generated objects if any
+    //       auto range = c.m_t_cache.equal_range(i);
+    //       for (auto it = range.first; it != range.second; it++)
+    //         {
+    //           std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
+    //           it->second->p_was_read = false;
+    //         }
+    //     }
+    // }
 
 
   public:
@@ -1740,12 +1740,12 @@ std::ostream& operator<<(std::ostream& s, const Configuration & c);
 //// Implementation of template methods.  ////
 //////////////////////////////////////////////
 
-}
+} // namespace conffwk
+} // namespace dunedaq
 
 #include "details/Configuration.hxx"
 
 
-} // namespace conffwk
-} // namespace dunedaq
+
 
 #endif // CONFFWK_CONFIGURATION_H_

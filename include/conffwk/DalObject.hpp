@@ -45,7 +45,7 @@ class DalObject
 {
 
   friend class Configuration;
-  friend DalFactoryFunctions;
+  friend class DalFactoryFunctions;
   friend class DalRegistry;
 
   friend std::ostream&
@@ -503,7 +503,8 @@ operator<<(std::ostream&, const DalObject *);
 
 //     return nullptr;
 //   }
+
 } // namespace conffwk
 } // namespace dunedaq
 
-#endif // CONFFWK_CONFIGOBJECT_H_
+#endif // CONFFWK_DAL_OBJECT_H_
