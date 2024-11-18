@@ -10,7 +10,6 @@
 #include "ers/internal/SingletonCreator.hpp"
 
 #include "conffwk/Change.hpp"
-// #include "conffwk/DalObject.hpp"
 #include "conffwk/DalObject.hpp"
 #include "conffwk/DalObjectPrint.hpp"
 #include "conffwk/DalFactory.hpp"

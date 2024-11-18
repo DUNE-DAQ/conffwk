@@ -18,7 +18,6 @@
 #include "conffwk/Errors.hpp"
 
 namespace dunedaq {
-
 namespace conffwk {
 
 class Configuration;
@@ -132,22 +131,6 @@ class ConfigObject {
   template <typename T>
   void set_list_pybind(const std::string& attrname, std::vector<T> l) {
     this->set_by_ref(attrname, l);
-  }
-
-  void set_date_list(ConfigObject& co, const std::string& attrname, const std::vector<std::string>& l) {
-    co.set_date(attrname, l);
-  }
-
-  void set_time_list(ConfigObject& co, const std::string& attrname, const std::vector<std::string>& l) {
-    co.set_time(attrname, l);
-  }
-
-  void set_class_list(ConfigObject& co, const std::string& attrname, const std::vector<std::string>& l) {
-    co.set_class(attrname, l);
-  }
-
-  void set_enum_list(ConfigObject& co, const std::string& attrname, const std::vector<std::string>& l) {
-    co.set_enum(attrname, l);
   }
 
   

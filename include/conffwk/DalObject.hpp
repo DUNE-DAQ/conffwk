@@ -5,8 +5,8 @@
  *  \brief base class for generated template objects
  */
 
-#ifndef CONFFWK_DAL_OBJECT2G_H_
-#define CONFFWK_DAL_OBJECT2G_H_
+#ifndef CONFFWK_DAL_OBJECT_H_
+#define CONFFWK_DAL_OBJECT_H_
 
 #include <iostream>
 #include <memory>
@@ -281,7 +281,7 @@ public:
    *  \param offset shift output
    *  \param print_header print header describing object (avoid when call this method for a base class from derived)
    *  \param s output stream
-   *  \throw Exception in case of problems (e.g. OKS schema / generated DAL mismatch)
+   *  \throw conffwk::Exception in case of problems (e.g. OKS schema / generated DAL mismatch)
    */
 
   virtual void print(unsigned int offset, bool print_header, std::ostream& s) const = 0;

@@ -77,8 +77,8 @@ like the database type wasn't specified in the name (i.e. \"oksconflibs:<filenam
                     raise RuntimeError(f"{preamble}; one reason is that it looks like \"{dbfilename}\" isn't an XML file")
                 else:
                     raise RuntimeError(f"""
-{preamble}; try running 
-\"conffwk_dump --database {connection}\" 
+{preamble}; try running
+\"oks_dump --files-only {dbfilename}\"
 to see if there's a problem with the input database""")
 
         self.__core_init__()

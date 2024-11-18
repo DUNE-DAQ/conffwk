@@ -16,7 +16,6 @@
 #include "conffwk/Errors.hpp"
 
 namespace dunedaq {
-
 namespace conffwk {
 
 class ConfigObject;

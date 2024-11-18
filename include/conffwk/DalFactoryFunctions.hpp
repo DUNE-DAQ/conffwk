@@ -29,7 +29,7 @@ class CacheBase;
  */
 
 typedef DalObject * (*dal_object_creator)(Configuration& db, ConfigObject& obj, const std::string& uid);
-typedef DalObject * (*dal_object_instatiator)(Configuration& db, ConfigObject& obj);
+
 
 /**
  *  \brief The notification callback function which
@@ -70,14 +70,12 @@ typedef void (*rename_object_f)(CacheBase* x, const std::string& old_id, const s
 
 
 
-
 struct DalFactoryFunctions
 {
   notify2 m_update_fn;
   unread_object m_unread_object_fn;
   rename_object_f m_rename_object_fn;
   dal_object_creator m_creator_fn;
-  dal_object_instatiator m_instantiator_fn;
 
   std::set<std::string> m_algorithms;
 

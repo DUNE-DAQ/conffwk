@@ -35,9 +35,8 @@
 #include "conffwk/set.hpp"
 
 namespace dunedaq {
-
 namespace conffwk {
-// class DalObject;
+
 class ConfigAction;
 class ConfigurationImpl;
 class ConfigurationChange;
@@ -65,10 +64,10 @@ class CacheBase
 
 protected:
 
-  CacheBase(const std::string& n, const DalFactoryFunctions& f) :
-      m_class_name(n),
+  CacheBase(const DalFactoryFunctions& f) :
       m_functions(f)
   {
+    ;
   }
 
   /** Method for configuration profiling */
@@ -84,7 +83,6 @@ protected:
 
 protected:
 
-  const std::string m_class_name;
   const DalFactoryFunctions& m_functions;
 
 private:
@@ -1446,6 +1444,9 @@ class Configuration {
       /** Get names of subclasses for each class **/
 
     const conffwk::fmap<conffwk::fset>& subclasses() const {return p_subclasses;}
+
+    std::vector<std::string> classes_in_python() const;
+  
   
  
   private:
@@ -1739,7 +1740,6 @@ std::ostream& operator<<(std::ostream& s, const Configuration & c);
 //// Implementation of template methods.  ////
 //////////////////////////////////////////////
 
-}
 }
 
 #include "details/Configuration.hxx"

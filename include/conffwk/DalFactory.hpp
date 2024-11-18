@@ -13,7 +13,6 @@
 #include "logging/Logging.hpp"
 
 namespace dunedaq {
-
 namespace conffwk {
 
 class DalObject;
