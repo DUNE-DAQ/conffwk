@@ -947,7 +947,9 @@ class Configuration {
        *  \return Return nullptr if the cast is not successful.
        */
 
-    template<class TARGET, class SOURCE> const TARGET *cast(const SOURCE *s) noexcept;
+    template<class TARGET, class SOURCE> const TARGET *cast(const SOURCE *s) noexcept {
+      return s->template cast<TARGET>();
+    }
 
 
   private:
