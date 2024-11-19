@@ -239,22 +239,9 @@ ConfigurationImpl::print_cache_info() noexcept
     "  number of cache hits: " << p_number_of_cache_hits << std::endl;
 }
 
-
-#ifndef ERS_NO_DEBUG
-# define CONFFWK_ADD_DEBUG_MSG(STREAM, MSG) if(ers::debug_level() >= 4) { *STREAM << MSG; }
-#else
-# define CONFFWK_ADD_DEBUG_MSG(STREAM, MSG) ;
-#endif
-
-
 ConfigObjectImpl *
 ConfigurationImpl::get_impl_object(const std::string& name, const std::string& id) const noexcept
 {
-#ifndef ERS_NO_DEBUG
-  std::unique_ptr<std::ostringstream> dbg_text;
-  if(ers::debug_level() >= 4)
-    dbg_text.reset(new std::ostringstream());
-#endif
 
   conffwk::pmap<conffwk::map<ConfigObjectImpl *> *>::const_iterator i = m_impl_objects.find(&name);
 
@@ -271,25 +258,22 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
 
     class_name = i->first;
 
-#ifndef ERS_NO_DEBUG
 
       // prepare and print out debug message
 
     if(ers::debug_level() >= 4) {
-      CONFFWK_ADD_DEBUG_MSG( dbg_text , "\n  * there is no object with id = \'" << id << "\' found in the class \'" << name << "\' that has " << i->second->size() << " objects in cache: " )
+      TLOG_DEBUG(40) << " * there is no object with id = \'" << id << "\' found in the class \'" << name
+                     << "\' that has " << i->second->size() << " objects in cache: ";
       for(j=i->second->begin(); j != i->second->end();++j) {
-        if(j != i->second->begin()) { CONFFWK_ADD_DEBUG_MSG( dbg_text , ", " ) }
-	CONFFWK_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
+        TLOG_DEBUG(40) << '\'' << j->first << '\'';
       }
-      CONFFWK_ADD_DEBUG_MSG( dbg_text , '\n' )
     }
-
-#endif
 
   }
   else {
     class_name = &DalFactory::instance().get_known_class_name_ref(name);
-    CONFFWK_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << name << "\' that has no objects in cache\n" )
+    TLOG_DEBUG(40) << "  * there is no object with id = \'" << id << "\' found in the class \'" << name
+                   << "\' that has no objects in cache";
   }
 
     // check implementation objects of subclasses
@@ -305,42 +289,38 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
 
           if(j != i->second->end()) {
             p_number_of_cache_hits++;
-  	    CONFFWK_ADD_DEBUG_MSG( dbg_text , "  * found the object with id = \'" << id << "\' in class \'" << *k << '\'' )
-	      TLOG_DEBUG(4) << dbg_text->str() ;
+            TLOG_DEBUG(40) << "  * found the object with id = \'" << id << "\' in class \'" << *k << '\'';
+
             return j->second;
           }
 
-#ifndef ERS_NO_DEBUG
 
             // prepare and print out debug message
 
           else if(ers::debug_level() >= 4) {
-            CONFFWK_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << *k << "\' that has " << i->second->size() << " objects in cache: " )
+            TLOG_DEBUG(40) << "  * there is no object with id = \'" << id << "\' found in the class \'" << *k
+                           << "\' that has " << i->second->size() << " objects in cache: ";
             for(j=i->second->begin(); j != i->second->end();++j) {
-              if(j != i->second->begin()) { CONFFWK_ADD_DEBUG_MSG( dbg_text , ", " ) }
-	      CONFFWK_ADD_DEBUG_MSG( dbg_text , '\'' << j->first << '\'' )
+              TLOG_DEBUG(40) << '\'' << j->first << '\'';
             }
-  	    CONFFWK_ADD_DEBUG_MSG( dbg_text , '\n' )
           }
 
-#endif
 
         }
         else {
-          CONFFWK_ADD_DEBUG_MSG( dbg_text , "  * there is no object with id = \'" << id << "\' found in the class \'" << *k << "\' that has no objects in cache\n" )
+          TLOG_DEBUG(40) << "  * there is no object with id = \'" << id << "\' found in the class \'" << *k
+                         << "\' that has no objects in cache\n";
         }
 
       }
     }
 
-    CONFFWK_ADD_DEBUG_MSG( dbg_text , "  * there is no object \'" << id << "\' in class \'" << name << "\' and it's subclasses, returning NULL ..." )
+    TLOG_DEBUG(40) << "  * there is no object \'" << id << "\' in class \'" << name
+                   << "\' and it's subclasses, returning NULL ...";
   }
   else {
-    CONFFWK_ADD_DEBUG_MSG( dbg_text , "  * there is no object \'" << id << "\' in class \'" << name << "\', returning NULL ..." )
+    TLOG_DEBUG(40) << "  * there is no object \'" << id << "\' in class \'" << name << "\', returning NULL ...";
   }
-
-  if (ers::debug_level() >= 4)
-  TLOG_DEBUG(4) << dbg_text->str() ;
 
   return nullptr;
 }
