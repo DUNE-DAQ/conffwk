@@ -1285,6 +1285,8 @@ class Configuration {
 
   private:
 
+    const dunedaq::conffwk::class_t& _get_class_info(const std::string& class_name, bool direct_only = false);
+
       // cache, storing descriptions of schema
 
     conffwk::map<dunedaq::conffwk::class_t *> p_direct_classes_desc_cache;

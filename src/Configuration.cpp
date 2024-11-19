@@ -438,8 +438,6 @@ Configuration::create(const std::string& db_name, const std::list<std::string>& 
   try
     {
       m_impl->create(db_name, includes);
-      // m_impl->get_superclasses(p_superclasses);
-      // set_subclasses();
       update_classes();
     }
   catch(dunedaq::conffwk::Generic & ex)
@@ -699,6 +697,7 @@ Configuration::update_classes() noexcept
   m_registry.update_class_maps();
 }
 
+
 std::deque<std::set<std::string>>
 Configuration::find_class_domains()
 {
@@ -706,7 +705,7 @@ Configuration::find_class_domains()
 
   std::deque<dunedaq::conffwk::class_t> seeds;
   for (const auto& c : get_class_list()) {
-    auto ci = get_class_info(c);
+    auto ci = this->_get_class_info(c);
     if (ci.p_superclasses.empty())
       seeds.push_back(ci);
   }
@@ -877,18 +876,24 @@ Configuration::rename_object(ConfigObject& obj, const std::string& new_id)
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-
-  //
-  // Meta-information access methods
-  //
-
+//
+// Meta-information access methods
+//
 //////////////////////////////////////////////////////////////////////////////////////////
+
 
 const dunedaq::conffwk::class_t&
 Configuration::get_class_info(const std::string& class_name, bool direct_only)
 {
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
+  this->_get_class_info()
+}
+
+
+const dunedaq::conffwk::class_t&
+Configuration::_get_class_info(const std::string& class_name, bool direct_only)
+{
   conffwk::map<dunedaq::conffwk::class_t *>& d_cache(direct_only ? p_direct_classes_desc_cache : p_all_classes_desc_cache);
 
   conffwk::map<dunedaq::conffwk::class_t *>::const_iterator i = d_cache.find(class_name);
