@@ -887,7 +887,7 @@ Configuration::get_class_info(const std::string& class_name, bool direct_only)
 {
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
-  this->_get_class_info()
+  return this->_get_class_info(class_name, direct_only);
 }
 
 

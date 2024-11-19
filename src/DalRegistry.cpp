@@ -21,7 +21,7 @@ DalRegistry::find_class_domains() {
 
   std::deque<dunedaq::conffwk::class_t> seeds;
   for (const auto& c : m_confdb.get_class_list()) {
-    auto ci = m_confdb.get_class_info(c);
+    auto ci = m_confdb._get_class_info(c);
     if (ci.p_superclasses.empty())
       seeds.push_back(ci);
   }
