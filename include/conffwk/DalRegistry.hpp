@@ -218,8 +218,6 @@ private:
 
   mutable std::mutex m_mutex; // mutex used to access template objects (i.e. generated DAL)
 
-  std::deque<std::set<std::string>> find_class_domains();
-
   void update_class_domain_map();
 
   conffwk::fmap<uint> m_class_domain_map;
