@@ -537,6 +537,13 @@ Configuration::get_includes(const std::string& db_name, std::list<std::string>& 
     }
 }
 
+std::vector<std::string>
+Configuration::get_schema() const {
+  if (m_impl == nullptr) {
+    throw dunedaq::conffwk::Generic( ERS_HERE, "no implementation loaded" );
+  }
+  return m_impl->get_schema();
+}
 
 void
 Configuration::get_updated_dbs(std::list<std::string>& dbs) const

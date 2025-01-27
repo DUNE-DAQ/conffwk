@@ -1170,6 +1170,9 @@ class Configuration {
     void get_includes(const std::string& db_name, std::list<std::string>& includes) const;
 
 
+  std::vector<std::string> get_schema() const;
+
+
       /**
        *  \brief Get list of updated files to be committed.
        *
