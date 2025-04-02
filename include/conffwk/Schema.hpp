@@ -156,6 +156,7 @@ namespace dunedaq {
 
       std::string p_name;                                  /*!< the class name */
       std::string p_description;                           /*!< the description text of class */
+      std::string p_schema_path;                           /*!< the path to the schema_file */
       bool p_abstract;                                     /*!< if true, the class is abstract and has no objects */
       const std::vector<std::string> p_superclasses;       /*!< the names of direct superclasses */
       const std::vector<std::string> p_subclasses;         /*!< the names of direct subclasses */
@@ -167,6 +168,7 @@ namespace dunedaq {
       class_t(
         const std::string& name,
         const std::string& description,
+        const std::string& schema_path,
         bool is_abstract
       );
 

@@ -5,6 +5,10 @@
 
 #include "conffwk/Configuration.hpp"
 #include "conffwk/ConfigObject.hpp"
+#include "conffwk/Schema.hpp"
+#include "conffwk/Errors.hpp"
+
+#include <dlfcn.h>
 
 namespace dunedaq {
 namespace conffwk {
@@ -16,11 +20,37 @@ DalFactory::get_known_class_name_ref(const std::string& name)
   return *m_known_classes.emplace(name).first;
 }
 
+bool 
+DalFactory::try_load_class_library(Configuration& db, const std::string& class_name) {
+
+  auto& c = db.get_class_info(class_name);
+  // fmt::print("- {} '{}'\n", class_name, c.p_schema_path);
+
+  std::string file = c.p_schema_path;
+  std::string search {"/schema/"};
+  auto start = file.rfind(search) + search.size();
+  auto end = file.find("/", start);
+
+  std::string package = file.substr(start,end-start);
+  std::string library = "lib"+package+".so";
+  // fmt::print("{} -> {}\n", package, library);
+  TLOG() << "Loading library " << library << " for class " << class_name;
+
+  auto handle = dlopen(library.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+  // if (handle == nullptr) {
+    // fmt::print("Failed to load {}\n", library);
+
+    // throw (LoadDalFailed(ERS_HERE, library));
+  // }
+
+  return handle != nullptr;
+}
+
 /**
  * \brief Create a new DaqOnject2g
  */
 conffwk::DalObject* 
-DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered) {
+DalFactory::make(conffwk::DalRegistry& reg, conffwk::ConfigObject& o, bool upcast_unregistered) {
 
 
   TLOG_DEBUG(50) << "Building object " << o.UID() << " of class " << o.class_name();
@@ -29,27 +59,19 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast
 
   if (it == m_creators.end()) {
     TLOG_DEBUG(50) << "Constructor for class " << o.class_name() << " not found";
-    if (upcast_unregistered) {
 
-      auto sups = db.configuration().superclasses().find(&o.class_name());
-      if (sups != db.configuration().superclasses().end()) {
-        for (auto c : sups->second) {
-          it = m_creators.find(*c);
-          if (it != m_creators.end()) {
-            TLOG_DEBUG(1) << "use first suitable base class " << c << " instead of unregistered DAL class " << o.class_name();
-            auto dal_obj = it->second(db,o);
-            TLOG_DEBUG(50) << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
-
-            return dal_obj;
-          }
-        }
-      }
-      
+    if (!this->try_load_class_library(reg.configuration(), o.class_name())) {
+      throw NotFound(ERS_HERE, "class", o.class_name().c_str());
     }
-    throw dunedaq::conffwk::NotFound(ERS_HERE, "class", o.class_name().c_str());
+    it = m_creators.find(o.class_name());
+    if (it == m_creators.end()) {
+        throw dunedaq::conffwk::NotFound(ERS_HERE, "class", o.class_name().c_str());
+    }
+  } else {
+    TLOG() << ">>> Constructor for class " << o.class_name() << " found";
   }
 
-  auto dal_obj = it->second(db,o);
+  auto dal_obj = it->second(reg,o);
   TLOG_DEBUG(50) << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
 
   return dal_obj;
@@ -60,7 +82,7 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast
  * \brief Create a new DaqOnject2g
  */
 conffwk::DalObject* 
-DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::string& fallback_unregistred) {
+DalFactory::make(conffwk::DalRegistry& reg, conffwk::ConfigObject& o, const std::string& fallback_unregistred) {
 
 
   TLOG_DEBUG(50) << "Building object " << o.UID() << " of class " << o.class_name();
@@ -68,22 +90,17 @@ DalFactory::make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::
   auto it = m_creators.find(o.class_name());
 
   if (it == m_creators.end()) {
-    TLOG_DEBUG(50) << "Constructor for class " << o.class_name() << " not found";
-    if (!fallback_unregistred.empty()) {
-      it = m_creators.find(fallback_unregistred); 
-      if (it == m_creators.end()) {
-        throw dunedaq::conffwk::NotFound(ERS_HERE, "class", o.class_name().c_str());
-      }
-      TLOG_DEBUG(1) << "use first suitable base class " << fallback_unregistred << " instead of unregistered DAL class " << o.class_name();
-      auto dal_obj = it->second(db,o);
-      TLOG_DEBUG(50) << "Object " << o.UID() << " of class " << fallback_unregistred << " created " << (void*)dal_obj;
-
-      return dal_obj;
+    if (!this->try_load_class_library(reg.configuration(), o.class_name())) {
+      throw NotFound(ERS_HERE, "class", o.class_name().c_str());
     }
-    throw dunedaq::conffwk::NotFound(ERS_HERE, "class", o.class_name().c_str());
+    it = m_creators.find(o.class_name());
+    if (it == m_creators.end()) {
+        throw dunedaq::conffwk::NotFound(ERS_HERE, "class", o.class_name().c_str());
+    }
+
   }
 
-  auto dal_obj = it->second(db,o);
+  auto dal_obj = it->second(reg,o);
   TLOG_DEBUG(50) << "Object " << o.UID() << " of class " << o.class_name() << " created " << (void*)dal_obj;
 
   return dal_obj;
@@ -112,31 +129,20 @@ DalFactory::get(Configuration& db, ConfigObject& obj, const std::string& uid, co
 
 
 const DalFactoryFunctions&
-DalFactory::functions(const Configuration& db, const std::string& name, bool upcast_unregistered) const
+DalFactory::functions(Configuration& db, const std::string& name, bool upcast_unregistered)
 {
   auto it = m_classes.find(name);
 
   if (it == m_classes.end())
     {
-      if (upcast_unregistered)
-        {
-          auto x = db.superclasses().find(&name);
-          if (x != db.superclasses().end())
-            {
-              for (auto c : x->second)
-                {
-                  auto sc = m_classes.find(*c);
-                  if (sc != m_classes.end())
-                    {
-                      TLOG_DEBUG(1) << "use first suitable base class " << c << " instead of unregistered DAL class " << name;
-                      return sc->second;
-                    }
-                }
-            }
-        }
-
-      std::string text(std::string("DAL class ") + name + " was not registered");
-      throw dunedaq::conffwk::Generic(ERS_HERE, text.c_str());
+      if (!this->try_load_class_library(db, name)) {
+        throw NotFound(ERS_HERE, "class", name.c_str());
+      }
+      it = m_classes.find(name);
+      if (it == m_classes.end()) {
+          throw dunedaq::conffwk::NotFound(ERS_HERE, "class", name.c_str());
+      }
+  
     }
 
   return it->second;

@@ -71,7 +71,7 @@ public:
    */
 
   const DalFactoryFunctions&
-  functions(const Configuration& db, const std::string& name, bool upcast_unregistered) const;
+  functions(Configuration& db, const std::string& name, bool upcast_unregistered);
 
 
   const std::string&
@@ -105,6 +105,9 @@ private:
 
   std::mutex m_known_class_mutex;
   conffwk::set m_known_classes;
+
+  // Move into a dedicated class/function
+  bool try_load_class_library(Configuration& db, const std::string& class_name);
 };
 
 } // namespace conffwk

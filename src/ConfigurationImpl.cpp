@@ -151,10 +151,12 @@ namespace dunedaq {
     class_t::class_t(
       const std::string& name,
       const std::string& description,
+      const std::string& schema_path,
       bool is_abstract
     ) :
     p_name             (name),
     p_description      (description),
+    p_schema_path      (schema_path),
     p_abstract         (is_abstract)
     { ; }
 
@@ -163,7 +165,8 @@ namespace dunedaq {
       out
         << prefix << "class \'" << p_name << "\'\n"
         << prefix << "  is abstract: \'" << bool2str(p_abstract) << "\'\n"
-        << prefix << "  description: \'" << p_description << "\'\n";
+        << prefix << "  description: \'" << p_description << "\'\n"
+        << prefix << "  path: \'" << p_schema_path << "\'\n";
 
       if(p_superclasses.empty()) {
         out << prefix << "  there are no superclasses\n";

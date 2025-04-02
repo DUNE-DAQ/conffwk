@@ -35,6 +35,7 @@ public:
   ~DalRegistry();
 
   Configuration& configuration() { return m_confdb; }
+  const Configuration& configuration() const { return m_confdb; }
   
   /**
    * 
