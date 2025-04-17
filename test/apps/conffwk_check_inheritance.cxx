@@ -82,8 +82,8 @@ main(int argc, char const* argv[])
   fmt::print("Found {} inheritance domains\n", domains.size());
   for( size_t i(0); i<domains.size(); ++i ) {
     const auto& dom = domains[i];
-    // fmt::print("   - {} : {}", i, fmt::join(dom, ","));
-    fmt::print("   - {} : {}", i, dom);
+    fmt::print("   - {} : {}", i, fmt::join(dom, ","));
+    // fmt::print("   - {} : {}", i, dom);
     for( const auto& class_name : dom ) {
       class_domain_map[class_name] = i;
       class_domain_map_2[&conffwk::DalFactory::instance().get_known_class_name_ref(class_name)] = i;
