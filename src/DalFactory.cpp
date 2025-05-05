@@ -32,7 +32,7 @@ DalFactory::try_load_class_library(Configuration& db, const std::string& class_n
   auto end = file.find("/", start);
 
   std::string package = file.substr(start,end-start);
-  std::string library = "lib"+package+".so";
+  std::string library = "lib"+package+"_dal.so";
   // fmt::print("{} -> {}\n", package, library);
   TLOG() << "Loading library " << library << " for class " << class_name;
 
