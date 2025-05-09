@@ -32,16 +32,16 @@ DalFactory::try_load_class_library(Configuration& db, const std::string& class_n
   auto end = file.find("/", start);
 
   std::string package = file.substr(start,end-start);
-  std::string library = "lib"+package+"_dal.so";
+  std::string library = "lib"+package+".so";
   // fmt::print("{} -> {}\n", package, library);
   TLOG() << "Loading library " << library << " for class " << class_name;
 
   auto handle = dlopen(library.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-  // if (handle == nullptr) {
+  if (handle == nullptr) {
     // fmt::print("Failed to load {}\n", library);
 
-    // throw (LoadDalFailed(ERS_HERE, library));
-  // }
+    throw (LoadDalFailed(ERS_HERE, library));
+  }
 
   return handle != nullptr;
 }

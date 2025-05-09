@@ -13,6 +13,11 @@
 #include "logging/Logging.hpp"
 
 namespace dunedaq {
+
+ERS_DECLARE_ISSUE(conffwk, LoadDalFailed,
+                "Could not load dal shared library " << library,
+                ((std::string)library))
+                
 namespace conffwk {
 
 class DalObject;
