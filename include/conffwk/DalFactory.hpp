@@ -16,7 +16,7 @@ namespace dunedaq {
 
 ERS_DECLARE_ISSUE(conffwk, DalPackageNameNotFound,
               "Failed to find the dal package name for class " << class << " in its schema path '" << schema_path << "'",
-              ((std::string)class))((std::string)schema_path))
+              ((std::string)class))((std::string)schema_path)
 
 ERS_DECLARE_ISSUE(conffwk, LoadDalFailed,
                 "Could not load dal shared library " << library,
