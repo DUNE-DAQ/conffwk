@@ -43,7 +43,7 @@ namespace dunedaq {
         case string_type: return "string";
         case enum_type:   return "enumeration";
         case class_type:  return "class reference";
-	default:          return "unknown";
+        default:          return "unknown";
       }
     }
 
@@ -76,7 +76,7 @@ namespace dunedaq {
         case oct_int_format:   return "octal";
         case dec_int_format:   return "decimal";
         case hex_int_format:   return "hexadecimal";
-	default:               return "not applicable";
+        default:               return "not applicable";
       }
     }
 
@@ -115,7 +115,7 @@ namespace dunedaq {
                             (can_be_null  && !is_multi_value) ? zero_or_one  :
                             (can_be_null  && is_multi_value ) ? zero_or_many :
                             (!can_be_null && is_multi_value ) ? one_or_many  :
-	                    only_one
+                            only_one
                          ),
       p_is_aggregation   (is_aggregation),
       p_description      (description)
@@ -128,7 +128,7 @@ namespace dunedaq {
         case zero_or_many:   return "zero or many";
         case only_one:       return "one";
         case one_or_many:    return "one or many";
-	default:             return "unknown";
+        default:             return "unknown";
       }
     }
 
@@ -151,10 +151,12 @@ namespace dunedaq {
     class_t::class_t(
       const std::string& name,
       const std::string& description,
+      const std::string& schema_path,
       bool is_abstract
     ) :
     p_name             (name),
     p_description      (description),
+    p_schema_path      (schema_path),
     p_abstract         (is_abstract)
     { ; }
 
@@ -163,16 +165,17 @@ namespace dunedaq {
       out
         << prefix << "class \'" << p_name << "\'\n"
         << prefix << "  is abstract: \'" << bool2str(p_abstract) << "\'\n"
-        << prefix << "  description: \'" << p_description << "\'\n";
+        << prefix << "  description: \'" << p_description << "\'\n"
+        << prefix << "  path: \'" << p_schema_path << "\'\n";
 
       if(p_superclasses.empty()) {
         out << prefix << "  there are no superclasses\n";
       }
       else {
         out << prefix << "  " << p_superclasses.size() << " superclass(es):\n";
-	for(std::vector<std::string>::const_iterator i = p_superclasses.begin(); i != p_superclasses.end(); ++i) {
-	  out << prefix << "    \'" << *i << "\'\n";
-	}
+        for(std::vector<std::string>::const_iterator i = p_superclasses.begin(); i != p_superclasses.end(); ++i) {
+          out << prefix << "    \'" << *i << "\'\n";
+        }
       }
 
       if(p_subclasses.empty()) {
@@ -180,9 +183,9 @@ namespace dunedaq {
       }
       else {
         out << prefix << "  " << p_subclasses.size() << " subclass(es):\n";
-	for(std::vector<std::string>::const_iterator i = p_subclasses.begin(); i != p_subclasses.end(); ++i) {
-	  out << prefix << "    \'" << *i << "\'\n";
-	}
+        for(std::vector<std::string>::const_iterator i = p_subclasses.begin(); i != p_subclasses.end(); ++i) {
+          out << prefix << "    \'" << *i << "\'\n";
+        }
       }
 
       std::string new_prefix(prefix);
@@ -193,10 +196,10 @@ namespace dunedaq {
       }
       else {
         out << prefix << "  " << p_attributes.size() << " attribute(s):\n";
-	for(std::vector<attribute_t>::const_iterator i = p_attributes.begin(); i != p_attributes.end(); ++i) {
-	  (*i).print(out, new_prefix.c_str());
-	  out << std::endl;
-	}
+        for(std::vector<attribute_t>::const_iterator i = p_attributes.begin(); i != p_attributes.end(); ++i) {
+          (*i).print(out, new_prefix.c_str());
+          out << std::endl;
+        }
       }
 
       if(p_relationships.empty()) {
@@ -204,10 +207,10 @@ namespace dunedaq {
       }
       else {
         out << prefix << "  " << p_relationships.size() << " relationship(s):\n";
-	for(std::vector<relationship_t>::const_iterator i = p_relationships.begin(); i != p_relationships.end(); ++i) {
-	  (*i).print(out, new_prefix.c_str());
-	  out << std::endl;
-	}
+        for(std::vector<relationship_t>::const_iterator i = p_relationships.begin(); i != p_relationships.end(); ++i) {
+          (*i).print(out, new_prefix.c_str());
+          out << std::endl;
+        }
       }
     }
 

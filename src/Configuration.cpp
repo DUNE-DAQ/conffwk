@@ -94,9 +94,13 @@ check_prefetch_needs()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+Configuration::Configuration() :
+  p_number_of_cache_hits(0), p_number_of_template_object_created(0), p_number_of_template_object_read(0), m_impl(nullptr), m_shlib_h(nullptr), m_registry(*this){
+    
+  }
 
 Configuration::Configuration(const std::string& spec) :
-    p_number_of_cache_hits(0), p_number_of_template_object_created(0), p_number_of_template_object_read(0), m_impl(nullptr), m_shlib_h(nullptr)
+  p_number_of_cache_hits(0), p_number_of_template_object_created(0), p_number_of_template_object_read(0), m_impl(nullptr), m_shlib_h(nullptr), m_registry(*this)
 {
   std::string s;
 
@@ -129,7 +133,6 @@ Configuration::Configuration(const std::string& spec) :
   std::string impl_creator = std::string("_") + m_impl_name + "_creator_";
 
   // load plug-in
-
   m_shlib_h = dlopen(plugin_name.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 
   if (!m_shlib_h)
@@ -163,8 +166,9 @@ Configuration::Configuration(const std::string& spec) :
 
   if (m_impl)
     {
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
       m_impl->set(this);
     }
 
@@ -185,19 +189,20 @@ Configuration::print_profiling_info() noexcept
       "  number of read template objects: " << p_number_of_template_object_read << "\n"
       "  number of cache hits: " << p_number_of_cache_hits << std::endl;
 
-  const char * s = ::getenv("TDAQ_DUMP_CONFFWK_PROFILER_INFO");
-  if (s && !strcmp(s, "DEBUG"))
-    {
-      std::cout << "  Details of accessed objects:\n";
+  // FIXME: re-implement for the dal registry
+  // const char * s = ::getenv("TDAQ_DUMP_CONFFWK_PROFILER_INFO");
+  // if (s && !strcmp(s, "DEBUG"))
+  //   {
+  //     std::cout << "  Details of accessed objects:\n";
 
-      for (auto & i : m_cache_map)
-        {
-          Cache<DalObject> *c = static_cast<Cache<DalObject>*>(i.second);
-          std::cout << "    *** " << c->m_cache.size() << " objects is class \'" << *i.first << "\' were accessed ***\n";
-          for (auto & j : c->m_cache)
-            std::cout << "     - object \'" << j.first << '\'' << std::endl;
-        }
-    }
+  //     for (auto & i : m_cache_map)
+  //       {
+  //         Cache<DalObject> *c = static_cast<Cache<DalObject>*>(i.second);
+  //         std::cout << "    *** " << c->m_cache.size() << " objects is class \'" << *i.first << "\' were accessed ***\n";
+  //         for (auto & j : c->m_cache)
+  //           std::cout << "     - object \'" << j.first << '\'' << std::endl;
+  //       }
+  //   }
 
   if (m_impl)
     {
@@ -341,8 +346,9 @@ Configuration::load(const std::string& db_name)
   if (m_impl)
     {
       m_impl->open_db(name);
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
       m_impl->set(this);
 
       if(check_prefetch_needs())
@@ -376,20 +382,20 @@ Configuration::unload()
         }
     }
 
-  for(auto & i : m_cache_map)
-    {
-      delete i.second;
-    }
+    // for (auto& i : m_cache_map) {
+    //   delete i.second;
+    // }
 
-  m_cache_map.clear();
+    // m_cache_map.clear();
+    m_registry.clear();
 
     {
       std::lock_guard<std::mutex> scoped_lock3(m_else_mutex);
 
-      for(auto& cb : m_callbacks)
+      for (auto& cb : m_callbacks)
         delete cb;
 
-      for(auto& cb : m_pre_callbacks)
+      for (auto& cb : m_pre_callbacks)
         delete cb;
 
       m_callbacks.clear();
@@ -397,13 +403,12 @@ Configuration::unload()
 
       m_impl->unsubscribe();
 
-      for(auto& l : m_convert_map)
-        {
-          for(auto& a : *l.second)
-            delete a;
+      for (auto& l : m_convert_map) {
+        for (auto& a : *l.second)
+          delete a;
 
-          delete l.second;
-        }
+        delete l.second;
+      }
 
       m_convert_map.clear();
     }
@@ -433,8 +438,7 @@ Configuration::create(const std::string& db_name, const std::list<std::string>& 
   try
     {
       m_impl->create(db_name, includes);
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      update_classes();
     }
   catch(dunedaq::conffwk::Generic & ex)
     {
@@ -477,8 +481,9 @@ Configuration::add_include(const std::string& db_name, const std::string& includ
   try
     {
       m_impl->add_include(db_name, include);
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
     }
   catch(dunedaq::conffwk::Generic & ex)
     {
@@ -500,8 +505,9 @@ Configuration::remove_include(const std::string& db_name, const std::string& inc
   try
     {
       m_impl->remove_include(db_name, include);
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
     }
   catch(dunedaq::conffwk::Generic & ex)
     {
@@ -607,8 +613,10 @@ Configuration::abort()
       m_impl->abort();
       _unread_implementation_objects(dunedaq::conffwk::Unknown);
       _unread_template_objects();
-      m_impl->get_superclasses(p_superclasses);
-      set_subclasses();
+      // m_impl->get_superclasses(p_superclasses);
+      // set_subclasses();
+      update_classes();
+
     }
   catch (dunedaq::conffwk::Generic & ex)
     {
@@ -642,11 +650,11 @@ Configuration::unread_all_objects(bool unread_implementation_objs) noexcept
 }
 
 
+// FIXME: find better name?
 void
 Configuration::_unread_template_objects() noexcept
 {
-  for (auto &j : m_cache_map)
-    j.second->m_functions.m_unread_object_fn(j.second);
+  m_registry.unread_all();
 }
 
 void
@@ -677,6 +685,81 @@ Configuration::set_subclasses() noexcept
   for (const auto &i : p_superclasses)
     for (const auto &j : i.second)
       p_subclasses[j].insert(i.first);
+}
+
+
+void
+Configuration::update_classes() noexcept
+{
+  m_impl->get_superclasses(p_superclasses);
+  this->set_subclasses();
+  this->set_class_domain_map();
+  m_registry.update_class_maps();
+}
+
+
+std::deque<std::set<std::string>>
+Configuration::find_class_domains()
+{
+  std::deque<std::set<std::string>> domains;
+
+  std::deque<dunedaq::conffwk::class_t> seeds;
+  for (const auto& c : get_class_list()) {
+    auto ci = this->_get_class_info(c);
+    if (ci.p_superclasses.empty())
+      seeds.push_back(ci);
+  }
+
+  for (const auto& ci : seeds) {
+    // Make a candidate domain based using the seed subclasses
+    std::set<std::string> class_domain;
+    class_domain.insert(ci.p_name);
+    class_domain.insert(ci.p_subclasses.begin(), ci.p_subclasses.end());
+
+    // Look for overlaps with other domains
+    std::deque<std::set<std::string>> overlapping;
+    for (auto& d : domains) {
+      std::set<std::string> intersection;
+      std::set_intersection(d.begin(), d.end(), class_domain.begin(), class_domain.end(), std::inserter(intersection, intersection.begin()));
+      // non-zero intersection, overlap found
+      if (intersection.size() > 0) {
+        overlapping.push_back(d);
+      }
+    }
+
+    // If overlapping are found, add all overlapping to 
+    // the new domain and remove them from the domain list
+    if ( !overlapping.empty() ) {
+      for( auto& d : overlapping ) {
+        // merge the existing cluster in class_domain
+        class_domain.insert(d.begin(), d.end());
+        // Remove the old cluster from the list
+        auto it = std::find(domains.begin(), domains.end(), d);
+        if (it!= domains.end()) {
+            domains.erase(it);
+        }
+      }
+    }
+
+    domains.push_back(class_domain);
+  }
+
+  return domains;
+}
+
+
+void
+Configuration::set_class_domain_map() {
+  
+  p_class_domain_map.clear();
+  
+  auto domains = this->find_class_domains();
+  for( size_t i(0); i<domains.size(); ++i ) {
+    const auto& dom = domains[i];
+    for( const auto& class_name : dom ) {
+      p_class_domain_map[&conffwk::DalFactory::instance().get_known_class_name_ref(class_name)] = i;
+    }
+  }
 }
 
 
@@ -772,37 +855,45 @@ Configuration::rename_object(ConfigObject& obj, const std::string& new_id)
 
   TLOG_DEBUG(3) << " * call rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << obj.class_name() << "\')";
 
-  conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(&obj.class_name());
-  if (j != m_cache_map.end())
-    j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
+  m_registry._rename_object(obj.class_name(), old_id, new_id);
 
-  conffwk::fmap<conffwk::fset>::const_iterator sc = p_superclasses.find(&obj.class_name());
+  // conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(&obj.class_name());
+  // if (j != m_cache_map.end())
+  //   j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
 
-  if (sc != p_superclasses.end())
-    for (conffwk::fset::const_iterator c = sc->second.begin(); c != sc->second.end(); ++c)
-      {
-        conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(*c);
+  // conffwk::fmap<conffwk::fset>::const_iterator sc = p_superclasses.find(&obj.class_name());
 
-        if (j != m_cache_map.end())
-          j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
-      }
+  // if (sc != p_superclasses.end())
+  //   for (conffwk::fset::const_iterator c = sc->second.begin(); c != sc->second.end(); ++c)
+  //     {
+  //       conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(*c);
+
+  //       if (j != m_cache_map.end())
+  //         j->second->m_functions.m_rename_object_fn(j->second, old_id, new_id);
+  //     }
 }
 
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-
-  //
-  // Meta-information access methods
-  //
-
+//
+// Meta-information access methods
+//
 //////////////////////////////////////////////////////////////////////////////////////////
+
 
 const dunedaq::conffwk::class_t&
 Configuration::get_class_info(const std::string& class_name, bool direct_only)
 {
   std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
 
+  return this->_get_class_info(class_name, direct_only);
+}
+
+
+const dunedaq::conffwk::class_t&
+Configuration::_get_class_info(const std::string& class_name, bool direct_only)
+{
   conffwk::map<dunedaq::conffwk::class_t *>& d_cache(direct_only ? p_direct_classes_desc_cache : p_all_classes_desc_cache);
 
   conffwk::map<dunedaq::conffwk::class_t *>::const_iterator i = d_cache.find(class_name);
@@ -1415,61 +1506,64 @@ Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcep
 
   for (const auto& i : changes)
     {
-      const std::string * class_name = &DalFactory::instance().get_known_class_name_ref(i->get_class_name()); // FIXME: optimise with above
 
-      // invoke configuration update if there are template objects of given class
+      m_registry.update(i->get_class_name(), i->get_modified_objs(), i->get_removed_objs(), i->get_created_objs());
 
-        {
-          conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(class_name);
+      // const std::string * class_name = &DalFactory::instance().get_known_class_name_ref(i->get_class_name()); // FIXME: optimise with above
 
-          if (j != m_cache_map.end())
-            {
-              TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects";
-              j->second->m_functions.m_update_fn(*this, i);
-            }
-        }
+      // // invoke configuration update if there are template objects of given class
 
+      //   {
+      //     conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(class_name);
 
-      // invoke configuration update if there are template objects in super-classes
-
-        {
-          conffwk::fmap<conffwk::fset>::const_iterator sc = p_superclasses.find(class_name);
-
-          if (sc != p_superclasses.end())
-            {
-              for (const auto& c : sc->second)
-                {
-                  conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
-
-                  if (j != m_cache_map.end())
-                    {
-                      TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as super-class of \'" << *class_name << "\')";
-                      j->second->m_functions.m_update_fn(*this, i);
-                    }
-                }
-            }
-        }
+      //     if (j != m_cache_map.end())
+      //       {
+      //         TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects";
+      //         j->second->m_functions.m_update_fn(*this, i);
+      //       }
+      //   }
 
 
-      // invoke configuration update if there are template objects in sub-classes
+      // // invoke configuration update if there are template objects in super-classes
 
-        {
-          conffwk::fmap<conffwk::fset>::const_iterator sc = p_subclasses.find(class_name);
+      //   {
+      //     conffwk::fmap<conffwk::fset>::const_iterator sc = p_superclasses.find(class_name);
 
-          if (sc != p_subclasses.end())
-            {
-              for (const auto& c : sc->second)
-                {
-                  conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
+      //     if (sc != p_superclasses.end())
+      //       {
+      //         for (const auto& c : sc->second)
+      //           {
+      //             conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
 
-                  if (j != m_cache_map.end())
-                    {
-                      TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as sub-class of \'" << *class_name << "\')";
-                      j->second->m_functions.m_update_fn(*this, i);
-                    }
-                }
-            }
-        }
+      //             if (j != m_cache_map.end())
+      //               {
+      //                 TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as super-class of \'" << *class_name << "\')";
+      //                 j->second->m_functions.m_update_fn(*this, i);
+      //               }
+      //           }
+      //       }
+      //   }
+
+
+      // // invoke configuration update if there are template objects in sub-classes
+
+      //   {
+      //     conffwk::fmap<conffwk::fset>::const_iterator sc = p_subclasses.find(class_name);
+
+      //     if (sc != p_subclasses.end())
+      //       {
+      //         for (const auto& c : sc->second)
+      //           {
+      //             conffwk::fmap<CacheBase*>::iterator j = m_cache_map.find(c);
+
+      //             if (j != m_cache_map.end())
+      //               {
+      //                 TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as sub-class of \'" << *class_name << "\')";
+      //                 j->second->m_functions.m_update_fn(*this, i);
+      //               }
+      //           }
+      //       }
+      //   }
 
     }
 
@@ -1761,36 +1855,49 @@ Configuration::print(std::ostream &s) const noexcept
     }
 }
 
+
 bool
 Configuration::try_cast(const std::string& target, const std::string& source) noexcept
 {
-  return try_cast(&DalFactory::instance().get_known_class_name_ref(target), &DalFactory::instance().get_known_class_name_ref(source));
+  return is_superclass_of(target, source);
 }
 
 bool
 Configuration::try_cast(const std::string *target, const std::string *source) noexcept
 {
-  if (target == source)
+  return is_superclass_of(target, source);
+}
+
+bool
+Configuration::is_superclass_of(const std::string& base_class, const std::string& child_class) noexcept
+{
+  return is_superclass_of(&DalFactory::instance().get_known_class_name_ref(base_class), &DalFactory::instance().get_known_class_name_ref(child_class));
+}
+
+bool
+Configuration::is_superclass_of(const std::string *base_class, const std::string *child_class) noexcept
+{
+  if (base_class == child_class)
     {
-      TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is allowed (equal classes)";
+      TLOG_DEBUG(50) << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is allowed (equal classes)";
       return true;
     }
 
-  conffwk::fmap<conffwk::fset>::iterator i = p_superclasses.find(source);
+  conffwk::fmap<conffwk::fset>::iterator i = p_superclasses.find(child_class);
 
   if (i == p_superclasses.end())
     {
-      TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is not possible (source class is not loaded)";
+      TLOG_DEBUG(50) << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is not possible (base class is not loaded)";
       return false;
     }
 
-  if (i->second.find(target) != i->second.end())
+  if (i->second.find(base_class) != i->second.end())
     {
-      TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is allowed (use inheritance)";
+      TLOG_DEBUG(50) << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is allowed (use inheritance)";
       return true;
     }
 
-  TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is not allowed (class \'" << *source << "\' has no \'" << *target << "\' as a superclass)";
+  TLOG_DEBUG(50) << "cast \'" << *child_class << "\' => \'" << *base_class << "\' is not allowed (class \'" << *child_class << "\' has no \'" << *base_class << "\' as a superclass)";
 
   return false;
 }
@@ -1803,18 +1910,31 @@ operator<<(std::ostream &s, const Configuration &c)
   return s;
 }
 
-std::ostream&
-operator<<(std::ostream& s, const DalObject * obj)
-{
-  if (obj == nullptr)
-    DalObject::p_null(s);
-  else if (obj->is_deleted())
-    s << "(deleted object " << obj->UID() << '@' << obj->class_name() << ')';
-  else
-    s << '\'' << obj->UID() << '@' << obj->class_name() << '\'';
+// std::ostream&
+// operator<<(std::ostream& s, const DalObject * obj)
+// {
+//   if (obj == nullptr)
+//     DalObject::p_null(s);
+//   else if (obj->is_deleted())
+//     s << "(deleted object " << obj->UID() << '@' << obj->class_name() << ')';
+//   else
+//     s << '\'' << obj->UID() << '@' << obj->class_name() << '\'';
 
-  return s;
-}
+//   return s;
+// }
+
+// std::ostream&
+// operator<<(std::ostream& s, const DalObject * obj)
+// {
+//   if (obj == nullptr)
+//     DalObject::p_null(s);
+//   else if (obj->is_deleted())
+//     s << "(deleted object " << obj->UID() << '@' << obj->class_name() << ')';
+//   else
+//     s << '\'' << obj->UID() << '@' << obj->class_name() << '\'';
+
+//   return s;
+// }
 
 std::string
 Configuration::mk_ref_ex_text(const char * what, const std::string& cname, const std::string& rname, const ConfigObject& obj) noexcept
@@ -1833,23 +1953,25 @@ Configuration::mk_ref_by_ex_text(const std::string& cname, const std::string& rn
   return text.str();
 }
 
-std::vector<const DalObject*>
-Configuration::make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered)
-{
-  std::vector<const DalObject*> result;
+// std::vector<const DalObject*>
+// Configuration::make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered)
+// {
+//   std::vector<const DalObject*> result;
 
-  for (auto &i : objs)
-    if (DalObject *o = DalFactory::instance().get(*this, i, i.UID(), upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
-      result.push_back(o);
+//   for (auto &i : objs)
+//     // if (DalObject *o = DalFactory::instance().get(*this, i, i.UID(), upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
+//     if (DalObject *o = m_registry.get(i,upcast_unregistered)) // FIXME: 2018-11-09: pass right UID()
+//       result.push_back(o);
 
-  return result;
-}
+//   return result;
+// }
 
-const DalObject*
-Configuration::make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name)
-{
-  return DalFactory::instance().get(*this, obj, uid, class_name);
-}
+// const DalObject*
+// Configuration::make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name)
+// {
+  // return DalFactory::instance().get(*this, obj, uid, class_name);
+  // return m_registry.get(*this, obj, uid, class_name);
+// }
 
 
 std::vector<const DalObject*>
@@ -1864,7 +1986,8 @@ Configuration::referenced_by(const DalObject& obj, const std::string& relationsh
       std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
 
       obj.p_obj.referenced_by(objs, relationship_name, check_composite_only, rlevel, rclasses);
-      return make_dal_objects(objs, upcast_unregistered);
+      // return make_dal_objects(objs, upcast_unregistered);
+      return m_registry.get(objs, upcast_unregistered);
     }
   catch (dunedaq::conffwk::Generic & ex)
     {
@@ -1900,7 +2023,7 @@ Configuration::attributes_pybind(const std::string& class_name, bool all) {
 }
 
 std::vector<std::string> 
-Configuration::classes_pybind() const {
+Configuration::get_class_list() const {
   std::vector<std::string> classes;
   for (const auto& it : this->superclasses()) {
     classes.push_back(*it.first);
@@ -1987,168 +2110,6 @@ Configuration::superclasses_pybind(const std::string& class_name, bool all) {
   return c.p_superclasses;
 }
 
-bool
-DalObject::get_rel_objects(const std::string &name, bool upcast_unregistered, std::vector<const DalObject*> &objs) const
-{
-  std::vector<ConfigObject> c_objs;
-
-  if (const_cast<ConfigObject*>(&p_obj)->rel(name, c_objs))
-    {
-      std::lock_guard<std::mutex> scoped_lock(p_db.m_tmpl_mutex);
-      p_db.make_dal_objects(c_objs, upcast_unregistered).swap(objs);
-      return true;
-    }
-
-  return false;
-}
-
-
-bool
-DalObject::get_algo_objects(const std::string &name, std::vector<const DalObject*> &objs) const
-{
-  const std::string &suitable_dal_class = DalFactory::instance().class4algo(p_db, class_name(), name);
-
-  TLOG_DEBUG(2) << "suitable class for algorithm " << name << " on object " << this << " is " << suitable_dal_class;
-
-  if (!suitable_dal_class.empty())
-    if (const DalObject *obj = p_db.make_dal_object(const_cast<ConfigObject&>(p_obj), UID(), suitable_dal_class))
-      {
-        obj->get(name, false).swap(objs);
-        return true;
-      }
-
-  return false;
-}
-
-
-
-  // DalObject helper
-
-void
-DalObject::p_null(std::ostream &s)
-{
-  s << "(null)";
-}
-
-void
-DalObject::p_rm(std::ostream &s)
-{
-  s << "(deleted object)";
-}
-
-void
-DalObject::p_error(std::ostream &s, dunedaq::conffwk::Exception &ex)
-{
-  s << "ERROR in generated DAL print method:\n\twas caused by: " << ex << std::endl;
-}
-
-void
-DalObject::p_hdr(std::ostream &s, unsigned int indent, const std::string &cl, const char *nm) const
-{
-  const std::string str(indent, ' ');
-  s << str;
-  if (nm)
-    s << nm << ' ';
-  s << cl << " object:\n" << str << "  id: \'" << UID() << "\', class name: \'" << DalObject::class_name() << "\'\n";
-}
-
-  void
-  p_sv_rel(std::ostream &s, const std::string &str, const std::string &name, const DalObject *obj)
-  {
-    s << str << name << ": " << obj << '\n';
-  }
-
-
-
-void DalObject::throw_init_ex(dunedaq::conffwk::Exception& ex)
-{
-  std::ostringstream text;
-  text << "failed to init " << this << ":\n\twas caused by: " << ex << std::endl;
-  p_was_read = false;
-  throw dunedaq::conffwk::Generic (ERS_HERE, text.str().c_str());
-}
-
-void DalObject::throw_get_ex(const std::string& what, const std::string& class_name, const DalObject * obj)
-{
-  std::ostringstream text;
-  text << "cannot find relationship or algorithm \"" << what << "\" in c++ class \"" << class_name << "\" for object " << obj;
-  throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
-}
-
-
-DalFactory &
-DalFactory::instance()
-{
-  static DalFactory * instance = ers::SingletonCreator<DalFactory>::create();
-  return *instance;
-}
-
-
-DalObject *
-DalFactory::get(Configuration& db, ConfigObject& obj, const std::string& uid, bool upcast_unregistered) const
-{
-  return (*instance().functions(db, obj.class_name(), upcast_unregistered).m_creator_fn)(db, obj, uid);
-}
-
-DalObject *
-DalFactory::get(Configuration& db, ConfigObject& obj, const std::string& uid, const std::string& class_name) const
-{
-  return (*instance().functions(db, class_name, false).m_creator_fn)(db, obj, uid);
-}
-
-
-const DalFactoryFunctions&
-DalFactory::functions(const Configuration& db, const std::string& name, bool upcast_unregistered) const
-{
-  auto it = m_classes.find(name);
-
-  if (it == m_classes.end())
-    {
-      if (upcast_unregistered)
-        {
-          auto x = db.superclasses().find(&name);
-          if (x != db.superclasses().end())
-            {
-              for (auto c : x->second)
-                {
-                  auto sc = m_classes.find(*c);
-                  if (sc != m_classes.end())
-                    {
-                      TLOG_DEBUG(1) << "use first suitable base class " << c << " instead of unregistered DAL class " << name;
-                      return sc->second;
-                    }
-                }
-            }
-        }
-
-      std::string text(std::string("DAL class ") + name + " was not registered");
-      throw dunedaq::conffwk::Generic(ERS_HERE, text.c_str());
-    }
-
-  return it->second;
-}
-
-const std::string&
-DalFactory::class4algo(Configuration& db, const std::string& name, const std::string& algorithm) const
-{
-  for (const auto& x : m_classes)
-    if (x.second.m_algorithms.find(algorithm) != x.second.m_algorithms.end() && db.try_cast(x.first, name))
-      return x.first;
-
-  static const std::string empty;
-  return empty;
-}
-
-
-const DalFactoryFunctions&
-DalFactory::functions(const std::string& name) const
-{
-  auto it = m_classes.find(name);
-
-  ERS_ASSERT_MSG( (it != m_classes.end()), "writer lock was not initialized" );
-
-  return it->second;
-}
 
 } // namespace conffwk
 } // namespace dunedaq

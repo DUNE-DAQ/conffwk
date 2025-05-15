@@ -29,16 +29,19 @@
 #include "conffwk/ConfigVersion.hpp"
 #include "conffwk/Errors.hpp"
 #include "conffwk/DalFactory.hpp"
+#include "conffwk/DalRegistry.hpp"
 
 #include "conffwk/map.hpp"
 #include "conffwk/set.hpp"
 
 namespace dunedaq {
 namespace conffwk {
-class DalObject;
+
 class ConfigAction;
 class ConfigurationImpl;
 class ConfigurationChange;
+class DalObject;
+class DalRegistry;
 
 
 struct class_t;
@@ -54,35 +57,39 @@ class Configuration;
  *  - DAL factory functions
  */
 
-class CacheBase
-{
+// class CacheBase
+// {
 
-  friend class Configuration;
+//   friend class Configuration;
 
-protected:
+// protected:
 
-  CacheBase(const DalFactoryFunctions& f) :
-      m_functions(f)
-  {
-    ;
-  }
+//   CacheBase(const DalFactoryFunctions& f) :
+//       m_functions(f)
+//   {
+//     ;
+//   }
 
-  /** Method for configuration profiling */
+//   /** Method for configuration profiling */
 
-  void
-  increment_gets(Configuration& db) noexcept;
+//   void
+//   increment_gets(Configuration& db) noexcept;
 
-  virtual
-  ~CacheBase() noexcept
-  {
-    ;
-  }
+//   virtual
+//   ~CacheBase() noexcept
+//   {
+//     ;
+//   }
 
-protected:
+// protected:
 
-  const DalFactoryFunctions& m_functions;
+//   const DalFactoryFunctions& m_functions;
 
-};
+// private:
+
+//   conffwk::map<DalObject*> m_cache;
+//   conffwk::multimap<DalObject*> m_t_cache;
+// };
 
 
   /**
@@ -216,51 +223,53 @@ class Configuration {
   friend class DalObject;
   friend class ConfigObject;
   friend class ConfigurationImpl;
-  friend class CacheBase;
+  // friend class CacheBase;
+  friend class DalObject;
+  friend class DalRegistry;
 
   public:
 
 
-      /**
-       *  \brief Constructor to build a configuration object using implementation plug-in.
-       *
-       *  The constructor expects parameter in format "plugin-name:plugin-parameter".
-       *  The plugin-name is used to get implementation shared library by adding "lib"
-       *  prefix and ".so" suffix, e.g. "oksconflibs" -> "liboksconflibs.so". 
-       *  The plugin-parameter is optional; if non-empty, it is passed to the plug-in
-       *  constructor.
-       *
-       *  \param spec         database name to be understood by the database implementation
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
+    /**
+     *  \brief Constructor to build a configuration object using implementation plug-in.
+     *
+     *  The constructor expects parameter in format "plugin-name:plugin-parameter".
+     *  The plugin-name is used to get implementation shared library by adding "lib"
+     *  prefix and ".so" suffix, e.g. "oksconflibs" -> "liboksconflibs.so". 
+     *  The plugin-parameter is optional; if non-empty, it is passed to the plug-in
+     *  constructor.
+     *
+     *  \param spec         database name to be understood by the database implementation
+     *
+     *  \throw dunedaq::conffwk::Generic in case of an error
+     */
 
     Configuration(const std::string& spec);
 
-    Configuration() = default;
+    Configuration();
   
 
-      /** Get implementation plug-in and it's parameter used to build conffwk object */
+    /** Get implementation plug-in and it's parameter used to build conffwk object */
 
     const std::string& get_impl_spec() const noexcept {return m_impl_spec;}
 
 
-      /** Get implementation plug-in name used to build conffwk object */
+    /** Get implementation plug-in name used to build conffwk object */
      
     const std::string& get_impl_name() const noexcept {return m_impl_name;}
 
 
-       /** Get implementation plug-in parameter used to build conffwk object */
+      /** Get implementation plug-in parameter used to build conffwk object */
 
     const std::string& get_impl_param() const noexcept {return m_impl_param;}
 
 
-      /**
-       *  \brief Destructor to destroy a configuration object.
-       *
-       *  The destructor unloads database for given database implementation
-       *  and destroys all user objects in cache.
-       */
+    /**
+     *  \brief Destructor to destroy a configuration object.
+     *
+     *  The destructor unloads database for given database implementation
+     *  and destroys all user objects in cache.
+     */
 
     ~Configuration() noexcept;
 
@@ -454,41 +463,41 @@ class Configuration {
     template<class T> void _reset_objects() noexcept;
 
 
-      /**
-       *  \brief Mark object of given template class as unread (multi-thread unsafe).
-       *
-       *  Is used by automatically generated data access libraries code after reading parameters for substitution,
-       *  since cache contains objects with non-substituted attributes. Should not be explicitly used by user.
-       *
-       *  The method is used by the unread_all_objects() method.
-       *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
-       */
+    //   /**
+    //    *  \brief Mark object of given template class as unread (multi-thread unsafe).
+    //    *
+    //    *  Is used by automatically generated data access libraries code after reading parameters for substitution,
+    //    *  since cache contains objects with non-substituted attributes. Should not be explicitly used by user.
+    //    *
+    //    *  The method is used by the unread_all_objects() method.
+    //    *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
+    //    */
 
-    template<class T> static void _unread_objects(CacheBase * cache_ptr) noexcept;
-
-
-      /**
-       *  \brief Rename object of given template class (multi-thread unsafe).
-       *
-       *  Is used by automatically generated data access libraries when an object has been renamed by user's code.
-       *  Should not be explicitly used by user.
-       *
-       *  The method is used by the unread_all_objects() method.
-       *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
-       *  \param  old_id old object ID
-       *  \param  new_id new object ID
-       */
-
-    template<class T> static void _rename_object(CacheBase* cache_ptr, const std::string& old_id, const std::string& new_id) noexcept;
+    // template<class T> static void _unread_objects(CacheBase * cache_ptr) noexcept;
 
 
-      /**
-       *  \brief Update state of all objects in cache after abort / commit operations.
-       *
-       *  It is used by automatically generated data access libraries.
-       */
+    //   /**
+    //    *  \brief Rename object of given template class (multi-thread unsafe).
+    //    *
+    //    *  Is used by automatically generated data access libraries when an object has been renamed by user's code.
+    //    *  Should not be explicitly used by user.
+    //    *
+    //    *  The method is used by the unread_all_objects() method.
+    //    *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
+    //    *  \param  old_id old object ID
+    //    *  \param  new_id new object ID
+    //    */
 
-    void _reset_all_objects() noexcept;
+    // template<class T> static void _rename_object(CacheBase* cache_ptr, const std::string& old_id, const std::string& new_id) noexcept;
+
+
+    //   /**
+    //    *  \brief Update state of all objects in cache after abort / commit operations.
+    //    *
+    //    *  It is used by automatically generated data access libraries.
+    //    */
+
+    // void _reset_all_objects() noexcept;
 
 
       /**
@@ -938,7 +947,9 @@ class Configuration {
        *  \return Return nullptr if the cast is not successful.
        */
 
-    template<class TARGET, class SOURCE> const TARGET *cast(const SOURCE *s) noexcept;
+    template<class TARGET, class SOURCE> const TARGET *cast(const SOURCE *s) noexcept {
+      return s->template cast<TARGET>();
+    }
 
 
   private:
@@ -952,8 +963,8 @@ class Configuration {
     /// \throw dunedaq::conffwk::Generic
     template<class T> const T * _get(ConfigObject& obj, bool init_children = false, bool init = true);
 
-    /// \throw dunedaq::conffwk::Generic
-    template<class T> const T * _get(ConfigObject& obj, const std::string& id);
+    // /// \throw dunedaq::conffwk::Generic
+    // template<class T> const T * _get(ConfigObject& obj, const std::string& id);
 
     /// \throw dunedaq::conffwk::Generic
     template<class T> void _get(std::vector<const T*>& objects, bool init_children = false, bool init = true, const std::string& query = "", unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
@@ -965,9 +976,9 @@ class Configuration {
       return const_cast<T*>(_get<T>(obj, uid));
     }
 
-    std::vector<const DalObject*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
+    // std::vector<const DalObject*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
 
-    const DalObject* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
+    // const DalObject* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
 
 
     // should be made private
@@ -1031,6 +1042,9 @@ class Configuration {
 
     bool try_cast(const std::string* target, const std::string* source) noexcept;
 
+    bool is_superclass_of(const std::string& target, const std::string& source) noexcept;
+
+    bool is_superclass_of(const std::string* target, const std::string* source) noexcept;
 
   private:
 
@@ -1271,6 +1285,8 @@ class Configuration {
 
   private:
 
+    const dunedaq::conffwk::class_t& _get_class_info(const std::string& class_name, bool direct_only = false);
+
       // cache, storing descriptions of schema
 
     conffwk::map<dunedaq::conffwk::class_t *> p_direct_classes_desc_cache;
@@ -1412,8 +1428,15 @@ class Configuration {
 
     conffwk::fmap<conffwk::fset> p_superclasses;
     conffwk::fmap<conffwk::fset> p_subclasses;
+    conffwk::fmap<uint> p_class_domain_map;
 
     void set_subclasses() noexcept;
+    
+    void set_class_domain_map();
+
+    void update_classes() noexcept;
+
+    std::deque<std::set<std::string>> find_class_domains();
 
   public:
 
@@ -1426,9 +1449,10 @@ class Configuration {
 
     const conffwk::fmap<conffwk::fset>& subclasses() const {return p_subclasses;}
 
-  std::vector<std::string> classes_in_python() const;
+    std::vector<std::string> classes_in_python() const;
   
   
+ 
   private:
 
     conffwk::map<std::list<AttributeConverterBase*> * > m_convert_map;
@@ -1450,155 +1474,169 @@ class Configuration {
        *
        */
 
-    template<class T> class Cache : public CacheBase {
+    // template<class T> class Cache : public CacheBase {
     
-      friend class Configuration;
+    //   friend class Configuration;
     
-      public:
+    //   public:
 
-        Cache() :
-            CacheBase(DalFactory::instance().functions(T::s_class_name))
-        {
-          ;
-        }
-
-
-        virtual ~Cache() noexcept;
+    //     Cache() :
+    //         CacheBase(DalFactory::instance().functions(T::s_class_name))
+    //     {
+    //       ;
+    //     }
 
 
-           /**
-            *  \brief Get template object from cache by conffwk object.
-            *
-            *  The method searches an object with id of given conffwk object within the cache.
-            *  If found, the method sets given conffwk object as implementation of the template
-	    *  object and returns pointer on the template object.
-            *  If there is no such object in cache, then it is created from given conffwk object.
-            *
-            *  In case of success, the new object is put into cache and pointer to the object is returned.
-            *  If there is no such object for given template class, then \b null pointer is returned.
-            *
-            *  \param conffwk         the configuration object
-            *  \param obj            the conffwk object used to set for the template object
-            *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new object)
-            *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation of new object)
-            *
-            *  \return Return pointer to object.
-            *
-            *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-            */
-
-        T * get(Configuration& conffwk, ConfigObject& obj, bool init_children, bool init_object);
+    //     virtual ~Cache() noexcept;
 
 
-           /**
-            *  \brief Get template object from cache by object's ID.
-            *
-            *  The method searches an object with given id within the cache.
-            *  If found, the method returns pointer on it.
-            *  If there is no such object in cache, there is an attempt to create new object.
-            *  In case of success, the new object is put into cache and pointer to the object is returned.
-            *  If there is no such object for given template class, then \b null pointer is returned.
-            *
-            *  \param conffwk         the configuration object
-            *  \param name           object identity
-            *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new object)
-            *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation of new object)
-            *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache during creation of new object)
-            *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache during creation of new object)
-            *
-            *  \return Return pointer to object. It can be \b null, if there is no such object found.
-            *
-            *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-            */
+      //      /**
+      //       *  \brief Get template object from cache by conffwk object.
+      //       *
+      //       *  The method searches an object with id of given conffwk object within the cache.
+      //       *  If found, the method sets given conffwk object as implementation of the template
+	    // *  object and returns pointer on the template object.
+      //       *  If there is no such object in cache, then it is created from given conffwk object.
+      //       *
+      //       *  In case of success, the new object is put into cache and pointer to the object is returned.
+      //       *  If there is no such object for given template class, then \b null pointer is returned.
+      //       *
+      //       *  \param conffwk         the configuration object
+      //       *  \param obj            the conffwk object used to set for the template object
+      //       *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new object)
+      //       *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation of new object)
+      //       *
+      //       *  \return Return pointer to object.
+      //       *
+      //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
+      //       */
 
-          T * get(Configuration& conffwk, const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses);
-
-
-           /**
-            *  \brief Find template object using ID.
-            *
-            *  The method is suitable for generated template objects.
-            *
-            *  In case of success, the new object is put into cache and pointer to the object is returned.
-            *  If there is no such object for given template class, then \b null pointer is returned.
-            *
-            *  \param id             ID of generated object
-            *
-            *  \return Return pointer to object.
-            *
-            *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-            */
+      //   T * get(Configuration& conffwk, ConfigObject& obj, bool init_children, bool init_object);
 
 
-          T *
-          find(const std::string& id);
+      //      /**
+      //       *  \brief Get template object from cache by object's ID.
+      //       *
+      //       *  The method searches an object with given id within the cache.
+      //       *  If found, the method returns pointer on it.
+      //       *  If there is no such object in cache, there is an attempt to create new object.
+      //       *  In case of success, the new object is put into cache and pointer to the object is returned.
+      //       *  If there is no such object for given template class, then \b null pointer is returned.
+      //       *
+      //       *  \param conffwk         the configuration object
+      //       *  \param name           object identity
+      //       *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new object)
+      //       *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation of new object)
+      //       *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache during creation of new object)
+      //       *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache during creation of new object)
+      //       *
+      //       *  \return Return pointer to object. It can be \b null, if there is no such object found.
+      //       *
+      //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
+      //       */
+
+      //     T * get(Configuration& conffwk, const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses);
 
 
-           /**
-            *  \brief Generate template object using conffwk object and ID.
-            *
-            *  The method searches an object with id of given conffwk object within the cache using given ID.
-            *  If found, the method sets given conffwk object as implementation of the template
-            *  object and returns pointer on the template object.
-            *  If there is no such object in cache, then it is created from given conffwk object.
-            *
-            *  In case of success, the new object is put into cache and pointer to the object is returned.
-            *  If there is no such object for given template class, then \b null pointer is returned.
-            *
-            *  \param conffwk         the configuration object
-            *  \param obj            the conffwk object used to set for the template object
-            *  \param id             ID of generated object
-            *
-            *  \return Return pointer to object.
-            *
-            *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-            */
-
-          T *
-          get(Configuration& conffwk, ConfigObject& obj, const std::string& id);
+      //      /**
+      //       *  \brief Find template object using ID.
+      //       *
+      //       *  The method is suitable for generated template objects.
+      //       *
+      //       *  In case of success, the new object is put into cache and pointer to the object is returned.
+      //       *  If there is no such object for given template class, then \b null pointer is returned.
+      //       *
+      //       *  \param id             ID of generated object
+      //       *
+      //       *  \return Return pointer to object.
+      //       *
+      //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
+      //       */
 
 
-      private:
-
-        conffwk::map<T*> m_cache;
-        conffwk::multimap<T*> m_t_cache;
+      //     T *
+      //     find(const std::string& id);
 
 
-    };
+      //      /**
+      //       *  \brief Generate template object using conffwk object and ID.
+      //       *
+      //       *  The method searches an object with id of given conffwk object within the cache using given ID.
+      //       *  If found, the method sets given conffwk object as implementation of the template
+      //       *  object and returns pointer on the template object.
+      //       *  If there is no such object in cache, then it is created from given conffwk object.
+      //       *
+      //       *  In case of success, the new object is put into cache and pointer to the object is returned.
+      //       *  If there is no such object for given template class, then \b null pointer is returned.
+      //       *
+      //       *  \param conffwk         the configuration object
+      //       *  \param obj            the conffwk object used to set for the template object
+      //       *  \param id             ID of generated object
+      //       *
+      //       *  \return Return pointer to object.
+      //       *
+      //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
+      //       */
+
+      //     T *
+      //     get(Configuration& conffwk, ConfigObject& obj, const std::string& id);
+
+
+      // private:
+
+      //   conffwk::map<T*> m_cache;
+      //   conffwk::multimap<T*> m_t_cache;
+
+
+    // };
 
   private:
 
-      // Get cache for this type of objects.
+    // Get cache for this type of objects.
 
-    template<class T> Cache<T> * get_cache() noexcept;
+    // template<class T> Cache<T> * get_cache() noexcept;
 
-    conffwk::fmap<CacheBase*> m_cache_map;
+    // template<class T> Cache<T> * get_cache( const std::string& class_name ) {
+
+    //   const std::string& class_name_ref = DalFactory::instance().get_known_class_name_ref(class_name);
+    //   CacheBase*& c(m_cache_map[&class_name_ref]);
+
+    //   if (c == nullptr)
+    //     // c = new CacheBase(DalFactory::instance().functions(class_name_ref));
+    //     c = new CacheBase(class_name_ref, DalFactory::instance().functions(*this, class_name_ref, true));
+  
+    //   return static_cast<Cache<T>*>(c);
+
+    //   // return c;
+    // }
+
+    // conffwk::fmap<CacheBase*> m_cache_map;
 
     void rename_object(ConfigObject& obj, const std::string& new_id);
 
-    template<class T>
-    void
-    set_cache_unread(const std::vector<std::string>& objects, Cache<T>& c) noexcept
-    {
-      for (const auto& i : objects)
-        {
-          // unread template objects
-          auto x = c.m_cache.find(i);
-          if (x != c.m_cache.end())
-            {
-              std::lock_guard<std::mutex> scoped_lock(x->second->m_mutex);
-              x->second->p_was_read = false;
-            }
+    // template<class T>
+    // void
+    // set_cache_unread(const std::vector<std::string>& objects, Cache<T>& c) noexcept
+    // {
+    //   for (const auto& i : objects)
+    //     {
+    //       // unread template objects
+    //       auto x = c.m_cache.find(i);
+    //       if (x != c.m_cache.end())
+    //         {
+    //           std::lock_guard<std::mutex> scoped_lock(x->second->m_mutex);
+    //           x->second->p_was_read = false;
+    //         }
 
-          // unread generated objects if any
-          auto range = c.m_t_cache.equal_range(i);
-          for (auto it = range.first; it != range.second; it++)
-            {
-              std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
-              it->second->p_was_read = false;
-            }
-        }
-    }
+    //       // unread generated objects if any
+    //       auto range = c.m_t_cache.equal_range(i);
+    //       for (auto it = range.first; it != range.second; it++)
+    //         {
+    //           std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
+    //           it->second->p_was_read = false;
+    //         }
+    //     }
+    // }
 
 
   public:
@@ -1624,6 +1662,9 @@ class Configuration {
     std::string m_impl_spec;
     std::string m_impl_name;
     std::string m_impl_param;
+
+
+
     void * m_shlib_h;
 
 
@@ -1662,6 +1703,7 @@ class Configuration {
 
 
   private:
+    DalRegistry m_registry;
 
     mutable std::mutex m_impl_mutex;  // mutex used to access implementation objects (i.e. ConfigObjectImpl objects)
     mutable std::mutex m_tmpl_mutex;  // mutex used to access template objects (i.e. generated DAL)
@@ -1681,7 +1723,7 @@ class Configuration {
   // JCF, Jan-1-2023: a set of functions written specifically for Python bindings
 
   std::unordered_map<std::string, std::unordered_map<std::string, std::string>> attributes_pybind(const std::string& class_name, bool all);
-  std::vector<std::string> classes_pybind() const;
+  std::vector<std::string> get_class_list() const;
   ConfigObject* create_and_return_obj_pybind(const std::string& at, const std::string& class_name, const std::string& id);
   ConfigObject* create_and_return_obj_pybind(const ConfigObject& at, const std::string& class_name, const std::string& id);
   ConfigObject* get_obj_pybind(const std::string& class_name, const std::string& id);
@@ -1698,409 +1740,16 @@ class Configuration {
 
 std::ostream& operator<<(std::ostream& s, const Configuration & c);
 
-
 //////////////////////////////////////////////
 //// Implementation of template methods.  ////
 //////////////////////////////////////////////
 
-
-template<class T>
-  const T *
-  Configuration::create(const std::string& at, const std::string& id, bool init_object)
-  {
-    ConfigObject obj;
-
-    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-    create(at, T::s_class_name, id, obj);
-    return get_cache<T>()->get(*this, obj, false, init_object);
-  }
-
-
-template<class T>
-  void
-  Configuration::destroy(T& obj)
-  {
-    destroy_obj(const_cast<ConfigObject&>(obj.config_object()));
-  }
-
-// Get object of given class and instantiate the template parameter with it.
-template<class T>
-  const T *
-  Configuration::_get(const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses)
-  {
-    return get_cache<T>()->get(*this, name, init_children, init_object, rlevel, rclasses);
-  }
-
-// Instantiate the template parameter using existing conffwk object.
-template<class T>
-  const T *
-  Configuration::_get(ConfigObject& obj, bool init_children, bool init_object)
-  {
-    return get_cache<T>()->get(*this, obj, init_children, init_object);
-  }
-
-template<class T>
-  const T *
-  Configuration::_get(ConfigObject& obj, const std::string& id)
-  {
-    return get_cache<T>()->get(*this, obj, id);
-  }
-
-template<class T>
-  const T *
-  Configuration::_find(const std::string& id)
-  {
-    auto it = m_cache_map.find(&T::s_class_name);
-    return (it != m_cache_map.end() ? static_cast<Cache<T>*>(it->second)->find(id) : nullptr);
-  }
-
-// Get all objects the given class and instantiate a vector of the template parameters object with it.
-template<class T>
-  void
-  Configuration::_get(std::vector<const T*>& result, bool init_children, bool init_object, const std::string& query, unsigned long rlevel, const std::vector<std::string> * rclasses)
-  {
-    std::vector<ConfigObject> objs;
-
-    try
-      {
-        get(T::s_class_name, objs, query, rlevel, rclasses);
-      }
-    catch (dunedaq::conffwk::NotFound & ex)
-      {
-        std::ostringstream text;
-        text << "wrong database schema, cannot find class \'" << ex.get_data() << '\'';
-        throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
-      }
-
-    if (!objs.empty())
-      {
-        if (Configuration::Cache<T> * the_cache = get_cache<T>())
-          {
-            for (auto& i : objs)
-              {
-                result.push_back(the_cache->get(*this, i, init_children, init_object));
-              }
-          }
-      }
-  }
-
-
-// Get relation from object and instantiate result with it.
-template<class T>
-  const T *
-  Configuration::_ref(ConfigObject& obj, const std::string& name, bool read_children)
-  {
-    ConfigObject res;
-
-    try
-      {
-        obj.get(name, res);
-      }
-    catch (dunedaq::conffwk::Generic & ex)
-      {
-        throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_ex_text("an object", T::s_class_name, name, obj).c_str(), ex ) );
-      }
-
-    return ((!res.is_null()) ? get_cache<T>()->get(*this, res, read_children, read_children) : nullptr);
-  }
-
-
-// Get multiple relations from object and instantiate result with it.
-template<class T>
-  void
-  Configuration::_ref(ConfigObject& obj, const std::string& name, std::vector<const T*>& results, bool read_children)
-  {
-    std::vector<ConfigObject> objs;
-
-    results.clear();
-
-    try
-      {
-        obj.get(name, objs);
-        results.reserve(objs.size());
-
-        for (auto& i : objs)
-          {
-            results.push_back(get_cache<T>()->get(*this, i, read_children, read_children));
-          }
-      }
-    catch (dunedaq::conffwk::Generic & ex)
-      {
-        throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_ex_text("objects", T::s_class_name, name, obj).c_str(), ex ) );
-      }
-  }
-
-template<class T, class V>
-  void
-  Configuration::referenced_by(const T& obj, std::vector<const V*>& results, const std::string& relationship_name, bool check_composite_only, bool init, unsigned long rlevel, const std::vector<std::string> * rclasses)
-  {
-    std::vector<ConfigObject> objs;
-
-    results.clear();
-
-    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-
-    try
-      {
-        obj.p_obj.referenced_by(objs, relationship_name, check_composite_only, rlevel, rclasses);
-
-        for (auto& i : objs)
-          {
-            if (try_cast(V::s_class_name, i.class_name()) == true)
-              {
-                if (const V * o = get_cache<V>()->get(*this, i, init, init))
-                  {
-                    results.push_back(o);
-                  }
-              }
-          }
-      }
-    catch (dunedaq::conffwk::Generic & ex)
-      {
-        throw(dunedaq::conffwk::Generic( ERS_HERE, mk_ref_by_ex_text(V::s_class_name, relationship_name, obj.p_obj).c_str(), ex ) );
-      }
-  }
-
-
-template<class T>
-  Configuration::Cache<T>::~Cache() noexcept
-  {
-    // delete each object in cache
-    for (const auto& i : m_cache)
-      {
-        delete i.second;
-      }
-  }
-
-
-template<class T>
-  T *
-Configuration::Cache<T>::get(Configuration& conffwk,
-                             ConfigObject& obj, bool init_children, bool init_object)
-  {
-    T*& result(m_cache[obj.m_impl->m_id]);
-    if (result == nullptr)
-      {
-        result = new T(conffwk, obj);
-        if (init_object)
-          {
-            std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
-            result->init(init_children);
-          }
-      }
-    else if(obj.m_impl != result->p_obj.m_impl)
-      {
-        std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
-        result->set(obj); // update implementation object; to be used in case if the object is re-created
-      }
-    increment_gets(conffwk);
-    return result;
-  }
-
-template<class T>
-  T *
-  Configuration::Cache<T>::find(const std::string& id)
-  {
-    auto it = m_cache.find(id);
-    return (it != m_cache.end() ? it->second : nullptr);
-  }
-
-template<class T>
-  T *
-  Configuration::Cache<T>::get(Configuration& db, ConfigObject& obj, const std::string& id)
-  {
-    T*& result(m_cache[id]);
-    if (result == nullptr)
-      {
-        result = new T(db, obj);
-        if (id != obj.UID())
-          {
-            result->p_UID = id;
-            m_t_cache.emplace(obj.UID(), result);
-          }
-      }
-    else if(obj.m_impl != result->p_obj.m_impl)
-      {
-        std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
-        result->set(obj); // update implementation object; to be used in case if the object is re-created
-      }
-    increment_gets(db);
-    return result;
-  }
-
-
-  // Get object from cache or create it.
-
-template<class T> T *
-Configuration::Cache<T>::get(Configuration& conffwk, const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses)
-{
-  typename conffwk::map<T*>::iterator i = m_cache.find(name);
-  if(i == m_cache.end()) {
-    try {
-      ConfigObject obj;
-      conffwk._get(T::s_class_name, name, obj, rlevel, rclasses);
-      return get(conffwk, obj, init_children, init_object);
-    }
-    catch(dunedaq::conffwk::NotFound & ex) {
-      if(!strcmp(ex.get_type(), "class")) {
-        std::ostringstream text;
-	text << "wrong database schema, cannot find class \"" << ex.get_data() << '\"';
-	throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
-      }
-      else {
-        return 0;
-      }
-    }
-  }
-  increment_gets(conffwk);
-  return i->second;
-}
-
-
-template<class T>
-  bool
-  Configuration::is_valid(const T * object) noexcept
-  {
-    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-
-    auto j = m_cache_map.find(&T::s_class_name);
-
-    if (j != m_cache_map.end())
-      {
-        Cache<T> *c = static_cast<Cache<T>*>(j->second);
-
-        for (const auto& i : c->m_cache)
-          {
-            if (i->second == object)
-              return true;
-          }
-      }
-
-    return false;
-  }
-
-
-template<class T> void
-Configuration::update(const std::vector<std::string>& modified,
-                      const std::vector<std::string>& removed,
-                      const std::vector<std::string>& created) noexcept
-  {
-    auto j = m_cache_map.find(&T::s_class_name);
-
-    TLOG_DEBUG(4) << "call for class \'" << T::s_class_name << '\'';
-
-    if (j != m_cache_map.end())
-      {
-        Cache<T> *c = static_cast<Cache<T>*>(j->second);
-        set_cache_unread(removed, *c);
-        set_cache_unread(created, *c);
-        set_cache_unread(modified, *c);
-      }
-  }
-
-template<class T> void
-Configuration::_reset_objects() noexcept
-  {
-    auto j = m_cache_map.find(&T::s_class_name);
-
-    if (j != m_cache_map.end())
-      {
-        _unread_objects(static_cast<Cache<T>*>(j->second));
-      }
-  }
-
-template<class T>
-  void
-  Configuration::_unread_objects(CacheBase* x) noexcept
-  {
-    Cache<T> *c = static_cast<Cache<T>*>(x);
-
-    for (auto& i : c->m_cache)
-      {
-        i.second->p_was_read = false;
-      }
-  }
-
-template<class T> void
-Configuration::_rename_object(CacheBase* x, const std::string& old_id, const std::string& new_id) noexcept
-{
-  Cache<T> *c = static_cast<Cache<T>*>(x);
-
-  // rename template object
-  auto it = c->m_cache.find(old_id);
-  if (it != c->m_cache.end())
-    {
-      TLOG_DEBUG(3) << " * rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << T::s_class_name << "\')";
-      c->m_cache[new_id] = it->second;
-      c->m_cache.erase(it);
-
-      std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
-      it->second->p_UID = new_id;
-    }
-
-  // rename generated objects if any
-  auto range = c->m_t_cache.equal_range(old_id);
-  for (auto it = range.first; it != range.second;)
-    {
-      T * o = it->second;
-      it = c->m_t_cache.erase(it);
-      c->m_t_cache.emplace(new_id, o);
-    }
-}
-
-
-template<class T> void
-Configuration::register_converter(AttributeConverter<T> * object) noexcept
-  {
-    std::lock_guard<std::mutex> scoped_lock(m_else_mutex);
-
-    std::list<AttributeConverterBase*> * c = m_convert_map[typeid(T).name()];
-    if (c == 0)
-      {
-        c = m_convert_map[typeid(T).name()] = new std::list<AttributeConverterBase*>();
-      }
-
-    c->push_back(object);
-  }
-
-template<class T>
-  void
-  Configuration::convert(T& value, const ConfigObject& obj, const std::string& attr_name) noexcept
-  {
-    conffwk::map<std::list<AttributeConverterBase*> *>::const_iterator l = m_convert_map.find(typeid(T).name());
-    if (l != m_convert_map.end())
-      {
-        for (const auto& i : *l->second)
-          {
-            static_cast<AttributeConverter<T>*>(i)->convert(value, *this, obj, attr_name);
-          }
-      }
-  }
-
-template<class T>
-  void
-  Configuration::convert2(std::vector<T>& value, const ConfigObject& obj, const std::string& attr_name) noexcept
-  {
-    conffwk::map<std::list<AttributeConverterBase*> *>::const_iterator l = m_convert_map.find(typeid(T).name());
-    if (l != m_convert_map.end())
-      {
-        for (auto& j : value)
-          {
-            for (const auto& i : *l->second)
-              {
-                static_cast<AttributeConverter<T>*>(i)->convert(j, *this, obj, attr_name);
-              }
-          }
-      }
-  }
-
-inline void
-CacheBase::increment_gets(Configuration& db) noexcept
-{
-  ++db.p_number_of_cache_hits;
-}
-
 } // namespace conffwk
 } // namespace dunedaq
+
+#include "details/Configuration.hxx"
+
+
+
 
 #endif // CONFFWK_CONFIGURATION_H_

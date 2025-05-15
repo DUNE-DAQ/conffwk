@@ -136,7 +136,7 @@
    <method-implementation language="c++" prototype="bool is_templated() const" body=""/>
    <method-implementation language="java" prototype="boolean get_is_templated() throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="return get_app_conffwk(false).get_is_templated();"/>
   </method>
-  <method name="get_app_conffwk" description="">
+  <method name="get_app_config" description="">
    <method-implementation language="c++" prototype="const AppConfig * get_app_conffwk(bool no_except = false) const" body="BEGIN_HEADER_PROLOGUE&#xA;#include &lt;atomic&gt;&#xA;#include &lt;dal/app-conffwk.h&gt;&#xA;namespace daq { namespace core { class AlgorithmUtils; } }&#xA;END_HEADER_PROLOGUE&#xA;&#xA;BEGIN_PRIVATE_SECTION&#xA;std::unique_ptr&lt;AppConfig&gt; p_app_conffwk;&#xA;mutable std::atomic&lt;const BaseApplication *&gt; p_gen_obj;&#xA;friend class daq::core::AlgorithmUtils;&#xA;END_PRIVATE_SECTION&#xA;&#xA;BEGIN_MEMBER_INITIALIZER_LIST&#xA;p_gen_obj(nullptr)&#xA;END_MEMBER_INITIALIZER_LIST&#xA;"/>
    <method-implementation language="java" prototype="dal.AppConfig get_app_conffwk(boolean no_except) throws conffwk.GenericException, conffwk.NotFoundException, conffwk.NotValidException, conffwk.SystemException" body="BEGIN_PRIVATE_SECTION&#xA;dal.AppConfig p_app_conffwk;&#xA;dal.BaseApplication p_gen_obj;&#xA;END_PRIVATE_SECTION&#xA;&#xA;return dal.ApplicationConfig.get_app_conffwk(this, no_except);&#xA;"/>
   </method>
@@ -225,7 +225,7 @@
  </class>
 
  <class name="CustomLifetimeApplicationBase">
-  <attribute name="Lifetime" description="Defines the transitions at which the application shall be started/stopped." type="enum" range="Boot_Shutdown,Configure_Unconffwkure,SOR_EOR,EOR_SOR,UserDefined_Shutdown" init-value="Boot_Shutdown"/>
+  <attribute name="Lifetime" description="Defines the transitions at which the application shall be started/stopped." type="enum" range="Boot_Shutdown,Configure_Unconfigure,SOR_EOR,EOR_SOR,UserDefined_Shutdown" init-value="Boot_Shutdown"/>
   <attribute name="AllowSpontaneousExit" description="Allow the application to exit when it has finished its task.&#xA;The exit code will be checked and if it is !=0 then the system will behave as specified by the IfExitsUnexpectedly attribute." type="bool" init-value="false"/>
  </class>
 
@@ -396,7 +396,7 @@
   <superclass name="Interface"/>
   <attribute name="IPAddress" description="The hostname or dotted IP address for this interface." type="string"/>
   <attribute name="Label" description="TDAQ network label. CTRL, DC* and EF to be used on Point-1. The DATA to be used on external testbeds." type="enum" range="NONE,CTRL,DC1,DC2,EF,DATA"/>
-  <attribute name="InterfaceName" description="Value returned by /sbin/conffwk for this NIC." type="string" is-not-null="yes"/>
+  <attribute name="InterfaceName" description="Value returned by /sbin/config for this NIC." type="string" is-not-null="yes"/>
  </class>
 
  <class name="OnlineSegment">
@@ -418,7 +418,7 @@
   <attribute name="DBPath" description="Defines locations of database repositories (i.e. OKS_DB_ROOT). By default, it is copied from the variable TDAQ_DB_PATH defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_PATH)"/>
   <attribute name="DBName" description="Defines database name, e.g. name of the OKS data file. By default, it is copied from the variable TDAQ_DB_DATA defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_DATA)"/>
   <attribute name="DBVersion" description="Defines database version (SHA key) if GIT repository is used . By default, it is copied from the variable TDAQ_DB_VERSION defined in the process environment and passed to environment of all applications of such partition." type="string" init-value="$(TDAQ_DB_VERSION)"/>
-  <attribute name="DBTechnology" description="Defines conffwk database technology implementation to be used by all processes running in given partition. Defines TDAQ_DB variable to be passed to all applications of the partition." type="enum" range="rdbconffwk,oksconflibs" init-value="rdbconffwk"/>
+  <attribute name="DBTechnology" description="Defines config database technology implementation to be used by all processes running in given partition. Defines TDAQ_DB variable to be passed to all applications of the partition." type="enum" range="rdbconfig,oksconflibs" init-value="rdbconfig"/>
   <attribute name="LogRoot" description="Defines root directory for log files." type="string" init-value="/tmp"/>
   <attribute name="WorkingDirectory" description="Defines directory, where a new process run by pmg will be started." type="string" init-value="/tmp"/>
   <attribute name="RunTypes" type="string" is-multi-value="yes"/>
@@ -456,13 +456,13 @@
   <method name="get_log_directory" description="returns the directory in which to write log files. ">
    <method-implementation language="c++" prototype="std::string get_log_directory() const" body=""/>
   </method>
-  <method name="set_conffwk_version" description="Set configuration version, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
-   <method-implementation language="c++" prototype="void set_conffwk_version(const std::string&amp; name, bool reload)" body=""/>
-   <method-implementation language="java" prototype="void set_conffwk_version(final String version, boolean reload) throws conffwk.GenericException, conffwk.SystemException, conffwk.NotFoundException, conffwk.NotValidException" body="dal.Algorithms.set_conffwk_version(UID(), version, reload);"/>
+  <method name="set_config_version" description="Set configuration version, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
+   <method-implementation language="c++" prototype="void set_config_version(const std::string&amp; name, bool reload)" body=""/>
+   <method-implementation language="java" prototype="void set_config_version(final String version, boolean reload) throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="dal.Algorithms.set_config_version(UID(), version, reload);"/>
   </method>
-  <method name="get_conffwk_version" description="Return configuration version used by given partition, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
-   <method-implementation language="c++" prototype="std::string get_conffwk_version()" body=""/>
-   <method-implementation language="java" prototype="String get_conffwk_version() throws conffwk.GenericException, conffwk.SystemException, conffwk.NotFoundException, conffwk.NotValidException" body="return dal.Algorithms.get_conffwk_version(UID());"/>
+  <method name="get_config_version" description="Return configuration version used by given partition, i.e. OKS GIT repository SHA. The partition infrastructure has to be running.">
+   <method-implementation language="c++" prototype="std::string get_config_version()" body=""/>
+   <method-implementation language="java" prototype="String get_config_version() throws config.GenericException, config.SystemException, config.NotFoundException, config.NotValidException" body="return dal.Algorithms.get_config_version(UID());"/>
   </method>
  </class>
 
@@ -532,7 +532,7 @@
  <class name="ResourcesInfoConfig" description="Describes full configuration of ResourceInfo service. An instance of that class to be linked with Partition object to enable the service.">
   <attribute name="ArchiveInCOOL" description="If true, the resources info is stored on COOL. Otherwise the resources info is only published in IS." type="bool" init-value="false"/>
   <relationship name="DetectorFolders" description="Defines detectors folders." class-type="ResourcesInfoDetectorConfig" low-cc="one" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
-  <relationship name="GlobalFolder" description="Mandatory relationship on folder collecting resources shared by several detectors. The mix and max ID values are ignored, but sub-folders conffwk is used." class-type="ResourcesInfoDetectorConfig" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="GlobalFolder" description="Mandatory relationship on folder collecting resources shared by several detectors. The mix and max ID values are ignored, but sub-folders config is used." class-type="ResourcesInfoDetectorConfig" low-cc="one" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <relationship name="DefaultDetectorSubFolders" description="Defines sub-folders for all detectors" class-type="ResourcesInfoDetectorFolderConfig" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
  </class>
 
@@ -616,7 +616,7 @@
   <attribute name="Shell" description="Specify shell script interpreter." type="string"/>
  </class>
 
- <class name="Segment" description="A segment is self-sufficient part of the system which can be conffwkured and controlled independently from the rest of the TDAQ system. A segment represents a detector, a system or their part. A segment can include other segments. A segment is controlled by associated RC controller application.&#xA;To be used by the partition it has to be added to the partition&apos;s Segments relationship. To be temporary ignored a segment can be disabled, i.e. added to the partition&apos;s Disabled relationship. When a segment is disabled, all nested segments are also disabled.&#xA;A segment can include applications and resources.&#xA;For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_2_Segment_Classes">
+ <class name="Segment" description="A segment is self-sufficient part of the system which can be configured and controlled independently from the rest of the TDAQ system. A segment represents a detector, a system or their part. A segment can include other segments. A segment is controlled by associated RC controller application.&#xA;To be used by the partition it has to be added to the partition&apos;s Segments relationship. To be temporary ignored a segment can be disabled, i.e. added to the partition&apos;s Disabled relationship. When a segment is disabled, all nested segments are also disabled.&#xA;A segment can include applications and resources.&#xA;For more information read https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltDal#3_2_Segment_Classes">
   <superclass name="Component"/>
   <relationship name="Segments" description="Nested segments of given segment." class-type="Segment" low-cc="zero" high-cc="many" is-composite="yes" is-exclusive="no" is-dependent="no"/>
   <relationship name="UsesObjects" description="A segment state depends on state of hw objects it uses." class-type="HW_Object" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
@@ -718,7 +718,7 @@
   <relationship name="l1" description="The L1 configuration parameters" class-type="L1TriggerConfiguration" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <relationship name="hlt" description="The L2 implementation to be loaded in Level-2 processors" class-type="HLTImplementation" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
   <relationship name="TriggerDBConnection" description="Object containing the database connection parameters for the TriggerDB." class-type="TriggerDBConnection" low-cc="zero" high-cc="one" is-composite="no" is-exclusive="no" is-dependent="no"/>
-  <relationship name="DBConnections" description="Links the description of DB connections needed to conffwkure the Trigger to the TriggerConfiguration object.&#xA;This relationship excludes the TriggerDB connection which is linked via the TriggerDBConnections relationship. " class-type="DBConnection" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
+  <relationship name="DBConnections" description="Links the description of DB connections needed to configure the Trigger to the TriggerConfiguration object.&#xA;This relationship excludes the TriggerDB connection which is linked via the TriggerDBConnections relationship. " class-type="DBConnection" low-cc="zero" high-cc="many" is-composite="no" is-exclusive="no" is-dependent="no"/>
  </class>
 
  <class name="TriggerDBConnection" description="Describes the database connection to be used to obtain trigger-configuration parameters">

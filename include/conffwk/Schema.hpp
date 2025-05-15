@@ -83,7 +83,7 @@ namespace dunedaq {
 
       void print(
         std::ostream& out,               /*!< the output stream */
-	const std::string& prefix = ""   /*!< optional shift output using prefix */
+        const std::string& prefix = ""   /*!< optional shift output using prefix */
       ) const;
 
         /** Return string corresponding to given data type */
@@ -123,8 +123,8 @@ namespace dunedaq {
       relationship_t(
         const std::string& name,
         const std::string& type,
-	bool can_be_null,
-	bool is_multi_value,
+        bool can_be_null,
+        bool is_multi_value,
         bool is_aggregation,
         const std::string& description
       );
@@ -139,7 +139,7 @@ namespace dunedaq {
 
       void print(
         std::ostream& out,               /*!< the output stream */
-	const std::string& prefix = ""   /*!< optional shift output using prefix */
+        const std::string& prefix = ""   /*!< optional shift output using prefix */
       ) const;
 
 
@@ -156,6 +156,7 @@ namespace dunedaq {
 
       std::string p_name;                                  /*!< the class name */
       std::string p_description;                           /*!< the description text of class */
+      std::string p_schema_path;                           /*!< the path to the schema_file */
       bool p_abstract;                                     /*!< if true, the class is abstract and has no objects */
       const std::vector<std::string> p_superclasses;       /*!< the names of direct superclasses */
       const std::vector<std::string> p_subclasses;         /*!< the names of direct subclasses */
@@ -167,7 +168,8 @@ namespace dunedaq {
       class_t(
         const std::string& name,
         const std::string& description,
-	bool is_abstract
+        const std::string& schema_path,
+        bool is_abstract
       );
 
 
@@ -180,7 +182,7 @@ namespace dunedaq {
 
       void print(
         std::ostream& out,               /*!< the output stream */
-	const std::string& prefix = ""   /*!< optional shift output using prefix */
+        const std::string& prefix = ""   /*!< optional shift output using prefix */
       ) const;
 
     };

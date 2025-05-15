@@ -18,6 +18,7 @@
 #include "conffwk/Change.hpp"
 #include "conffwk/DalFactoryFunctions.hpp"
 #include "conffwk/Errors.hpp"
+#include "conffwk/DalRegistry.hpp"
 
 namespace dunedaq {
 namespace conffwk {
@@ -44,7 +45,9 @@ class DalObject
 {
 
   friend class Configuration;
-  friend DalFactoryFunctions;
+  friend class DalFactoryFunctions;
+  friend class DalRegistry;
+
   friend std::ostream&
   operator<<(std::ostream& s, const DalObject * obj);
 
@@ -54,8 +57,8 @@ protected:
    *  The constructor of DAL object.
    */
 
-  DalObject(Configuration& db, const ConfigObject& o) noexcept :
-    p_was_read(false), p_db(db), p_obj(o), p_UID(p_obj.UID())
+  DalObject(DalRegistry& db, const ConfigObject& o) noexcept :
+    p_was_read(false), p_registry(db), p_obj(o), p_UID(p_obj.UID())
     {
       increment_created();
     }
@@ -108,7 +111,7 @@ protected:
   bool p_was_read;
 
   /// Configuration object
-  Configuration& p_db;
+  DalRegistry& p_registry;
 
   /// Config object used by given template object
   ConfigObject p_obj;
@@ -144,7 +147,7 @@ public:
 
   bool castable(const std::string& target) const noexcept
     {
-      return p_db.try_cast(target, *p_obj.m_impl->m_class_name);
+      return p_registry.configuration().is_superclass_of(target, *p_obj.m_impl->m_class_name);
     }
 
   /**
@@ -153,7 +156,7 @@ public:
 
   bool castable(const std::string * target) const noexcept
     {
-      return p_db.try_cast(target, p_obj.m_impl->m_class_name);
+      return p_registry.configuration().is_superclass_of(target, p_obj.m_impl->m_class_name);
     }
 
   /**
@@ -168,8 +171,9 @@ public:
   template<class TARGET> const TARGET *
   cast() const noexcept
     {
-      std::lock_guard<std::mutex> scoped_lock(m_mutex);
-      return const_cast<Configuration&>(p_db).cast<TARGET>(this);
+      // std::lock_guard<std::mutex> scoped_lock(m_mutex);
+      // return const_cast<Configuration&>(p_registry).cast<TARGET>(this);
+      return dynamic_cast<const TARGET*>(this);
     }
 
 
@@ -203,10 +207,20 @@ public:
    *  Returns reference on the configuration object.
    */
 
+  DalRegistry& registry() const noexcept
+    {
+      return p_registry;
+    }
+
+  /**
+   *  Returns reference on the configuration object.
+   */
+
   Configuration& configuration() const noexcept
     {
-      return p_db;
+      return p_registry.configuration();
     }
+
 
   /**
    *  Is used to mark template object as non-read,
@@ -328,7 +342,7 @@ protected:
 
   void increment_created() noexcept
     {
-      ++(p_db.p_number_of_template_object_created);
+      // ++(p_registry.p_number_of_template_object_created);
     }
 
   /**
@@ -337,7 +351,7 @@ protected:
 
   void increment_read() noexcept
     {
-      ++(p_db.p_number_of_template_object_read);
+      // ++(p_registry.p_number_of_template_object_read);
     }
 
 
@@ -347,30 +361,37 @@ private:
   DalObject(const DalObject&) = delete;
   DalObject& operator=(const DalObject&) = delete;
 
-  template<typename T>
-  static void update(Configuration& db, const ConfigurationChange * change) noexcept
-    {
-      db.update<T>(change->get_modified_objs(), change->get_removed_objs(), change->get_created_objs());
-    }
+  // template<typename T>
+  // static void update(Configuration& db, const ConfigurationChange * change) noexcept
+  //   {
+  //     db.update<T>(change->get_modified_objs(), change->get_removed_objs(), change->get_created_objs());
+  //   }
 
-  template<typename T>
-  static void change_id(CacheBase* x, const std::string& old_id, const std::string& new_id) noexcept
-    {
-      Configuration::_rename_object<T>(x, old_id, new_id);
-    }
+  // template<typename T>
+  // static void change_id(CacheBase* x, const std::string& old_id, const std::string& new_id) noexcept
+  //   {
+  //     Configuration::_rename_object<T>(x, old_id, new_id);
+  //   }
 
-  template<typename T>
-  static void unread(CacheBase* x) noexcept
-    {
-      Configuration::_unread_objects<T>(x);
-    }
+  // template<typename T>
+  // static void unread(CacheBase* x) noexcept
+  //   {
+  //     Configuration::_unread_objects<T>(x);
+  //   }
 
-  template<typename T>
-    static DalObject *
-    create_instance(Configuration& db, ConfigObject& obj, const std::string& uid)
-    {
-      return db._make_instance<T>(obj, uid);
-    }
+  // template<typename T>
+  //   static DalObject *
+  //   create_instance(Configuration& db, ConfigObject& obj, const std::string& uid)
+  //   {
+  //     return db._make_instance<T>(obj, uid);
+  //   }
+
+  // template<typename T>
+  //   static DalObject *
+  //   new_instance(Configuration& db, ConfigObject& obj)
+  //   {
+  //     return new T(db, obj);
+  //   }
 
 protected:
 
@@ -385,7 +406,7 @@ protected:
     {
       if(!p_was_read)
         {
-          std::lock_guard<std::mutex> scoped_lock(this->p_db.m_tmpl_mutex);
+          std::lock_guard<std::mutex> scoped_lock(this->p_registry.m_mutex);
           const_cast<DalObject*>(this)->init(false);
         }
     }
@@ -434,57 +455,56 @@ operator<<(std::ostream&, const DalObject *);
 ///////////////////////////////////////////////////////////////////////////////////////
 
 
-template<class T>
-  DalFactoryFunctions::DalFactoryFunctions(boost::compute::identity<T>, const std::set<std::string> algorithms) :
-      m_update_fn(DalObject::update<T>),
-      m_unread_object_fn(DalObject::unread<T>),
-      m_rename_object_fn(DalObject::change_id<T>),
-      m_creator_fn(DalObject::create_instance<T>),
-      m_algorithms(algorithms)
-  {
-    ;
-  }
+// template<class T>
+//   DalFactoryFunctions::DalFactoryFunctions(boost::compute::identity<T>, const std::set<std::string> algorithms) :
+//       m_update_fn(DalObject::update<T>),
+//       m_creator_fn(DalObject::create_instance<T>),
+//       m_instantiator_fn(DalObject::new_instance<T>),
+//   {
+//     ;
+//   }
 
 
-template<class T>
-  const T *
-  Configuration::create(const DalObject& at, const std::string& id, bool init_object)
-  {
-    return create<T>(at.config_object().contained_in(), id, init_object);
-  }
+// template<class T>
+//   const T *
+//   Configuration::create(const DalObject& at, const std::string& id, bool init_object)
+//   {
+//     return create<T>(at.config_object().contained_in(), id, init_object);
+//   }
 
-template<class T>
-Configuration::Cache<T> *
-  Configuration::get_cache() noexcept
-  {
-    CacheBase*& c(m_cache_map[&T::s_class_name]);
+// template<class T>
+// Configuration::Cache<T> *
+//   Configuration::get_cache() noexcept
+//   {
+//     CacheBase*& c(m_cache_map[&T::s_class_name]);
 
-    if (c == nullptr)
-      c = new Cache<T>();
+//     if (c == nullptr)
+//       c = new CacheBase(T::s_class_name, DalFactory::instance().functions(*this, T::s_class_name, true));
 
-    return static_cast<Cache<T>*>(c);
-  }
+//     return static_cast<Cache<T>*>(c);
+//   }
 
-template<class TARGET, class SOURCE>
-  const TARGET *
-  Configuration::cast(const SOURCE *s) noexcept
-  {
-    if (s)
-      {
-        std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-        ConfigObjectImpl * obj = s->p_obj.m_impl;
+// template<class TARGET, class SOURCE>
+//   const TARGET *
+//   Configuration::cast(const SOURCE *s) noexcept
+//   {
+//     if (s)
+//       {
+//         std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+//         ConfigObjectImpl * obj = s->p_obj.m_impl;
 
-        if (try_cast(&TARGET::s_class_name, obj->m_class_name) == true)
-          {
-            std::lock_guard<std::mutex> scoped_lock(obj->m_mutex);
-            if (obj->m_state == dunedaq::conffwk::Valid)
-              return _get<TARGET>(*const_cast<ConfigObject *>(&s->p_obj), s->UID());
-          }
-      }
+//         if (try_cast(&TARGET::s_class_name, obj->m_class_name) == true)
+//           {
+//             std::lock_guard<std::mutex> scoped_lock(obj->m_mutex);
+//             if (obj->m_state == dunedaq::conffwk::Valid)
+//               return _get<TARGET>(*const_cast<ConfigObject *>(&s->p_obj), s->UID());
+//           }
+//       }
 
-    return nullptr;
-  }
+//     return nullptr;
+//   }
+
 } // namespace conffwk
 } // namespace dunedaq
 
-#endif // CONFFWK_CONFIGOBJECT_H_
+#endif // CONFFWK_DAL_OBJECT_H_
