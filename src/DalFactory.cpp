@@ -24,22 +24,26 @@ bool
 DalFactory::try_load_class_library(Configuration& db, const std::string& class_name) {
 
   auto& c = db.get_class_info(class_name);
-  // fmt::print("- {} '{}'\n", class_name, c.p_schema_path);
+  TLOG_DEBUG(1) << "Resolvung dal library for class " << class_name;
 
   std::string file = c.p_schema_path;
   std::string search {"/schema/"};
-  auto start = file.rfind(search) + search.size();
+  auto start = file.rfind(search) 
+  if ( start == std::string::npos) {
+    throw (DalPackageNameNotFound(ERS_HERE, class_name, file));
+  }
+  start += search.size();
   auto end = file.find("/", start);
-
+  if ( end == std::string::npos) {
+    throw (DalPackageNameNotFound(ERS_HERE, class_name, file));
+  }
+  
   std::string package = file.substr(start,end-start);
   std::string library = "lib"+package+".so";
-  // fmt::print("{} -> {}\n", package, library);
-  TLOG() << "Loading library " << library << " for class " << class_name;
+  TLOG_DEBUG(1) << "Loading dal library " << library << " for class " << class_name;
 
   auto handle = dlopen(library.c_str(), RTLD_LAZY|RTLD_GLOBAL);
   if (handle == nullptr) {
-    // fmt::print("Failed to load {}\n", library);
-
     throw (LoadDalFailed(ERS_HERE, library));
   }
 
