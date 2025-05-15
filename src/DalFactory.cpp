@@ -28,7 +28,7 @@ DalFactory::try_load_class_library(Configuration& db, const std::string& class_n
 
   std::string file = c.p_schema_path;
   std::string search {"/schema/"};
-  auto start = file.rfind(search) 
+  auto start = file.rfind(search);
   if ( start == std::string::npos) {
     throw (DalPackageNameNotFound(ERS_HERE, class_name, file));
   }
