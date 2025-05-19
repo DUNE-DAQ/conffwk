@@ -39,7 +39,7 @@ DalFactory::try_load_class_library(Configuration& db, const std::string& class_n
   }
   
   std::string package = file.substr(start,end-start);
-  std::string library = "lib"+package+".so";
+  std::string library = "lib"+package+"_dal.so";
   TLOG_DEBUG(1) << "Loading dal library " << library << " for class " << class_name;
 
   auto handle = dlopen(library.c_str(), RTLD_LAZY|RTLD_GLOBAL);
