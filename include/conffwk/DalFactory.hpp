@@ -13,10 +13,24 @@
 #include "logging/Logging.hpp"
 
 namespace dunedaq {
+
+ERS_DECLARE_ISSUE(conffwk, DalPackageNameNotFound,
+              "Failed to find the dal package name for class " << class_name << " in its schema path '" << schema_path << "'",
+              ((std::string)class_name)((std::string)schema_path))
+
+ERS_DECLARE_ISSUE(conffwk, LoadDalFailed,
+                "Could not load dal shared library " << library,
+                ((std::string)library))
+                
 namespace conffwk {
+
+class DalObject;
+class DalRegistry;
 
 class DalFactory
 {
+
+  typedef std::function<DalObject *(DalRegistry& db, ConfigObject& obj)> dal_object_instatiator_2g;
 
 public:
 
@@ -26,26 +40,16 @@ public:
 
   /** register DAL object creator by class name*/
   template<class T>
-    void
-    register_dal_class(const std::string & name, const std::set<std::string>& algorithms)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_class_mutex);
+  void
+  register_dal_class(const std::string & name, const std::set<std::string>& algorithms);
 
-      TLOG_DEBUG(1) << "register class " << name;
-
-      if (m_classes.emplace(name, DalFactoryFunctions(boost::compute::identity<T>(), algorithms)).second == false)
-        {
-          TLOG_DEBUG(0) << "class " << name << " was already registered";
-        }
-    }
+  /** register DAL object creator by class name*/
+  template<class T>
+  void
+  register_dal_class_2g(const std::string & name);
 
   const std::string&
-  get_known_class_name_ref(const std::string& name)
-  {
-    std::lock_guard<std::mutex> scoped_lock(m_known_class_mutex);
-    return *m_known_classes.emplace(name).first;
-  }
-
+  get_known_class_name_ref(const std::string& name);
 
   /**
    * \brief Get DAL object from conffwk object
@@ -76,7 +80,7 @@ public:
    */
 
   const DalFactoryFunctions&
-  functions(const Configuration& db, const std::string& name, bool upcast_unregistered) const;
+  functions(Configuration& db, const std::string& name, bool upcast_unregistered);
 
 
   const std::string&
@@ -93,16 +97,32 @@ public:
   functions(const std::string& name) const;
 
 
+/**
+ * \brief Create a new DaqOnject2g
+ */
+conffwk::DalObject* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered);
+
+conffwk::DalObject* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::string& fallback_class="");
+
 private:
 
   std::mutex m_class_mutex;
   std::map<std::string, DalFactoryFunctions> m_classes;
 
+  // std::map<std::string, dal_object_instatiator> m_instantiators;
+  std::map<std::string, dal_object_instatiator_2g> m_creators;
+
   std::mutex m_known_class_mutex;
   conffwk::set m_known_classes;
+
+  // Move into a dedicated class/function
+  bool try_load_class_library(Configuration& db, const std::string& class_name);
 };
 
 } // namespace conffwk
 } // namespace dunedaq
+
+
+#include "details/DalFactory.hxx"
 
 #endif

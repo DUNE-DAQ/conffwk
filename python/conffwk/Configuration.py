@@ -66,7 +66,7 @@ class Configuration(_ConfigurationProxy):
             preamble = f"Unable to open database off of \"{connection}\""
             if not re.search(r"^oksconflibs:", connection):
                 raise RuntimeError(f"""
-{preamble}; one reason is that it looks
+{preamble}; one reason is that it looks 
 like the database type wasn't specified in the name (i.e. \"oksconflibs:<filename>\")
 """)
             else:

@@ -35,7 +35,7 @@ register_conffwk(py::module& m)
     .def("attributes",
 	 &Configuration::attributes_pybind, "Get the properties of each attribute in a given class", py::arg("class_name"), py::arg("all"))
     .def("classes", 
-	 &Configuration::classes_pybind, "Get the names of the superclasses for each class")
+	 &Configuration::get_class_list, "Get the names of the superclasses for each class")
     .def("commit",
 	 &Configuration::commit, "Commit database changes.", py::arg("log_message") = "")
     .def("create_db",
