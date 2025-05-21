@@ -77,9 +77,6 @@ template<class T>
         throw dunedaq::conffwk::Generic(ERS_HERE, text.str().c_str());
       }
 
-      // FIXME
-      assert(false);
-
     if (!objs.empty())
       {
         for (auto& i : objs)
