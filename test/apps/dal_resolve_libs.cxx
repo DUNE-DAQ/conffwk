@@ -38,7 +38,7 @@ main(int argc, char const* argv[])
         auto end = file.find("/", start);
 
         std::string package = file.substr(start,end-start);
-        std::string library = "lib"+package+".so";
+        std::string library = "lib"+package+"_dal.so";
         fmt::print("Loading library {} from {}\n", library, package);
 
         auto handle = dlopen(library.c_str(), RTLD_LAZY|RTLD_GLOBAL);
