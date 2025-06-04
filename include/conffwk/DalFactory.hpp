@@ -38,15 +38,15 @@ public:
   static DalFactory &
   instance();
 
-  /** register DAL object creator by class name*/
-  template<class T>
-  void
-  register_dal_class(const std::string & name, const std::set<std::string>& algorithms);
+  // /** register DAL object creator by class name*/
+  // template<class T>
+  // void
+  // register_dal_class(const std::string & name, const std::set<std::string>& algorithms);
 
   /** register DAL object creator by class name*/
   template<class T>
   void
-  register_dal_class_2g(const std::string & name);
+  register_dal_class(const std::string & name);
 
   const std::string&
   get_known_class_name_ref(const std::string& name);
