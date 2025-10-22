@@ -2110,6 +2110,10 @@ Configuration::superclasses_pybind(const std::string& class_name, bool all) {
   return c.p_superclasses;
 }
 
-
+const std::string&
+Configuration::get_schema_path_pybind(const std::string& class_name) {
+  const dunedaq::conffwk::class_t& c = this->get_class_info(class_name, false);
+  return c.p_schema_path;
+}
 } // namespace conffwk
 } // namespace dunedaq

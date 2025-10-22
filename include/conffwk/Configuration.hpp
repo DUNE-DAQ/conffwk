@@ -1732,6 +1732,7 @@ class Configuration {
   std::list<std::string>* return_includes_pybind(const std::string& db_name);
   std::vector<std::string> subclasses_pybind(const std::string& class_name, bool all);
   std::vector<std::string> superclasses_pybind(const std::string& class_name, bool all);
+  [[nodiscard]] const std::string& get_schema_path_pybind(const std::string& class_name);
 };
 
   /**
