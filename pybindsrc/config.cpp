@@ -52,6 +52,8 @@ register_conffwk(py::module& m)
 	 &Configuration::get_impl_spec, "Get implementation plug-in and its parameter used to build conffwk object")
     .def("get_includes",
 	 &Configuration::return_includes_pybind, "Returns list of files included by given database.", py::arg("db_name"))
+    .def("get_schema_path",
+       &Configuration::get_schema_path_pybind, "Get path to schema file with definition of the given class", py::arg("class_name"))
     .def("get_obj",
      	 &Configuration::get_obj_pybind, "Create a configuration object containing the desired entity from the database", py::arg("class_name"), py::arg("id"))
     .def("get_objs",
@@ -67,13 +69,14 @@ register_conffwk(py::module& m)
     .def("superclasses",
 	 &Configuration::superclasses_pybind, "Get the superclasses of a single class", py::arg("class_name"), py::arg("all"))
     .def("subclasses",
-	 &Configuration::subclasses_pybind, "Get the superclasses of a single class", py::arg("class_name"), py::arg("all"))
+	 &Configuration::subclasses_pybind, "Get the subclasses of a single class", py::arg("class_name"), py::arg("all"))
     .def("test_object",
     	 &Configuration::test_object, "Test the existence of the object", py::arg("class_name"), py::arg("id"), py::arg("rlevel"), py::arg("rclasses"))
     .def("unload",
 	 &Configuration::unload, "Unload previously-loaded database")
     ;
 }
+
 
 void
 register_conffwkobject(py::module& m)
