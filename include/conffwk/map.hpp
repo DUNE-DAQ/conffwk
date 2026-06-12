@@ -1,3 +1,10 @@
+/*
+ * DUNE DAQ modification notice:
+ * This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+ * Fork baseline commit: 67a24e731 (2022-10-27).
+ * Renamed since fork: yes (from config/map.h to include/conffwk/map.hpp).
+ */
+
 #ifndef CONFFWK_MAP_H_
 #define CONFFWK_MAP_H_
 

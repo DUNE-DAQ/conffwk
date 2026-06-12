@@ -1,10 +1,23 @@
 
-This repo's code has been copied from the ATLAS TDAQ package of the
-same name (under the tdaq-9-05-00 release) and been refactored for the
-DUNE DAQ. Original ATLAS TDAQ licensing info (Apache License 2.0) can
-be found below this line. Note that while this license does not
-necessarily apply to the refactored parts of the code, it does apply
-to the unmodified parts.
+This repository's code was copied from the ATLAS TDAQ package "config"
+(https://gitlab.cern.ch/atlas-tdaq-software/config/) (from its 67a24e731 commit on its master branch) in November 2022; the
+carbon copy of that code can be found in commit
+cfca638154a48962fd03bf9bafcded9801f0b324 in this repo. Since then, the
+code has been refactored for the DUNE DAQ and the package has been
+renamed from "config" to "conffwk".
+
+Consistent with the ATLAS "config" repository's Apache 2.0 license:
+
+* A copy of the original ATLAS config NOTICE is reproduced below and in
+  licenses_and_notices/NOTICE.config_ATLAS.
+
+* A copy of the ATLAS config Apache 2.0 license is included in
+  licenses_and_notices/LICENSE.Apache2.0; it is to be considered only
+  in terms of satisfying ATLAS config's license terms and not as a
+  licensing of this repository's code as such.
+
+* All modifications to the source files for DUNE DAQ in this
+  repository are marked as such in each file's header.
 
 ======================================================================
 
@@ -14,11 +27,7 @@ Licensed under the Apache License, version 2.0.
 Contributors
 ============
  Igor Soloviev <Igor.Soloviev@cern.ch>
- Giovanna Lehmann Miotto <Giovanna.Lehmann@cern.ch>
- Marc Dobson <Marc.Dobson@cern.ch>
- Andrei Kazarov <Andrei.Kazarov@cern.ch>
- Giuseppe Avolio <Giuseppe.Avolio@cern.ch>
- Bahar Aydemir <bahar.aydemir@cern.ch>
- Andy Salnikov <salnikov@slac.stanford.edu>
- Andre Dos Anjos <andre.dos.anjos@gmail.com>
-
+ Reiner Hauser <Reiner.Hauser@cern.ch>
+ Andre Dos Anjos <Andre.dos.Anjos@gmail.com>
+ Wainer Vandelli <Wainer.Vandelli@cern.ch>
+ Rodrigo Coura Torres <Rodrigo.Torres@cern.ch>

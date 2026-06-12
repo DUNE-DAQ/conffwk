@@ -1,3 +1,8 @@
+# DUNE DAQ modification notice:
+# This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+# Fork baseline commit: 67a24e731 (2022-10-27).
+# Renamed since fork: yes (from python/config/dal.py to python/conffwk/dal.py).
+
 """Contains the base class for DAL types and auxiliary methods.
 
 This module defines the PyDALBase class that is used as the base type for all

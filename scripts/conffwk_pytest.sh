@@ -1,4 +1,9 @@
 #!/bin/bash
+# DUNE DAQ modification notice:
+# This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+# Fork baseline commit: 67a24e731 (2022-10-27).
+# Renamed since fork: yes (from test/pytest.sh to scripts/conffwk_pytest.sh).
+
 # Created by Andre Anjos <andre.dos.anjos@cern.ch>
 # Fri 23 Nov 2007 12:24:50 PM CET
 export TDAQ_PYTHONPATH=${TDAQ_INST_PATH}/share/lib/python:${TDAQ_INST_PATH}/${CMTCONFIG}/lib:${TDAQ_PYTHONPATH}

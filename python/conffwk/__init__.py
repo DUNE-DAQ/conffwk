@@ -1,3 +1,8 @@
+# DUNE DAQ modification notice:
+# This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+# Fork baseline commit: 67a24e731 (2022-10-27).
+# Renamed since fork: yes (from python/config/__init__.py to python/conffwk/__init__.py).
+
 from __future__ import absolute_import
 from .Configuration import Configuration
 from .ConfigObject import ConfigObject

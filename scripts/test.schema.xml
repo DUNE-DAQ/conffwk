@@ -1,3 +1,5 @@
+<!-- DUNE DAQ modification notice: This file has been modified from the original ATLAS config source for the DUNE DAQ project. Fork baseline commit: 67a24e731 (2022-10-27). Renamed since fork: yes (from python/tests/test.schema.xml to scripts/test.schema.xml). -->
+
 <?xml version="1.0" encoding="ASCII"?>
 
 <!-- oks-schema version 2.2 -->

@@ -1,3 +1,10 @@
+/*
+ * DUNE DAQ modification notice:
+ * This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+ * Fork baseline commit: 67a24e731 (2022-10-27).
+ * Renamed since fork: yes (from config/ConfigurationPointer.h to include/conffwk/ConfigurationPointer.hpp).
+ */
+
 /**
  * @file conffwk/ConfigurationPointer.h
  * @author <a href="mailto:andre.dos.anjos@cern.ch">Andre Anjos</a> 
