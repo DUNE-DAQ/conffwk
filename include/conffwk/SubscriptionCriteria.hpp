@@ -1,9 +1,9 @@
-/*
- * DUNE DAQ modification notice:
- * This file has been modified from the original ATLAS config source for the DUNE DAQ project.
- * Fork baseline commit: 67a24e731 (2022-10-27).
- * Renamed since fork: yes (from config/SubscriptionCriteria.h to include/conffwk/SubscriptionCriteria.hpp).
- */
+//
+// DUNE DAQ modification notice:
+// This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+// Fork baseline commit: 67a24e731 (2022-10-27).
+// Renamed since fork: yes (from config/SubscriptionCriteria.h to include/conffwk/SubscriptionCriteria.hpp).
+//
 
   /**
    *  \file SubscriptionCriteria.h This file contains ConfigurationSubscriptionCriteria class,

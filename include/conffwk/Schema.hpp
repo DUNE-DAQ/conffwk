@@ -1,9 +1,9 @@
-/*
- * DUNE DAQ modification notice:
- * This file has been modified from the original ATLAS config source for the DUNE DAQ project.
- * Fork baseline commit: 67a24e731 (2022-10-27).
- * Renamed since fork: yes (from config/Schema.h to include/conffwk/Schema.hpp).
- */
+//
+// DUNE DAQ modification notice:
+// This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+// Fork baseline commit: 67a24e731 (2022-10-27).
+// Renamed since fork: yes (from config/Schema.h to include/conffwk/Schema.hpp).
+//
 
   /**
    *  \file Schema.h This file contains several schema classes,
