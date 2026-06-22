@@ -1,3 +1,10 @@
+//
+// DUNE DAQ modification notice:
+// This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+// Fork baseline commit: 67a24e731 (2022-10-27).
+// Renamed since fork: yes (from config/ConfigPackages.doxygen.h to include/conffwk/ConfigPackages.doxygen.hpp).
+//
+
   /**
    *  \file ConfigPackages.doxygen.h This file contains the main page for the conffwk package documentation.
    *  \author Igor Soloviev

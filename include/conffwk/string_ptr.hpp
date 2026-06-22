@@ -1,3 +1,10 @@
+//
+// DUNE DAQ modification notice:
+// This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+// Fork baseline commit: 67a24e731 (2022-10-27).
+// Renamed since fork: yes (from config/string_ptr.h to include/conffwk/string_ptr.hpp).
+//
+
 #ifndef CONFFWK_STRING_PTR_H_
 #define CONFFWK_STRING_PTR_H_
 

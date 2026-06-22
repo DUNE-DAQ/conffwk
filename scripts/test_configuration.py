@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# DUNE DAQ modification notice:
+# This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+# Fork baseline commit: 67a24e731 (2022-10-27).
+# Renamed since fork: yes (from python/tests/test_configuration.py to scripts/test_configuration.py).
+
 # Andre dos Anjos <andre.dos.anjos@cern.ch>
 
 """Unit test for the Python bindings to the Configuration class."""

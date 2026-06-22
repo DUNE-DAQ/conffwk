@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
+# DUNE DAQ modification notice:
+# This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+# Fork baseline commit: 67a24e731 (2022-10-27).
+# Renamed since fork: yes (from python/config/ConfigObject.py to python/conffwk/ConfigObject.py).
+
 # Created by Andre Anjos <andre.dos.anjos@cern.ch>
 # Mon 22 Oct 2007 04:12:01 PM CEST
 

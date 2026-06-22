@@ -1,3 +1,10 @@
+//
+// DUNE DAQ modification notice:
+// This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+// Fork baseline commit: 67a24e731 (2022-10-27).
+// Renamed since fork: yes (from config/ConfigurationImpl.h to include/conffwk/ConfigurationImpl.hpp).
+//
+
   /**
    *  \file ConfigurationImpl.h This file contains abstract ConfigurationImpl class,
    *  that is used to implement configuration objects.

@@ -1,3 +1,8 @@
+# DUNE DAQ modification notice:
+# This file has been modified from the original ATLAS config source for the DUNE DAQ project.
+# Fork baseline commit: 67a24e731 (2022-10-27).
+# Renamed since fork: no.
+
 cmake_minimum_required(VERSION 3.12)
 project(conffwk VERSION 2.1.1)
 
