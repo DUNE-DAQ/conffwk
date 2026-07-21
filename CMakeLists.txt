@@ -34,3 +34,5 @@ daq_add_application(conffwk_dal_resolve_libs dal_resolve_libs.cxx  	            
 
 
 daq_install()
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/ DESTINATION ${CMAKE_INSTALL_PYTHONDIR} OPTIONAL FILES_MATCHING PATTERN "py.typed" PATTERN "*.pyi")
