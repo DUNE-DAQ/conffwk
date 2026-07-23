@@ -24,8 +24,8 @@ PYBIND11_MODULE(_daq_conffwk_py, m)
 
   m.doc() = "Python interface to the conffwk package"; // optional module docstring
 
-  register_conffwk(m);
   register_conffwkobject(m);
+  register_conffwk(m);
 }
 
 } // namespace dunedaq::conffwk::python
