@@ -32,5 +32,5 @@ daq_add_application(conffwk_test_rw config_test_rw.cxx                      TEST
 daq_add_application(conffwk_check_inheritance conffwk_check_inheritance.cxx TEST       LINK_LIBRARIES conffwk CLI11::CLI11 fmt::fmt)
 daq_add_application(conffwk_dal_resolve_libs dal_resolve_libs.cxx  	            TEST       LINK_LIBRARIES conffwk conffwk CLI11::CLI11 fmt::fmt)
 
-
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/ DESTINATION ${CMAKE_INSTALL_PYTHONDIR} OPTIONAL FILES_MATCHING PATTERN "py.typed" PATTERN "*.pyi")
 daq_install()

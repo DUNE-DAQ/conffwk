@@ -591,6 +591,10 @@ class FSMAction(DalBase):
     """This class is used to represent any FSM action object in the system. """
     pass
 
+class SessionDal(DalBase):
+    """This class is used to represent any FSM action object in the system. """
+    self.controller_log_level: int | str = "INFO"
+
 def get_classes(m):
     """Returns a map with classes in a module, the key is the class name."""
 
