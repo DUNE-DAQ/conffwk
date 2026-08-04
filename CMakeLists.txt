@@ -20,7 +20,7 @@ remove_definitions(-DERS_NO_DEBUG)
 
 daq_add_library(*.cpp LINK_LIBRARIES ers::ers logging::logging)
 
-daq_add_python_bindings(*.cpp)
+daq_add_python_bindings(*.cpp GENERATE_STUBS)
 
 daq_add_application(conffwk_dump config_dump.cxx                    LINK_LIBRARIES conffwk Boost::program_options)
 daq_add_application(conffwk_export_data config_export_data.cxx      LINK_LIBRARIES conffwk Boost::program_options)
