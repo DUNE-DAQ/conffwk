@@ -16,13 +16,11 @@
 namespace dunedaq {
 namespace conffwk {
 
-
 class Configuration;
 class ConfigObject;
 class ConfigurationChange;
 class DalObject;
 class CacheBase;
-
 
 /**
  *  \brief The factory function creates DAL object of given template class.
@@ -35,8 +33,7 @@ class CacheBase;
  *  \return      the DAL object
  */
 
-typedef DalObject * (*dal_object_creator)(Configuration& db, ConfigObject& obj, const std::string& uid);
-
+typedef DalObject* (*dal_object_creator)(Configuration& db, ConfigObject& obj, const std::string& uid);
 
 /**
  *  \brief The notification callback function which
@@ -48,8 +45,7 @@ typedef DalObject * (*dal_object_creator)(Configuration& db, ConfigObject& obj, 
  *  \param changed_class   pointer to changed class
  */
 
-typedef void (*notify2)(Configuration & conf, const ConfigurationChange * changed_class);
-
+typedef void (*notify2)(Configuration& conf, const ConfigurationChange* changed_class);
 
 /**
  *  \brief The function to update states of objects in cache.
@@ -61,7 +57,6 @@ typedef void (*notify2)(Configuration & conf, const ConfigurationChange * change
  */
 
 typedef void (*unread_object)(CacheBase* x);
-
 
 /**
  *  \brief The function to rename object in cache.
@@ -75,8 +70,6 @@ typedef void (*unread_object)(CacheBase* x);
 
 typedef void (*rename_object_f)(CacheBase* x, const std::string& old_id, const std::string& new_id);
 
-
-
 struct DalFactoryFunctions
 {
   notify2 m_update_fn;
@@ -87,7 +80,7 @@ struct DalFactoryFunctions
   std::set<std::string> m_algorithms;
 
   template<class T>
-    DalFactoryFunctions(boost::compute::identity<T>, const std::set<std::string> algorithms);
+  DalFactoryFunctions(boost::compute::identity<T>, const std::set<std::string> algorithms);
 };
 } // namespace conffwk
 } // namespace dunedaq

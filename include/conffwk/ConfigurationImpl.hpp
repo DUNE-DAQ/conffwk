@@ -5,25 +5,25 @@
 // Renamed since fork: yes (from config/ConfigurationImpl.h to include/conffwk/ConfigurationImpl.hpp).
 //
 
-  /**
-   *  \file ConfigurationImpl.h This file contains abstract ConfigurationImpl class,
-   *  that is used to implement configuration objects.
-   *  \author Igor Soloviev
-   *  \brief abstract Configuration implementation
-   */
+/**
+ *  \file ConfigurationImpl.h This file contains abstract ConfigurationImpl class,
+ *  that is used to implement configuration objects.
+ *  \author Igor Soloviev
+ *  \brief abstract Configuration implementation
+ */
 
 #ifndef CONFFWK_CONFIGURATIONIMPL_H_
 #define CONFFWK_CONFIGURATIONIMPL_H_
 
+#include <list>
+#include <map>
+#include <set>
 #include <string>
 #include <vector>
-#include <list>
-#include <set>
-#include <map>
 
+#include "conffwk/ConfigVersion.hpp"
 #include "conffwk/map.hpp"
 #include "conffwk/set.hpp"
-#include "conffwk/ConfigVersion.hpp"
 
 class ConfigurationChange;
 class ConfigObject;
@@ -32,259 +32,255 @@ class ConfigObjectImpl;
 namespace dunedaq {
 namespace conffwk {
 
-
 struct class_t;
 
+/**
+ * \brief Provides pure virtual interface used by the Configuration class.
+ *
+ *  The class has several pure virtual methods to manipulate databases,
+ *  access database information, subscribe and receive notification on data changes.
+ *  Any database implementation inherits from this class and implements it's methods.
 
-  /**
-   * \brief Provides pure virtual interface used by the Configuration class.
-   *
-   *  The class has several pure virtual methods to manipulate databases,
-   *  access database information, subscribe and receive notification on data changes.
-   *  Any database implementation inherits from this class and implements it's methods. 
+ *  The methods may throw dunedaq::conffwk::Exception exception (like Generic, NotFound) in
+ *  case of an error unless \b noexcept is explicitly used in their specification.
+ */
 
-   *  The methods may throw dunedaq::conffwk::Exception exception (like Generic, NotFound) in
-   *  case of an error unless \b noexcept is explicitly used in their specification.
-   */
-
-class ConfigurationImpl {
+class ConfigurationImpl
+{
 
   friend class ConfigObject;
   friend class ConfigObjectImpl;
   friend class Configuration;
 
-  public:
+public:
+  /// The constructor.
 
-      /// The constructor.
+  ConfigurationImpl() noexcept;
 
-    ConfigurationImpl() noexcept;
+  /// Virtual destructor.
 
-      /// Virtual destructor.
+  virtual ~ConfigurationImpl();
 
-    virtual ~ConfigurationImpl();
+  // methods to open/close database
 
+public:
+  /// Open database implementation in accordance with given name.
 
-    // methods to open/close database
+  virtual void open_db(const std::string& db_name) = 0;
 
-  public:
+  /// Close database implementation.
 
-      /// Open database implementation in accordance with given name.
+  virtual void close_db() = 0;
 
-    virtual void open_db(const std::string& db_name) = 0;
+  /// Check if a database is loaded.
 
-      /// Close database implementation.
+  virtual bool loaded() const noexcept = 0;
 
-    virtual void close_db() = 0;
+  /// Create database.
 
-      /// Check if a database is loaded.
+  virtual void create(const std::string& db_name, const std::list<std::string>& includes) = 0;
 
-    virtual bool loaded() const noexcept = 0;
+  /// Return write access status.
 
-      /// Create database.
+  virtual bool is_writable(const std::string& db_name) = 0;
 
-    virtual void create(const std::string& db_name, const std::list<std::string>& includes) = 0;
+  /// Add include file.
 
-      /// Return write access status.
+  virtual void add_include(const std::string& db_name, const std::string& include) = 0;
 
-    virtual bool is_writable(const std::string& db_name) = 0;
+  /// Remove include file.
 
-      /// Add include file.
+  virtual void remove_include(const std::string& db_name, const std::string& include) = 0;
 
-    virtual void add_include(const std::string& db_name, const std::string& include)= 0;
+  /// Get included files.
 
-      /// Remove include file.
+  virtual void get_includes(const std::string& db_name, std::list<std::string>& includes) const = 0;
 
-    virtual void remove_include(const std::string& db_name, const std::string& include)= 0;
+  /// Get uncommitted files.
 
-      /// Get included files.
+  virtual void get_updated_dbs(std::list<std::string>& dbs) const = 0;
 
-    virtual void get_includes(const std::string& db_name, std::list<std::string>& includes) const = 0;
+  /// Set commit credentials.
 
-      /// Get uncommitted files.
+  virtual void set_commit_credentials(const std::string& user, const std::string& password) = 0;
 
-    virtual void get_updated_dbs(std::list<std::string>& dbs) const = 0;
+  /// Commit database changes.
 
-      /// Set commit credentials.
+  virtual void commit(const std::string& log_message) = 0;
 
-    virtual void set_commit_credentials(const std::string& user, const std::string& password) = 0;
+  /// Abort database changes.
 
-      /// Commit database changes.
+  virtual void abort() = 0;
 
-    virtual void commit(const std::string& log_message) = 0;
+  /// Prefetch all data into client cache
 
-      /// Abort database changes.
+  virtual void prefetch_all_data() = 0;
 
-    virtual void abort() = 0;
+  /// Get newly available versions
 
-      /// Prefetch all data into client cache
+  virtual std::vector<dunedaq::conffwk::Version> get_changes() = 0;
 
-    virtual void prefetch_all_data() = 0;
+  /// Get archived versions
 
-      /// Get newly available versions
+  virtual std::vector<dunedaq::conffwk::Version> get_versions(const std::string& since,
+                                                              const std::string& until,
+                                                              dunedaq::conffwk::Version::QueryType type,
+                                                              bool skip_irrelevant) = 0;
 
-    virtual std::vector<dunedaq::conffwk::Version> get_changes() = 0;
+  // methods to get data from database
 
-      /// Get archived versions
+public:
+  /// Get object of class by id.
 
-    virtual std::vector<dunedaq::conffwk::Version> get_versions(const std::string& since, const std::string& until, dunedaq::conffwk::Version::QueryType type, bool skip_irrelevant) = 0;
+  virtual void get(const std::string& class_name,
+                   const std::string& id,
+                   ConfigObject& object,
+                   unsigned long rlevel,
+                   const std::vector<std::string>* rclasses) = 0;
 
+  /// Get objects of class according to query.
 
-    // methods to get data from database
+  virtual void get(const std::string& class_name,
+                   std::vector<ConfigObject>& objects,
+                   const std::string& query,
+                   unsigned long rlevel,
+                   const std::vector<std::string>* rclasses) = 0;
 
-  public:
+  /// Get objects according to path.
 
-      /// Get object of class by id.
+  virtual void get(const ConfigObject& obj_from,
+                   const std::string& query,
+                   std::vector<ConfigObject>& objects,
+                   unsigned long rlevel,
+                   const std::vector<std::string>* rclasses) = 0;
 
-    virtual void get(const std::string& class_name, const std::string& id, ConfigObject& object, unsigned long rlevel, const std::vector<std::string> * rclasses) = 0;
+  /// Test object existence (used by Python binding)
 
-      /// Get objects of class according to query.
+  virtual bool test_object(const std::string& class_name,
+                           const std::string& id,
+                           unsigned long rlevel,
+                           const std::vector<std::string>* rclasses) = 0;
 
-    virtual void get(const std::string& class_name, std::vector<ConfigObject>& objects, const std::string& query, unsigned long rlevel, const std::vector<std::string> * rclasses) = 0;
+  // methods to create and destroy objects
 
-      /// Get objects according to path.
+public:
+  /// Create object of class by id at given file.
 
-    virtual void get(const ConfigObject& obj_from, const std::string& query, std::vector<ConfigObject>& objects, unsigned long rlevel, const std::vector<std::string> * rclasses) = 0;
+  virtual void create(const std::string& at,
+                      const std::string& class_name,
+                      const std::string& id,
+                      ConfigObject& object) = 0;
 
-      /// Test object existence (used by Python binding)
+  /// Create object of class by id at file identified by object 'at'.
 
-    virtual bool test_object(const std::string& class_name, const std::string& id, unsigned long rlevel, const std::vector<std::string> * rclasses) = 0;
+  virtual void create(const ConfigObject& at,
+                      const std::string& class_name,
+                      const std::string& id,
+                      ConfigObject& object) = 0;
 
+  /// Destroy object of class by id.
 
-    // methods to create and destroy objects
+  virtual void destroy(ConfigObject& object) = 0;
 
-  public:
+  // get meta-data
 
-      /// Create object of class by id at given file.
+public:
+  /// Get description of class in accordance with parameters.
 
-    virtual void create(const std::string& at, const std::string& class_name, const std::string& id, ConfigObject& object) = 0;
+  virtual dunedaq::conffwk::class_t* get(const std::string& class_name, bool direct_only) = 0;
 
-      /// Create object of class by id at file identified by object 'at'.
+  /// Get inheritance hierarchy
 
-    virtual void create(const ConfigObject& at, const std::string& class_name, const std::string& id, ConfigObject& object) = 0;
+  virtual void get_superclasses(conffwk::fmap<conffwk::fset>& schema) = 0;
 
-      /// Destroy object of class by id.
+  // notification
 
-    virtual void destroy(ConfigObject& object) = 0;
+public:
+  /// Callback to notify database changes
 
+  typedef void (*notify)(std::vector<ConfigurationChange*>& changes, Configuration*);
 
-    // get meta-data
+  /// Callback to pre-notify database changes
 
-  public:
+  typedef void (*pre_notify)(Configuration*);
 
-      /// Get description of class in accordance with parameters.
+  /// Subscribe on database changes
 
-    virtual dunedaq::conffwk::class_t * get(const std::string& class_name, bool direct_only) = 0;
+  virtual void subscribe(const std::set<std::string>& class_names,
+                         const std::map<std::string, std::set<std::string>>& objs,
+                         notify cb,
+                         pre_notify pre_cb) = 0;
 
-      /// Get inheritance hierarchy
+  /// Remove subscription on database changes
 
-    virtual void get_superclasses(conffwk::fmap<conffwk::fset>& schema) = 0;
+  virtual void unsubscribe() = 0;
 
+  /// Print implementation specific profiling information
 
-    // notification
+  virtual void print_profiling_info() noexcept = 0;
 
-  public:
+  /// Print profiling information about objects in cache
 
-      /// Callback to notify database changes
+  void print_cache_info() noexcept;
 
-    typedef void (*notify)(std::vector<ConfigurationChange *> & changes, Configuration *);
+  /// cache of implementation objects (class-name::->object_id->implementation)
 
-      /// Callback to pre-notify database changes
+private:
+  conffwk::pmap<conffwk::map<ConfigObjectImpl*>*> m_impl_objects;
+  std::vector<ConfigObjectImpl*> m_tangled_objects; // deleted and replaced by others as result of rename
 
-    typedef void (*pre_notify)(Configuration *);
+  mutable unsigned long p_number_of_cache_hits;
+  mutable unsigned long p_number_of_object_read;
 
-      /// Subscribe on database changes
+protected:
+  /// get object from cache
 
-    virtual void subscribe(const std::set<std::string>& class_names, const std::map< std::string, std::set<std::string> >& objs, notify cb, pre_notify pre_cb) = 0;
+  ConfigObjectImpl* get_impl_object(const std::string& class_name, const std::string& id) const noexcept;
 
-      /// Remove subscription on database changes
+  /// put object to cache
 
-    virtual void unsubscribe() = 0;
+  void put_impl_object(const std::string& class_name, const std::string& id, ConfigObjectImpl* obj) noexcept;
 
-      /// Print implementation specific profiling information
-    
-    virtual void print_profiling_info() noexcept = 0;
+  /// insert new object (update cache or create-and-insert)
 
-      /// Print profiling information about objects in cache
+  template<class T, class OBJ>
+  T* insert_object(OBJ& obj, const std::string& id, const std::string& class_name) noexcept
+  {
+    ConfigObjectImpl* p = get_impl_object(class_name, id);
 
-    void print_cache_info() noexcept;
+    if (p == nullptr) {
+      p = static_cast<ConfigObjectImpl*>(new T(obj, this));
+      put_impl_object(class_name, id, p);
+    } else {
+      static_cast<T*>(p)->set(obj);
+      p->m_state = dunedaq::conffwk::Valid;
+    }
 
+    return static_cast<T*>(p);
+  }
 
-      /// cache of implementation objects (class-name::->object_id->implementation)
+  /// clean cache (e.g. to be used by destructor)
 
-  private:
+  void clean() noexcept;
 
-    conffwk::pmap<conffwk::map<ConfigObjectImpl *> * > m_impl_objects;
-    std::vector<ConfigObjectImpl *> m_tangled_objects; // deleted and replaced by others as result of rename
+  /// Configuration pointer is needed for notification on changes, e.g. in case of subscription or an object deletion
 
-    mutable unsigned long p_number_of_cache_hits;
-    mutable unsigned long p_number_of_object_read;
+protected:
+  Configuration* m_conf;
 
+  /// Is required by reload methods
 
-  protected:
+  std::mutex& get_conf_impl_mutex() const;
 
-      /// get object from cache
+public:
+  /// set configuration object
 
-    ConfigObjectImpl * get_impl_object(const std::string& class_name, const std::string& id) const noexcept;
+  void set(Configuration* db) noexcept { m_conf = db; }
 
+public:
+  /// rename object in cache
 
-      /// put object to cache
-
-    void put_impl_object(const std::string& class_name, const std::string& id, ConfigObjectImpl * obj) noexcept;
-
-
-      /// insert new object (update cache or create-and-insert)
-
-    template<class T, class OBJ>
-      T *
-      insert_object(OBJ& obj, const std::string& id, const std::string& class_name) noexcept
-        {
-          ConfigObjectImpl * p = get_impl_object(class_name, id);
-
-          if (p == nullptr)
-            {
-              p = static_cast<ConfigObjectImpl *>(new T(obj, this));
-              put_impl_object(class_name, id, p);
-            }
-          else
-            {
-              static_cast<T *>(p)->set(obj);
-              p->m_state = dunedaq::conffwk::Valid;
-            }
-
-          return static_cast<T *>(p);
-        }
-
-
-      /// clean cache (e.g. to be used by destructor)
-
-    void clean() noexcept;
-
-
-      /// Configuration pointer is needed for notification on changes, e.g. in case of subscription or an object deletion
-
-  protected:
-
-    Configuration * m_conf;
-
-
-      /// Is required by reload methods
-
-    std::mutex& get_conf_impl_mutex() const;
-
-
-  public:
-
-      /// set configuration object
-
-    void set(Configuration * db) noexcept { m_conf = db; }
-
-
-  public:
-
-      /// rename object in cache
-
-    void rename_impl_object(const std::string * class_name, const std::string& old_id, const std::string& new_id) noexcept;
-
+  void rename_impl_object(const std::string* class_name, const std::string& old_id, const std::string& new_id) noexcept;
 };
 
 } // namespace conffwk

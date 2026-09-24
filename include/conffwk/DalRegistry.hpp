@@ -1,8 +1,8 @@
 #ifndef __DUNEDAQ_CONFFWK_DALREGISTRY_HPP__
 #define __DUNEDAQ_CONFFWK_DALREGISTRY_HPP__
 
-#include "conffwk/map.hpp"
 #include "conffwk/Errors.hpp"
+#include "conffwk/map.hpp"
 
 namespace dunedaq {
 namespace conffwk {
@@ -10,25 +10,26 @@ namespace conffwk {
 class DalObject;
 class Configuration;
 
-
 /**
  * @brief DalRegistry: A registry of DalObjects
  *        It provides a single interface to create, cache and manage DalObjecs
- * 
+ *
  */
-class DalRegistry {
+class DalRegistry
+{
 
   friend class DalObject;
 
-struct DalDomain {
-  mutable std::mutex mutex; // mutex used to access template objects (i.e. generated DAL
-  conffwk::map<DalObject*> cache;
-};
+  struct DalDomain
+  {
+    mutable std::mutex mutex; // mutex used to access template objects (i.e. generated DAL
+    conffwk::map<DalObject*> cache;
+  };
 
 public:
   /**
    * @brief Construct a new Dal Registry object
-   * 
+   *
    * @param confdb Reference to a Configuration object;
    */
   DalRegistry(Configuration& confdb);
@@ -36,80 +37,88 @@ public:
 
   Configuration& configuration() { return m_confdb; }
   const Configuration& configuration() const { return m_confdb; }
-  
+
   /**
-   * 
+   *
    * \brief Clear the content of the registy
    */
   void clear();
 
-  DalObject* get(ConfigObject& obj, bool upcast_unregistered=false);
-  std::vector<const DalObject*> get(std::vector<ConfigObject>& objs, bool upcast_unregistered=false);
+  DalObject* get(ConfigObject& obj, bool upcast_unregistered = false);
+  std::vector<const DalObject*> get(std::vector<ConfigObject>& objs, bool upcast_unregistered = false);
 
   /**
-  *  \brief Get template object from cache by conffwk object.
-  *
-  *  The method searches an object with id of given conffwk object within the cache.
-  *  If found, the method sets given conffwk object as implementation of the template
-  *  object and returns pointer on the template object.
-  *  If there is no such object in cache, then it is created from given conffwk object.
-  *
-  *  In case of success, the new object is put into cache and pointer to the object is returned.
-  *  If there is no such object for given template class, then \b null pointer is returned.
-  *
-  *  \param conffwk         the configuration object
-  *  \param obj            the conffwk object used to set for the template object
-  *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new object)
-  *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation of new object)
-  *
-  *  \return Return pointer to object.
-  *
-  *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-  */
-  template<class T> 
-  T * get(ConfigObject& obj, bool init_children=false, bool init_object=true);
-
-
-  /**
-  *  \brief Get template object from cache by object's ID.
-  *
-  *  The method searches an object with given id within the cache.
-  *  If found, the method returns pointer on it.
-  *  If there is no such object in cache, there is an attempt to create new object.
-  *  In case of success, the new object is put into cache and pointer to the object is returned.
-  *  If there is no such object for given template class, then \b null pointer is returned.
-  *
-  *  \param conffwk         the configuration object
-  *  \param name           object identity
-  *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new object)
-  *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation of new object)
-  *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache during creation of new object)
-  *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache during creation of new object)
-  *
-  *  \return Return pointer to object. It can be \b null, if there is no such object found.
-  *
-  *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-  */
+   *  \brief Get template object from cache by conffwk object.
+   *
+   *  The method searches an object with id of given conffwk object within the cache.
+   *  If found, the method sets given conffwk object as implementation of the template
+   *  object and returns pointer on the template object.
+   *  If there is no such object in cache, then it is created from given conffwk object.
+   *
+   *  In case of success, the new object is put into cache and pointer to the object is returned.
+   *  If there is no such object for given template class, then \b null pointer is returned.
+   *
+   *  \param conffwk         the configuration object
+   *  \param obj            the conffwk object used to set for the template object
+   *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new
+   * object)
+   *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation
+   * of new object)
+   *
+   *  \return Return pointer to object.
+   *
+   *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
+   */
   template<class T>
-  T * get(const std::string& name, bool init_children=false, bool init_object=true, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
-
+  T* get(ConfigObject& obj, bool init_children = false, bool init_object = true);
 
   /**
-  *  \brief Find template object using ID.
-  *
-  *  The method is suitable for generated template objects.
-  *
-  *  In case of success, the new object is put into cache and pointer to the object is returned.
-  *  If there is no such object for given template class, then \b null pointer is returned.
-  *
-  *  \param id             ID of generated object
-  *
-  *  \return Return pointer to object.
-  *
-  *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-  */
-  template<class T> 
-  T * find(const std::string & id);
+   *  \brief Get template object from cache by object's ID.
+   *
+   *  The method searches an object with given id within the cache.
+   *  If found, the method returns pointer on it.
+   *  If there is no such object in cache, there is an attempt to create new object.
+   *  In case of success, the new object is put into cache and pointer to the object is returned.
+   *  If there is no such object for given template class, then \b null pointer is returned.
+   *
+   *  \param conffwk         the configuration object
+   *  \param name           object identity
+   *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new
+   * object)
+   *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation
+   * of new object)
+   *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by
+   * given object have also to be read to the implementation cache during creation of new object)
+   *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have
+   * to be read to the implementation cache during creation of new object)
+   *
+   *  \return Return pointer to object. It can be \b null, if there is no such object found.
+   *
+   *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
+   */
+  template<class T>
+  T* get(const std::string& name,
+         bool init_children = false,
+         bool init_object = true,
+         unsigned long rlevel = 0,
+         const std::vector<std::string>* rclasses = nullptr);
+
+  /**
+   *  \brief Find template object using ID.
+   *
+   *  The method is suitable for generated template objects.
+   *
+   *  In case of success, the new object is put into cache and pointer to the object is returned.
+   *  If there is no such object for given template class, then \b null pointer is returned.
+   *
+   *  \param id             ID of generated object
+   *
+   *  \return Return pointer to object.
+   *
+   *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
+   */
+  template<class T>
+  T* find(const std::string& id);
 
   /**
    *  \brief Checks validity of pointer to an objects of given user class.
@@ -120,7 +129,7 @@ public:
    *  \return Return \b true if the pointer is valid and \b false otherwise.
    */
   template<class T>
-  bool is_valid(const T * object) noexcept;
+  bool is_valid(const T* object) noexcept;
 
   /**
    *  \brief Update cache of objects in case of modification.
@@ -130,7 +139,8 @@ public:
    *
    *  \param modified  vector of modified objects of given user class (objects to be re-read in cache)
    *  \param removed   vector of removed objects of given user class (objects to be removed from cache)
-   *  \param created   vector of created objects of given user class (objects to be reset in cache, if they were removed)
+   *  \param created   vector of created objects of given user class (objects to be reset in cache, if they were
+   * removed)
    */
   template<class T>
   void update(const std::vector<std::string>& modified,
@@ -143,9 +153,9 @@ public:
               const std::vector<std::string>& created);
 
   /**
-   * 
+   *
    * \brief Set the status of all objects in cache to unread
-   * 
+   *
    */
   void unread_all();
 
@@ -162,7 +172,8 @@ public:
    *  relationship with such name exists and it's value is set.
    *  Otherwise the method returns 0.
    *
-   *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no relationship with such name, plug-in specific problem)
+   *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no relationship with such name, plug-in specific
+   * problem)
    */
 
   template<class T>
@@ -178,9 +189,10 @@ public:
    *  \param objects   returned value
    *  \param init      if true, the objects and their referenced objects are initialized
    *
-   *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no relationship with such name, plug-in specific problem)
+   *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no relationship with such name, plug-in specific
+   * problem)
    */
-  template<class T> 
+  template<class T>
   void _ref(ConfigObject& obj, const std::string& name, std::vector<const T*>& results, bool read_children);
 
   /**
@@ -188,7 +200,7 @@ public:
    *
    *  It is used by automatically generated data access libraries.
    */
-  template<class T> 
+  template<class T>
   void _reset_objects();
 
   /**
@@ -206,15 +218,11 @@ public:
 
   /**
    * @brief Update the internal class domains map
-   * 
+   *
    */
-  void update_class_maps() {
-    this->update_class_domain_map();
-  }
-
+  void update_class_maps() { this->update_class_domain_map(); }
 
 private:
-
   Configuration& m_confdb;
 
   mutable std::mutex m_mutex; // mutex used to access template objects (i.e. generated DAL)
@@ -223,8 +231,7 @@ private:
 
   conffwk::fmap<uint> m_class_domain_map;
 
-  std::unordered_map<uint,DalDomain> m_cache_domains;
-
+  std::unordered_map<uint, DalDomain> m_cache_domains;
 };
 
 } // namespace conffwk

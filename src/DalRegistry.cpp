@@ -1,22 +1,22 @@
-#include "conffwk/Schema.hpp"
 #include "conffwk/DalObject.hpp"
+#include "conffwk/Schema.hpp"
 
 namespace dunedaq {
 namespace conffwk {
 
 //-----------------------------------------------------------------------------
-DalRegistry::DalRegistry( conffwk::Configuration& confdb ) : 
-  m_confdb(confdb) {
+DalRegistry::DalRegistry(conffwk::Configuration& confdb)
+  : m_confdb(confdb)
+{
 }
 
 //-----------------------------------------------------------------------------
-DalRegistry::~DalRegistry() {
-}
+DalRegistry::~DalRegistry() {}
 
 // //-----------------------------------------------------------------------------
 // std::deque<std::set<std::string>>
 // DalRegistry::find_class_domains() {
-  
+
 //   std::deque<std::set<std::string>> domains;
 
 //   std::deque<dunedaq::conffwk::class_t> seeds;
@@ -36,7 +36,8 @@ DalRegistry::~DalRegistry() {
 //     std::deque<std::set<std::string>> overlapping;
 //     for (auto& d : domains) {
 //       std::set<std::string> intersection;
-//       std::set_intersection(d.begin(), d.end(), class_domain.begin(), class_domain.end(), std::inserter(intersection, intersection.begin()));
+//       std::set_intersection(d.begin(), d.end(), class_domain.begin(), class_domain.end(), std::inserter(intersection,
+//       intersection.begin()));
 //       // non-zero intersection, overlap found
 //       if (intersection.size() > 0) {
 //         overlapping.push_back(d);
@@ -65,7 +66,8 @@ DalRegistry::~DalRegistry() {
 
 //-----------------------------------------------------------------------------
 void
-DalRegistry::update_class_domain_map() {
+DalRegistry::update_class_domain_map()
+{
 
   m_class_domain_map.clear();
 
@@ -75,17 +77,18 @@ DalRegistry::update_class_domain_map() {
     const auto& dom = domains[i];
     for (const auto& class_name : dom) {
       m_class_domain_map[&conffwk::DalFactory::instance().get_known_class_name_ref(class_name)] = i;
-      TLOG_DEBUG(9) << " - " << class_name << " : " <<  i;
+      TLOG_DEBUG(9) << " - " << class_name << " : " << i;
     }
   }
 }
 
 //-----------------------------------------------------------------------------
 void
-DalRegistry::clear() {
-  for( const auto& [index, domain] : m_cache_domains ) {
+DalRegistry::clear()
+{
+  for (const auto& [index, domain] : m_cache_domains) {
 
-    for(const auto& [uid, ptr] : domain.cache ) {
+    for (const auto& [uid, ptr] : domain.cache) {
       delete ptr;
     }
   }
@@ -94,14 +97,15 @@ DalRegistry::clear() {
 }
 
 //-----------------------------------------------------------------------------
-DalObject* 
-DalRegistry::get(ConfigObject& obj, bool upcast_unregistered) {
-  
+DalObject*
+DalRegistry::get(ConfigObject& obj, bool upcast_unregistered)
+{
+
   // Find the class domain of T
   auto it_dom = m_class_domain_map.find(&DalFactory::instance().get_known_class_name_ref(obj.class_name()));
-  
+
   // Class not known, this should not happen
-  if ( it_dom == m_class_domain_map.end() ) {
+  if (it_dom == m_class_domain_map.end()) {
     throw dunedaq::conffwk::NotFound(ERS_HERE, "class", obj.class_name().c_str());
   }
 
@@ -116,10 +120,9 @@ DalRegistry::get(ConfigObject& obj, bool upcast_unregistered) {
 
     std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
     result->set(obj); // update implementation object; to be used in case if the object is re-created
-  
   }
 
-  return result;   
+  return result;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,8 +131,8 @@ DalRegistry::get(std::vector<ConfigObject>& objs, bool upcast_unregistered)
 {
   std::vector<const DalObject*> result;
 
-  for (auto &i : objs)
-    if (DalObject *o = this->get(i,upcast_unregistered))
+  for (auto& i : objs)
+    if (DalObject* o = this->get(i, upcast_unregistered))
       result.push_back(o);
 
   return result;
@@ -137,36 +140,34 @@ DalRegistry::get(std::vector<ConfigObject>& objs, bool upcast_unregistered)
 
 //-----------------------------------------------------------------------------
 void
-DalRegistry::update(
-            const std::string& class_name,
-            const std::vector<std::string>& modified,
-            const std::vector<std::string>& removed,
-            const std::vector<std::string>& created) {
-  
+DalRegistry::update(const std::string& class_name,
+                    const std::vector<std::string>& modified,
+                    const std::vector<std::string>& removed,
+                    const std::vector<std::string>& created)
+{
+
   // Find the class domain of T
   auto it_dom = m_class_domain_map.find(&DalFactory::instance().get_known_class_name_ref(class_name));
 
   // Class not known, this should not happen
-  if ( it_dom == m_class_domain_map.end() ) {
+  if (it_dom == m_class_domain_map.end()) {
     throw dunedaq::conffwk::NotFound(ERS_HERE, "class", class_name.c_str());
   }
 
   // get the correct cache domain
   auto& domain = m_cache_domains[it_dom->second];
 
-  for( const auto& [uid, ptr] : domain.cache ) {
+  for (const auto& [uid, ptr] : domain.cache) {
 
     // Check if the ptr class is derived from class_name
     m_confdb.is_superclass_of(ptr->class_name(), class_name);
-    
+
     if (!ptr)
       continue;
 
-    bool update = (
-      ( std::find(modified.begin(), modified.end(), ptr->UID()) != modified.end() ) or
-      ( std::find(removed.begin(), removed.end(), ptr->UID()) != removed.end() ) or
-      ( std::find(created.begin(), created.end(), ptr->UID()) != created.end() )
-    );
+    bool update = ((std::find(modified.begin(), modified.end(), ptr->UID()) != modified.end()) or
+                   (std::find(removed.begin(), removed.end(), ptr->UID()) != removed.end()) or
+                   (std::find(created.begin(), created.end(), ptr->UID()) != created.end()));
 
     if (!update)
       continue;
@@ -176,31 +177,30 @@ DalRegistry::update(
   }
 }
 
-
 //-----------------------------------------------------------------------------
 void
-DalRegistry::unread_all() {
+DalRegistry::unread_all()
+{
 
-  for( const auto& [dom_id, domain] : m_cache_domains ) {
-  
+  for (const auto& [dom_id, domain] : m_cache_domains) {
+
     std::lock_guard<std::mutex> scoped_lock(domain.mutex);
 
-    for( const auto& [id, ptr] : domain.cache ) {
+    for (const auto& [id, ptr] : domain.cache) {
       ptr->p_was_read = false;
     }
-
   }
 }
 
-
 //-----------------------------------------------------------------------------
 void
-DalRegistry::_rename_object(std::string class_name, std::string old_id, std::string new_id) {
+DalRegistry::_rename_object(std::string class_name, std::string old_id, std::string new_id)
+{
   // Find the class domain of T
   auto it_dom = m_class_domain_map.find(&DalFactory::instance().get_known_class_name_ref(class_name));
 
   // Class not known, this should not happen
-  if ( it_dom == m_class_domain_map.end() ) {
+  if (it_dom == m_class_domain_map.end()) {
     throw dunedaq::conffwk::NotFound(ERS_HERE, class_name.c_str(), old_id.c_str());
   }
 
@@ -215,9 +215,7 @@ DalRegistry::_rename_object(std::string class_name, std::string old_id, std::str
 
   std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
   it->second->p_UID = new_id;
-  
 }
-
 
 } // namespace conffwk
 } // namespace dunedaq
