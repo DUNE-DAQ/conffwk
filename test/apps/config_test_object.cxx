@@ -10,44 +10,33 @@
 #include <iostream>
 #include <string>
 
-#include "conffwk/Configuration.hpp"
 #include "conffwk/ConfigObject.hpp"
+#include "conffwk/Configuration.hpp"
 
 using namespace dunedaq::conffwk;
 
-ERS_DECLARE_ISSUE(
-  conffwk_test_object,
-  BadCommandLine,
-  "bad command line: " << reason,
-  ((const char*)reason)
-)
+ERS_DECLARE_ISSUE(conffwk_test_object, BadCommandLine, "bad command line: " << reason, ((const char*)reason))
 
-ERS_DECLARE_ISSUE(
-  conffwk_test_object,
-  ConfigException,
-  "caught dunedaq::conffwk::Exception exception",
-)
+ERS_DECLARE_ISSUE(conffwk_test_object, ConfigException, "caught dunedaq::conffwk::Exception exception", )
 
 static void
 usage()
 {
-  std::cout << 
-    "Usage: conffwk_test_object -d | --database dbspec\n"
-    "                          -c | --class-name class\n"
-    "                          -o | --object-id object\n"
-    "\n"
-    "Options/Arguments:\n"
-    "       -d dbspec    database specification in format plugin-name:parameters\n"
-    "       -c class     name of the class to dump\n"
-    "       -o object    optional id of the object to dump\n"
-    "\n"
-    "Description:\n"
-    "       The utility tests object existence.\n\n";
-
+  std::cout << "Usage: conffwk_test_object -d | --database dbspec\n"
+               "                          -c | --class-name class\n"
+               "                          -o | --object-id object\n"
+               "\n"
+               "Options/Arguments:\n"
+               "       -d dbspec    database specification in format plugin-name:parameters\n"
+               "       -c class     name of the class to dump\n"
+               "       -o object    optional id of the object to dump\n"
+               "\n"
+               "Description:\n"
+               "       The utility tests object existence.\n\n";
 }
 
 static void
-no_param(const char * s)
+no_param(const char* s)
 {
   std::ostringstream text;
   text << "no parameter for " << s << " provided";
@@ -55,30 +44,38 @@ no_param(const char * s)
   exit(EXIT_FAILURE);
 }
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
-  const char * db_name = 0;
-  const char * class_name = 0;
-  const char * object_id = 0;
+  const char* db_name = 0;
+  const char* class_name = 0;
+  const char* object_id = 0;
 
-  for(int i = 1; i < argc; i++) {
-    const char * cp = argv[i];
+  for (int i = 1; i < argc; i++) {
+    const char* cp = argv[i];
 
-    if(!strcmp(cp, "-h") || !strcmp(cp, "--help")) {
+    if (!strcmp(cp, "-h") || !strcmp(cp, "--help")) {
       usage();
       return 0;
-    }
-    else if(!strcmp(cp, "-d") || !strcmp(cp, "--database")) {
-      if(++i == argc) { no_param(cp); } else { db_name = argv[i]; }
-    }
-    else if(!strcmp(cp, "-c") || !strcmp(cp, "--class-name")) {
-      if(++i == argc) { no_param(cp); } else { class_name = argv[i]; }
-    }
-    else if(!strcmp(cp, "-o") || !strcmp(cp, "--object-id")) {
-      if(++i == argc) { no_param(cp); } else { object_id = argv[i]; }
-    }
-    else {
+    } else if (!strcmp(cp, "-d") || !strcmp(cp, "--database")) {
+      if (++i == argc) {
+        no_param(cp);
+      } else {
+        db_name = argv[i];
+      }
+    } else if (!strcmp(cp, "-c") || !strcmp(cp, "--class-name")) {
+      if (++i == argc) {
+        no_param(cp);
+      } else {
+        class_name = argv[i];
+      }
+    } else if (!strcmp(cp, "-o") || !strcmp(cp, "--object-id")) {
+      if (++i == argc) {
+        no_param(cp);
+      } else {
+        object_id = argv[i];
+      }
+    } else {
       std::ostringstream text;
       text << "unexpected parameter: \'" << cp << "\'; run command with --help to see valid command line options.";
       ers::fatal(conffwk_test_object::BadCommandLine(ERS_HERE, text.str().c_str()));
@@ -86,17 +83,17 @@ int main(int argc, char *argv[])
     }
   }
 
-  if(!db_name) {
+  if (!db_name) {
     ers::fatal(conffwk_test_object::BadCommandLine(ERS_HERE, "no database name given"));
     return (EXIT_FAILURE);
   }
 
-  if(!class_name) {
+  if (!class_name) {
     ers::fatal(conffwk_test_object::BadCommandLine(ERS_HERE, "no class name given"));
     return (EXIT_FAILURE);
   }
 
-  if(!object_id) {
+  if (!object_id) {
     ers::fatal(conffwk_test_object::BadCommandLine(ERS_HERE, "no object id given"));
     return (EXIT_FAILURE);
   }
@@ -104,16 +101,14 @@ int main(int argc, char *argv[])
   try {
     Configuration db(db_name);
 
-    if(db.test_object(class_name, object_id)) {
+    if (db.test_object(class_name, object_id)) {
       std::cout << "object \'" << object_id << '@' << class_name << "\' exists" << std::endl;
-    }
-    else {
+    } else {
       std::cout << "object \'" << object_id << '@' << class_name << "\' does not exist" << std::endl;
     }
 
     return 0;
-  }
-  catch (dunedaq::conffwk::Exception & ex) {
+  } catch (dunedaq::conffwk::Exception& ex) {
     ers::fatal(conffwk_test_object::ConfigException(ERS_HERE, ex));
   }
 

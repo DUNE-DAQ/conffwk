@@ -20,16 +20,15 @@
 #include <mutex>
 #include <string>
 
+#include "conffwk/Change.hpp"
 #include "conffwk/ConfigObject.hpp"
 #include "conffwk/Configuration.hpp"
-#include "conffwk/Change.hpp"
 #include "conffwk/DalFactoryFunctions.hpp"
-#include "conffwk/Errors.hpp"
 #include "conffwk/DalRegistry.hpp"
+#include "conffwk/Errors.hpp"
 
 namespace dunedaq {
 namespace conffwk {
-
 
 /**
  * \brief The base class for any generated DAL object.
@@ -55,35 +54,30 @@ class DalObject
   friend class DalFactoryFunctions;
   friend class DalRegistry;
 
-  friend std::ostream&
-  operator<<(std::ostream& s, const DalObject * obj);
+  friend std::ostream& operator<<(std::ostream& s, const DalObject* obj);
 
 protected:
-
   /**
    *  The constructor of DAL object.
    */
 
-  DalObject(DalRegistry& db, const ConfigObject& o) noexcept :
-    p_was_read(false), p_registry(db), p_obj(o), p_UID(p_obj.UID())
-    {
-      increment_created();
-    }
+  DalObject(DalRegistry& db, const ConfigObject& o) noexcept
+    : p_was_read(false)
+    , p_registry(db)
+    , p_obj(o)
+    , p_UID(p_obj.UID())
+  {
+    increment_created();
+  }
 
-  virtual ~DalObject()
-    {
-      ;
-    }
+  virtual ~DalObject() { ; }
 
   /**
    *  The method resets state of object.
    *  When accessed next time, it will be completely re-read from implementation.
    */
 
-  void clear() noexcept
-    {
-      p_obj._clear();
-    }
+  void clear() noexcept { p_obj._clear(); }
 
   /**
    *  The method checks state of object and throws exception if it was deleted.
@@ -91,11 +85,7 @@ protected:
    *  \throw dunedaq::conffwk::DeletedObject if object was deleted
    */
 
-  void check() const
-    {
-      p_obj.m_impl->throw_if_deleted();
-    }
-
+  void check() const { p_obj.m_impl->throw_if_deleted(); }
 
   /**
    *  The method checks state of object and throws exception if it was deleted.
@@ -103,14 +93,9 @@ protected:
    *  \throw dunedaq::conffwk::Exception in case of problems
    */
 
-  bool is_deleted() const
-    {
-      return (p_obj.m_impl->is_deleted());
-    }
-
+  bool is_deleted() const { return (p_obj.m_impl->is_deleted()); }
 
 protected:
-
   /// Used to protect changes of DAL object
   mutable std::mutex m_mutex;
 
@@ -127,24 +112,17 @@ protected:
   std::string p_UID;
 
 public:
-
   /**
    *  Returns template object ID.
    */
 
-  const std::string& UID() const noexcept
-    {
-      return p_UID;
-    }
+  const std::string& UID() const noexcept { return p_UID; }
 
   /**
    *  Returns class name of the template object.
    */
 
-  const std::string& class_name() const noexcept
-    {
-      return p_obj.class_name();
-    }
+  const std::string& class_name() const noexcept { return p_obj.class_name(); }
 
   /**
    *  Check possibility to cast given object to a new class.
@@ -153,18 +131,18 @@ public:
    */
 
   bool castable(const std::string& target) const noexcept
-    {
-      return p_registry.configuration().is_superclass_of(target, *p_obj.m_impl->m_class_name);
-    }
+  {
+    return p_registry.configuration().is_superclass_of(target, *p_obj.m_impl->m_class_name);
+  }
 
   /**
    *  Same as castable(const std::string& target), but uses pointers returned by the DalFactory (more efficient)
    */
 
-  bool castable(const std::string * target) const noexcept
-    {
-      return p_registry.configuration().is_superclass_of(target, p_obj.m_impl->m_class_name);
-    }
+  bool castable(const std::string* target) const noexcept
+  {
+    return p_registry.configuration().is_superclass_of(target, p_obj.m_impl->m_class_name);
+  }
 
   /**
    *  \brief Casts object to different class.
@@ -175,26 +153,23 @@ public:
    *  \return Return pointer to DAL object of required template or \b nullptr if the cast is not successful.
    */
 
-  template<class TARGET> const TARGET *
-  cast() const noexcept
-    {
-      // std::lock_guard<std::mutex> scoped_lock(m_mutex);
-      // return const_cast<Configuration&>(p_registry).cast<TARGET>(this);
-      return dynamic_cast<const TARGET*>(this);
-    }
-
+  template<class TARGET>
+  const TARGET* cast() const noexcept
+  {
+    // std::lock_guard<std::mutex> scoped_lock(m_mutex);
+    // return const_cast<Configuration&>(p_registry).cast<TARGET>(this);
+    return dynamic_cast<const TARGET*>(this);
+  }
 
   /**
    *  Returns fullname of object in obj-id\@class-name format.
    */
 
-  std::string
-  full_name() const noexcept
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_mutex);
-      return (p_UID + '@' + class_name());
-    }
-
+  std::string full_name() const noexcept
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_mutex);
+    return (p_UID + '@' + class_name());
+  }
 
   /**
    *  Returns reference on the ConfigObject used by this template object.
@@ -202,32 +177,24 @@ public:
    *  \throw dunedaq::conffwk::DeletedObject if object was deleted
    */
 
-  const ConfigObject&
-  config_object() const
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_mutex);
-      check();
-      return p_obj;
-    }
+  const ConfigObject& config_object() const
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_mutex);
+    check();
+    return p_obj;
+  }
 
   /**
    *  Returns reference on the configuration object.
    */
 
-  DalRegistry& registry() const noexcept
-    {
-      return p_registry;
-    }
+  DalRegistry& registry() const noexcept { return p_registry; }
 
   /**
    *  Returns reference on the configuration object.
    */
 
-  Configuration& configuration() const noexcept
-    {
-      return p_registry.configuration();
-    }
-
+  Configuration& configuration() const noexcept { return p_registry.configuration(); }
 
   /**
    *  Is used to mark template object as non-read,
@@ -237,52 +204,38 @@ public:
    */
 
   void unread()
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_mutex);
-      check();
-      p_was_read = false;
-    }
-
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_mutex);
+    check();
+    p_was_read = false;
+  }
 
   /**
    *  Sets the ConfigObject to be used by this template object.
    *  \param o the conffwk object
    */
 
-  void set(const ConfigObject& o) noexcept
-    {
-      p_obj = o;
-    }
-
+  void set(const ConfigObject& o) noexcept { p_obj = o; }
 
   /**
    *  Move object to another file.
    *  \param at new file name
    */
 
-  void move(const std::string& at)
-    {
-      p_obj.move(at);
-    }
+  void move(const std::string& at) { p_obj.move(at); }
 
   /**
    *  Rename object.
    *  \param new_id new ID of object
    */
 
-  void rename(const std::string& new_id)
-    {
-      p_obj.rename(new_id);
-    }
+  void rename(const std::string& new_id) { p_obj.rename(new_id); }
 
-  virtual std::vector<const DalObject *> get(const std::string& name, bool upcast_unregistered = true) const = 0;
-
+  virtual std::vector<const DalObject*> get(const std::string& name, bool upcast_unregistered = true) const = 0;
 
   // helper methods used by generated DALs
 
 public:
-
-
   /**
    *  Print object details (method generated by genconffwk)
    *  \param offset shift output
@@ -303,67 +256,53 @@ public:
   static void p_error(std::ostream& s, dunedaq::conffwk::Exception& ex);
 
   /// print object headers
-  void p_hdr(std::ostream& s, unsigned int indent, const std::string& cl, const char * nm = nullptr) const;
+  void p_hdr(std::ostream& s, unsigned int indent, const std::string& cl, const char* nm = nullptr) const;
 
   /// print object details
   std::ostream& print_object(std::ostream& s) const
-    {
-      if(DalObject::is_null(this))
-        {
-          DalObject::p_null(s);
-        }
-      else if(p_obj.m_impl->m_state != dunedaq::conffwk::Valid)
-        {
-          DalObject::p_rm(s);
-        }
-      else
-        {
-          print(0, true, s);
-        }
-
-      return s;
+  {
+    if (DalObject::is_null(this)) {
+      DalObject::p_null(s);
+    } else if (p_obj.m_impl->m_state != dunedaq::conffwk::Valid) {
+      DalObject::p_rm(s);
+    } else {
+      print(0, true, s);
     }
+
+    return s;
+  }
 
   /// throw object initialisation exception (i.e. \throw dunedaq::conffwk::Generic)
   void throw_init_ex(dunedaq::conffwk::Exception& ex);
 
   /// throw exception in generated get method (i.e. \throw dunedaq::conffwk::Generic)
-  static void throw_get_ex(const std::string& what, const std::string& class_name, const DalObject * obj);
+  static void throw_get_ex(const std::string& what, const std::string& class_name, const DalObject* obj);
 
   /// check a pointer on DAL object is null
-  static bool
-  is_null(const DalObject * ref) noexcept
-    {
-      return (ref == nullptr);
-    }
+  static bool is_null(const DalObject* ref) noexcept { return (ref == nullptr); }
 
-
-
-// methods for configuration profiler
+  // methods for configuration profiler
 
 protected:
-
   /**
    *  Increment counter of created template objects (is used by the configuration profiler)
    */
 
   void increment_created() noexcept
-    {
-      // ++(p_registry.p_number_of_template_object_created);
-    }
+  {
+    // ++(p_registry.p_number_of_template_object_created);
+  }
 
   /**
    *  Increment counter of read template objects (is used by the configuration profiler)
    */
 
   void increment_read() noexcept
-    {
-      // ++(p_registry.p_number_of_template_object_read);
-    }
-
+  {
+    // ++(p_registry.p_number_of_template_object_read);
+  }
 
 private:
-
   // prevent copy constructor and operator=
   DalObject(const DalObject&) = delete;
   DalObject& operator=(const DalObject&) = delete;
@@ -401,7 +340,6 @@ private:
   //   }
 
 protected:
-
   /**
    *  Initialize object (method generated by genconffwk)
    *  \param init_children if true, initialize referenced objects
@@ -410,57 +348,49 @@ protected:
 
   /// Check and initialize object if necessary
   void check_init() const
-    {
-      if(!p_was_read)
-        {
-          std::lock_guard<std::mutex> scoped_lock(this->p_registry.m_mutex);
-          const_cast<DalObject*>(this)->init(false);
-        }
+  {
+    if (!p_was_read) {
+      std::lock_guard<std::mutex> scoped_lock(this->p_registry.m_mutex);
+      const_cast<DalObject*>(this)->init(false);
     }
+  }
 
   /// Helper method for generated set single-value relationship methods
   template<typename T>
-    void
-    _set_object(const std::string &name, const T *value)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_mutex);
-      check();
-      clear();
-      p_obj.set_obj(name, (value ? &value->config_object() : (ConfigObject*) nullptr));
-    }
+  void _set_object(const std::string& name, const T* value)
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_mutex);
+    check();
+    clear();
+    p_obj.set_obj(name, (value ? &value->config_object() : (ConfigObject*)nullptr));
+  }
 
   /// Helper method for generated set multi-value relationship methods
   template<typename T>
-    void
-    _set_objects(const std::string &name, const std::vector<const T*> &value)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_mutex);
-      check();
-      clear();
-      std::vector<const ConfigObject*> v;
-      for (auto &i : value)
-        v.push_back(&(i->config_object()));
-      p_obj.set_objs(name, v);
-    }
-
+  void _set_objects(const std::string& name, const std::vector<const T*>& value)
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_mutex);
+    check();
+    clear();
+    std::vector<const ConfigObject*> v;
+    for (auto& i : value)
+      v.push_back(&(i->config_object()));
+    p_obj.set_objs(name, v);
+  }
 
   /// Read relationship values as DAL objects using DAL factory
-  bool
-  get_rel_objects(const std::string& name, bool upcast_unregistered, std::vector<const DalObject*>& objs) const;
+  bool get_rel_objects(const std::string& name, bool upcast_unregistered, std::vector<const DalObject*>& objs) const;
 
   /// Run algorithm and return result as DAL objects using DAL factory
-  bool
-  get_algo_objects(const std::string& name, std::vector<const DalObject*>& objs) const;
-
+  bool get_algo_objects(const std::string& name, std::vector<const DalObject*>& objs) const;
 };
 
 /** Operator to print any template's object pointer in 'obj-id\@class-name' format **/
 
 std::ostream&
-operator<<(std::ostream&, const DalObject *);
+operator<<(std::ostream&, const DalObject*);
 
 ///////////////////////////////////////////////////////////////////////////////////////
-
 
 // template<class T>
 //   DalFactoryFunctions::DalFactoryFunctions(boost::compute::identity<T>, const std::set<std::string> algorithms) :
@@ -470,7 +400,6 @@ operator<<(std::ostream&, const DalObject *);
 //   {
 //     ;
 //   }
-
 
 // template<class T>
 //   const T *

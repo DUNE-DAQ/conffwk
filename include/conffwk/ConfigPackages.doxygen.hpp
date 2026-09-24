@@ -5,11 +5,11 @@
 // Renamed since fork: yes (from config/ConfigPackages.doxygen.h to include/conffwk/ConfigPackages.doxygen.hpp).
 //
 
-  /**
-   *  \file ConfigPackages.doxygen.h This file contains the main page for the conffwk package documentation.
-   *  \author Igor Soloviev
-   *  \brief conffwk documentation file 
-   */
+/**
+ *  \file ConfigPackages.doxygen.h This file contains the main page for the conffwk package documentation.
+ *  \author Igor Soloviev
+ *  \brief conffwk documentation file
+ */
 
 #ifndef CONFFWK_DOXYGEN_H_
 #define CONFFWK_DOXYGEN_H_
@@ -19,7 +19,8 @@
 The goal of the conffwk package %is to provide user-friendly API to access %data from the configuration database.
 There are two layers of such API which can be seen by user:
 \li abstract conffwk layer working with arbitrary database schema and hiding details of DBMS implementation
-\li %data access library (DAL), that %is generated for given database schema to map it on programming language %data types
+\li %data access library (DAL), that %is generated for given database schema to map it on programming language %data
+types
 
 This page describes basics which a user should know to generate DAL from the database schema,
 to get %data from database, to receive notification on their change, to create new %data or to modify
@@ -87,8 +88,8 @@ The editor window with loaded schema will appear. Then it is possible to create 
 To create a new schema from scratch, one just needs to run the editor without parameters and to create a new schema.
 For more information on the OKS schema editor, the OKS schema capabilities and exporting schema into different formats
 see OKS documentation. After the schema development is finished, it is necessary to save the schema into xml file
-and add it to the sources of some package. Such schema file will be used for the database %data access library generation
-described by next section.
+and add it to the sources of some package. Such schema file will be used for the database %data access library
+generation described by next section.
 
   \section DalGeneration 2. Generation of the DAL
 
@@ -133,22 +134,24 @@ Options/Arguments:
     -s files+            the schema files (at least one is mandatory)
 \endcode
 
-To generate a DAL it is necessary to provide name of the schema file. By default the DAL %is generated for all classes contained
-in the schema files, otherwise one should provide names of required classes via --classes parameter.
-It %is recommended to use unique namespace for each generated DAL to avoid possible problems when several DALs
-are used by one application.
+To generate a DAL it is necessary to provide name of the schema file. By default the DAL %is generated for all classes
+contained in the schema files, otherwise one should provide names of required classes via --classes parameter. It %is
+recommended to use unique namespace for each generated DAL to avoid possible problems when several DALs are used by one
+application.
 
 It %is possible to reuse already generated DALs. In this case one should to provide a list of directories
 containing information about already generated DALs via \c --include-dirs parameter, then to specify list of schema
 files and optionally to specify list of names of classes to be generated. It %is expected such schema files use include
-statement for base schema files. The DAL %is generated only for classes contained in the explicitly mentioned schema files,
-the classes from included files are ignored.
+statement for base schema files. The DAL %is generated only for classes contained in the explicitly mentioned schema
+files, the classes from included files are ignored.
 
   \subsection CmakeIntegration 2.2. Integration with CMake
 
-See CMake for ATLAS TDAQ Software <a href="https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltCMake#DAL_Generation">TWiki page</a>
+See CMake for ATLAS TDAQ Software <a
+href="https://twiki.cern.ch/twiki/bin/viewauth/Atlas/DaqHltCMake#DAL_Generation">TWiki page</a>
 
-The \c tdaq_generate_dal() command should be used to generate C++ and Java code from OKS schema files. The full signature looks like this:
+The \c tdaq_generate_dal() command should be used to generate C++ and Java code from OKS schema files. The full
+signature looks like this:
 
 \code{.txt}
 tdaq_generate_dal(schema_file...
@@ -163,8 +166,8 @@ tdaq_generate_dal(schema_file...
   [DUMP_OUTPUT var2])
 \endcode
 
-The command will generate the C++ and/or Java code and put the names of the generated files in the variables passed in the \c CPP_OUTPUT
-and \c JAVA_OUTPUT arguments respectively. Here %is a simple use case:
+The command will generate the C++ and/or Java code and put the names of the generated files in the variables passed in
+the \c CPP_OUTPUT and \c JAVA_OUTPUT arguments respectively. Here %is a simple use case:
 
 \code{.txt}
 tdaq_generate_dal(data/schema/myclasses.schema.xml
@@ -176,23 +179,25 @@ tdaq_generate_dal(data/schema/myclasses.schema.xml
   tdaq_add_library(mylib DAL ${dal_cpp_srcs})
 \endcode
 
-This generates the C++ code for the classes in the schema file, using the namespace \c MyNamespace and referring to previously declared
-classes from the dal package. The header files will be installed into \c include/DFConfiguration. Note that the user doesn't have to know
-the names of the generated files. They are simply passed on to the library that uses them. In a similar way, the Java sources can be generated
-(typically using the \c PACKAGE argument to specify the generated package name. You can also generate the C++ and Java with a single command.
-The Java sources should be passed to the \c tdaq_add_jar() command.
+This generates the C++ code for the classes in the schema file, using the namespace \c MyNamespace and referring to
+previously declared classes from the dal package. The header files will be installed into \c include/DFConfiguration.
+Note that the user doesn't have to know the names of the generated files. They are simply passed on to the library that
+uses them. In a similar way, the Java sources can be generated (typically using the \c PACKAGE argument to specify the
+generated package name. You can also generate the C++ and Java with a single command. The Java sources should be passed
+to the \c tdaq_add_jar() command.
 
-If you want to build the generated dump command for this schema, specify the \c DUMP_OUTPUT variable which will contain the source file for
-the dump command. You can pass that to \c tdaq_add_executable().
+If you want to build the generated dump command for this schema, specify the \c DUMP_OUTPUT variable which will contain
+the source file for the dump command. You can pass that to \c tdaq_add_executable().
 
-For both C++ and Java based libraries the DAL option should be specified when generated source files are used. This ensures that certain
-race conditions during the generation and the usage of the files are properly handled. The most common use case of having a single DAL
-and one or more libraries/jars using it %is covered in this case.
+For both C++ and Java based libraries the DAL option should be specified when generated source files are used. This
+ensures that certain race conditions during the generation and the usage of the files are properly handled. The most
+common use case of having a single DAL and one or more libraries/jars using it %is covered in this case.
 
-If you are in the unusual situation that you generate more than one DAL in the same package, you have to do a bit more work:
-First pass the TARGET target_name parameter to \c tdaq_generate_dal(). It will uses this name instead of a default to represent the generation
-of the source files. Then use the \c add_dependencies() command to explicitly add dependencies between the DAL generation target and any
-consumers of the generated files. The internal target %is the name you give, prefixes with DAL_.
+If you are in the unusual situation that you generate more than one DAL in the same package, you have to do a bit more
+work: First pass the TARGET target_name parameter to \c tdaq_generate_dal(). It will uses this name instead of a default
+to represent the generation of the source files. Then use the \c add_dependencies() command to explicitly add
+dependencies between the DAL generation target and any consumers of the generated files. The internal target %is the
+name you give, prefixes with DAL_.
 \code
 tdaq_generate_dal(TARGET dal1 schema/s1.schema.xml ...CPP_OUTPUT dal1_sources)
 tdaq_generate_dal(TARGET dal2 schema/s2.schema.xml ...CPP_OUTPUT dal2_sources)
@@ -205,16 +210,16 @@ add_dependencies(consumer2 DAL_dal2)
 \endcode
 
 You may not encounter any problems during development at all, especially if you don't do a highly parallel build.
-However, during the nightly builds we use all the cores of the machines we are running on, and if there are users in other packages
-of your library, the probability of race conditions increases.
+However, during the nightly builds we use all the cores of the machines we are running on, and if there are users in
+other packages of your library, the probability of race conditions increases.
 
  \section ClassesAndMethods 3. DAL classes and methods
 
 For each OKS class appropriate DAL classes are generated:
-\li in case of C++ the generated class has the same name as OKS one and %is declared inside namespace defined by the user;
-    there %is separate header file per each class; it has the same name as the database class and, to be included,
-    it may have directory prefix, defined by user; if a class %is derived from other classes, an appropriate C++
-    inheritance %is used;
+\li in case of C++ the generated class has the same name as OKS one and %is declared inside namespace defined by the
+user; there %is separate header file per each class; it has the same name as the database class and, to be included, it
+may have directory prefix, defined by user; if a class %is derived from other classes, an appropriate C++ inheritance
+%is used;
 \li in case of Java there %is interface which has the same name as the database class declared inside package with name
     provided by the user; the interface implementation %is in the class with suffix \c _Impl;
     the static methods to get existent or to create new objects of the class are in the class with suffix \c _Helper;
@@ -223,9 +228,9 @@ For each OKS class appropriate DAL classes are generated:
 For each direct attribute and relationship defined for OKS class the appropriate methods are generated.
 Such methods have the same names as the names of the attributes and the relationships in the database with
 \c get_ and \c set_ prefixes. The database attribute types are mapped to appropriate C++ and Java types.
-The multi-value attributes are mapped to \c std::vector of attribute %type in C++ and to array of attribute %type in Java.
-The database relationships are mapped to methods returning pointer or \c std::vector of pointers to objects of referenced
-class in C++ and similarly an object or array of objects in Java.
+The multi-value attributes are mapped to \c std::vector of attribute %type in C++ and to array of attribute %type in
+Java. The database relationships are mapped to methods returning pointer or \c std::vector of pointers to objects of
+referenced class in C++ and similarly an object or array of objects in Java.
 
 Additionally, for each class there are methods to get object's class name and object identity
 as they are defined in the database.
@@ -272,9 +277,12 @@ Methods of C++ and Java conffwk classes throw exceptions in case of errors.
 
 C++ %methods either have explicit \b noexcept specification if they may not throw an exception,
 or declare exception specification in doxygen documentation. The following exceptions can be thrown:
-\li \c daq::conffwk::Generic        %is used to report most of the problems (bad DB, wrong parameter, plug-in specific, etc.)
-\li \c daq::conffwk::NotFound       the conffwk object accessed by ID %is not found, class accessed by name %is not found
-\li \c daq::conffwk::DeletedObject  accessing template object that has been deleted (via notification or by the user's code)
+\li \c daq::conffwk::Generic        %is used to report most of the problems (bad DB, wrong parameter, plug-in specific,
+etc.)
+\li \c daq::conffwk::NotFound       the conffwk object accessed by ID %is not found, class accessed by name %is not
+found
+\li \c daq::conffwk::DeletedObject  accessing template object that has been deleted (via notification or by the user's
+code)
 
 All above exceptions have common class \c daq::conffwk::Exception, that can be used to catch all of them.
 \code{.cpp}
@@ -327,24 +335,24 @@ For the moment three implementation plug-ins are available:
 Below there are examples of the Configuration constructor explicit parameters:
 \code{.cpp}
 #include "conffwk/Configuration.h"
- 
+
 try {
     // example (1): load daq/partitions/be_test.data.xml file using oks
   ::Configuration db1("oksconflibs:daq/partitions/be_test.data.xml");
- 
+
     // example (2): connect with server RDB using rdb implementation (in initial partition)
   ::Configuration db2("rdbconffwk:RDB");
- 
+
     // example (2a): connect with server RDB using rdb implementation (in test partition)
   ::Configuration db2a("rdbconffwk:test::RDB");
- 
+
     // example (2b): same as above using new style server-name@partition-name
   ::Configuration db2b("rdbconffwk:RDB@test");
- 
+
     // example (3): use oks implementation and create new database
   ::Configuration db3("oksconflibs");
   db3.create("", "/tmp/my.data.xml", std::list<std::string>(1,"/tmp/my.sch.xml"));
- 
+
     // example (4): use rdb implementation and create new database
     //              on server RDB running in partition test
   ::Configuration db4("rdbconffwk");
@@ -359,7 +367,7 @@ The recommended way %is to get plug-in and it's parameter via environment variab
 Most of the user's code for applications run by TDAQ's setup should to leave the parameter empty:
 \code{.cpp}
 #include "conffwk/Configuration.h"
- 
+
 int main() {
   try {
     ::Configuration db("");
@@ -375,7 +383,7 @@ int main() {
 In case it the parameter can be also passed via command line, use it as shown below:
 \code{.cpp}
 #include "conffwk/Configuration.h"
- 
+
 int main(int argc, char *argv[]) {
   try {
     ::Configuration db(argv[1]);
@@ -408,25 +416,24 @@ catch (conffwk.SystemException ex) {
 \endcode
 
 Note in case when rdb implementation %is used, the partition name of the RDB %server can be specified by several ways:
-\li using the same approach as for C++, i.e. via constructor parameter using double colon-separated partition and %server names,
-  e.g. \e "rdbconffwk:partition-name::server-server" or \e "rdbconffwk:server-server@partition-name";
+\li using the same approach as for C++, i.e. via constructor parameter using double colon-separated partition and
+%server names, e.g. \e "rdbconffwk:partition-name::server-server" or \e "rdbconffwk:server-server@partition-name";
 \li via \e tdaq.ipc.partition.name java virtual machine property,
   e.g. run java application with "-Dtdaq.ipc.partition.name=partition-name".
 
   \subsection HTGD_ReadObjects 5.2. Read objects of class
 
-Once an object of the Configuration class %is successfully created, it can be used to get configuration %data (i.e. objects).
-Normally to get configuration objects only C++ template methods of the Configuration class and generated Java code
-should be used. The usage of conffwk layer (i.e. direct usage of objects of ConfigObject class) only makes sense
-in few packages working with arbitrary database schemes.
+Once an object of the Configuration class %is successfully created, it can be used to get configuration %data (i.e.
+objects). Normally to get configuration objects only C++ template methods of the Configuration class and generated Java
+code should be used. The usage of conffwk layer (i.e. direct usage of objects of ConfigObject class) only makes sense in
+few packages working with arbitrary database schemes.
 
 For each generated class %T two methods can be applied using configuration object:
 \li C++ template methods of the ::Configuration class:
   <ul>
-  <li> <tt> const %T * Configuration::get(const std::string&, bool, bool, unsigned long, const std::vector<std::string> *) </tt> -
-       to read named object;
-  <li> <tt> void Configuration::get(std::vector<const %T*>&, bool, bool, const std::string&, unsigned long rlevel, const std::vector<std::string> *) </tt> -
-       to read objects of class;
+  <li> <tt> const %T * Configuration::get(const std::string&, bool, bool, unsigned long, const std::vector<std::string>
+*) </tt> - to read named object; <li> <tt> void Configuration::get(std::vector<const %T*>&, bool, bool, const
+std::string&, unsigned long rlevel, const std::vector<std::string> *) </tt> - to read objects of class;
   </ul>
 \li Java methods generated in class T_Helper:
   <ul>
@@ -444,9 +451,12 @@ for objects of class B.
 If the query %is non-empty, the methods filling vectors of objects only return objects satisfying the query %criteria.
 A query can be an OKS query string. It can be created by the OKS Data Editor or written by hand as described
 by the OKS documentation , e.g.:
-\li <em> (all ("Name" "my-object" =)) </em> - search all objects of class %T and it's subclasses which name %is equal to "my-object";
-\li <em> (this (and ("Address" 128 >=) ("Address" 256 <))) </em> - search all objects of class %T which address %is equal or greater than 128 and less than 256;
-\li <em> (this ("Modules" all ("State" 0 =))) </em> - search all objects of class %T which has objects referenced via relationship "Modules" with attribute "State" %set to 0.
+\li <em> (all ("Name" "my-object" =)) </em> - search all objects of class %T and it's subclasses which name %is equal to
+"my-object";
+\li <em> (this (and ("Address" 128 >=) ("Address" 256 <))) </em> - search all objects of class %T which address %is
+equal or greater than 128 and less than 256;
+\li <em> (this ("Modules" all ("State" 0 =))) </em> - search all objects of class %T which has objects referenced via
+relationship "Modules" with attribute "State" %set to 0.
 
   \subsubsection HTGD_OnlineDalCppExample C++ Example (using online dal package)
 
@@ -498,9 +508,9 @@ Otherwise the referenced objects can only be pre-allocated (if they were not alr
 and the actual reading will happen, when the user will apply a %method to read values of their
 attributes or relationships.
 
-When the methods parameter \c init_object %is %set to \b false, all retrieved objects are only 
-pre-allocated without reading their attributes and relationships. The values of attributes and 
-relationships will actually be read from database implementation, when the user will apply 
+When the methods parameter \c init_object %is %set to \b false, all retrieved objects are only
+pre-allocated without reading their attributes and relationships. The values of attributes and
+relationships will actually be read from database implementation, when the user will apply
 a %method to read an attribute or relationship %value.
 
 The above two parameters can be used by the user to improve performance.
@@ -571,8 +581,8 @@ To do this he/she needs to implement or to use already existing converter class,
 converter object of that class and to pass such object to the Configuration object using %method
 Configuration::register_converter().
 
-In case of C++ such class has to inherit from the template 
-Configuration::AttributeConverter  < %T > class, where template parameter %T defines %type of 
+In case of C++ such class has to inherit from the template
+Configuration::AttributeConverter  < %T > class, where template parameter %T defines %type of
 attributes which values need to be converted and to implement virtual %method
 Configuration::AttributeConverter::convert(),  that performs the real conversion of attribute values.
 
@@ -621,8 +631,8 @@ import conffwk.AttributeConverter;
 
   // converter removes leading and trailing whitespace from a string
 public class TrimString implements conffwk.AttributeConverter {
-  public Object convert(Object s, conffwk.Configuration db, conffwk.ConfigObject obj, String attr_name) { return (Object)(s.trim()); }
-  public Class get_class() { return String.class; }
+  public Object convert(Object s, conffwk.Configuration db, conffwk.ConfigObject obj, String attr_name) { return
+(Object)(s.trim()); } public Class get_class() { return String.class; }
 }
 ...
 conffwk.Configuration db = new conffwk.Configuration("");
@@ -630,10 +640,10 @@ db.register_converter(new TrimString());
 \endcode
 
   \subsubsection HTGD_OnlineDalConverters Online DAL Converters
-The core TDAQ C++ DAL (libdaq-core-dal.so) provides converter daq::core::SubstituteVariables 
+The core TDAQ C++ DAL (libdaq-core-dal.so) provides converter daq::core::SubstituteVariables
 class to substitute configuration parameters in values of string attributes.
-It's constructor requires Configuration object and Partition object, since they are used 
-to calculate conversion map. In case, if configuration database %is reloaded, such parameters have to 
+It's constructor requires Configuration object and Partition object, since they are used
+to calculate conversion map. In case, if configuration database %is reloaded, such parameters have to
 be reset using reset() %method. An example of the C++ code %is shown below:
 \code{.cpp}
 #include <conffwk/Configuration.h>
@@ -667,7 +677,8 @@ if(p != null) {
 
   \subsection HTGD_ReadingRelationshipsValues 5.4. Reading Values of Relationships
 
-Once an object %is retrieved, the user can get objects referenced by it. A %method %is created for each relationship of each generated class. It has the following format:
+Once an object %is retrieved, the user can get objects referenced by it. A %method %is created for each relationship of
+each generated class. It has the following format:
 \li for C++:
   <ul>
   <li> <tt> const class-type * get_RelationshipName() const </tt> - for single-value relationships;
@@ -681,7 +692,9 @@ Once an object %is retrieved, the user can get objects referenced by it. A %meth
 
   \subsection HTGD_CastClassTypes 5.5. Cast Class Types
 
-There are situations when user may need to cast an object from one class to a derived one. To make a down cast for an object of generated class the user should to use the methods of the configuration classes and never use cast supported by the programming languages.
+There are situations when user may need to cast an object from one class to a derived one. To make a down cast for an
+object of generated class the user should to use the methods of the configuration classes and never use cast supported
+by the programming languages.
 
   \subsubsection HTGD_CppCast C++ cast
 
@@ -695,7 +708,7 @@ try {
   const std::vector<const dal::Application*>& l = ...;
   for(auto& j : l) {
     if(const dal::RunControlApplication * r = j->cast<dal::RunControlApplication>()) {
-      std::cout << "application " << r << " is run control application" << std::endl; 
+      std::cout << "application " << r << " is run control application" << std::endl;
     }
   }
 }
@@ -706,7 +719,8 @@ catch(daq::conffwk::Exception & ex) {
 
   \subsubsection HTGD_JavaCast Java cast
 
-To down cast an object of generated Java DAL use appropriate cast() %method in generated class. For example, some object of application class can be down casted to the run control application:
+To down cast an object of generated Java DAL use appropriate cast() %method in generated class. For example, some object
+of application class can be down casted to the run control application:
 \code{.java}
 dal.Application a = ...; // some code to get application
 dal.RunControlApplication rc_application = dal.RunControlApplication_Helper.cast(a);
@@ -725,8 +739,8 @@ The user must never try to modify or to destroy such objects himself.
 This section explains how to create a new database file, how to create or remove database %data and
 how to modify existing %data.
 
-Any modifications described by this section becomes persistent and visible to others processes only after 
-successful \b commit operation. If the modification should not be committed (e.g. a modification failed), 
+Any modifications described by this section becomes persistent and visible to others processes only after
+successful \b commit operation. If the modification should not be committed (e.g. a modification failed),
 it %is necessary to execute abort operation, e.g. in C++:
 \code{.cpp}
 try {
@@ -761,14 +775,15 @@ else {
 }
 \endcode
 
-To modify or to destroy an object using generated C++ DAL methods described below, 
-it %is necessary to have a non-const pointer or reference on the object. 
-However all generated DAL methods return objects as const. To make a change it %is necessary 
+To modify or to destroy an object using generated C++ DAL methods described below,
+it %is necessary to have a non-const pointer or reference on the object.
+However all generated DAL methods return objects as const. To make a change it %is necessary
 to use C++ \c const_cast to get non-const pointer or reference.
 
   \subsection HCM_CreationDB 6.1. Creation of new database file
 
-To create a new database file using C++ it %is necessary to build an object of the ::Configuration class only providing name of implementation plug-in:
+To create a new database file using C++ it %is necessary to build an object of the ::Configuration class only providing
+name of implementation plug-in:
 \code{.cpp}
 ::Configuration db("oksconflibs");
 \endcode
@@ -778,11 +793,11 @@ Similar code for Java %is below:
 conffwk.Configuration db = new conffwk.Configuration("rdbconffwk"); // no db file
 \endcode
 
-To create a new database %data file it %is necessary to decide which schema (at least one schema %is always required) 
-and optionally others database files will be used. Then it %is necessary to provide an absolute name for newly 
-created database file (the user should have write permission or the rdb %server must be run in read-write mode 
-under account which has such rights). If rdb implementation %is used, it %is also necessary to provide %server and 
-optionally partition name. After this it %is necessary to use create %method of the ::Configuration class and 
+To create a new database %data file it %is necessary to decide which schema (at least one schema %is always required)
+and optionally others database files will be used. Then it %is necessary to provide an absolute name for newly
+created database file (the user should have write permission or the rdb %server must be run in read-write mode
+under account which has such rights). If rdb implementation %is used, it %is also necessary to provide %server and
+optionally partition name. After this it %is necessary to use create %method of the ::Configuration class and
 check it's return status.
 
 Below there %is example for C++ and oks implementation:
@@ -841,27 +856,27 @@ catch(conffwk.NotAllowedException ex) {
 ... // catch conffwk.AlreadyExistsException in a similar way
 \endcode
 
-The included files should exist in advance and be defined either as an absolute path or as a relative path 
+The included files should exist in advance and be defined either as an absolute path or as a relative path
 to a token of the TDAQ_DB_PATH variable %value.
 
   \subsection HCM_DatabaseIncludes 6.2. Database Includes
 
-There are methods in C++ class ::Configuration to add a new include, to remove an existing include or 
+There are methods in C++ class ::Configuration to add a new include, to remove an existing include or
 to get list of includes for given database. They are:
-\li <tt> bool Configuration::add_include(const std::string& db_name, const std::string& include) </tt> - 
+\li <tt> bool Configuration::add_include(const std::string& db_name, const std::string& include) </tt> -
     adds include to the database db_name and returns true in case of success or false if failed;
-\li <tt> bool Configuration::remove_include(const std::string& db_name, const std::string& include) </tt> - 
+\li <tt> bool Configuration::remove_include(const std::string& db_name, const std::string& include) </tt> -
     removes an existing include from the database db_name and returns true in case of success or false if failed;
-\li <tt> bool Configuration::get_includes(const std::string& db_name, std::list<std::string>& includes) const </tt> - 
-    fills list of includes by files which are included by the db_name and returns true 
+\li <tt> bool Configuration::get_includes(const std::string& db_name, std::list<std::string>& includes) const </tt> -
+    fills list of includes by files which are included by the db_name and returns true
     in case of success or false if failed.
 
 Similar methods in Java class conffwk.Configuration are:
-\li <tt> void add_include(String db_name, String include) </tt> - 
+\li <tt> void add_include(String db_name, String include) </tt> -
     adds include to the database db_name or throws exception if failed;
-\li <tt> void remove_include(String db_name, String include) </tt> - 
+\li <tt> void remove_include(String db_name, String include) </tt> -
     removes an existing include from the database db_name or throws exception if failed;
-\li <tt> void get_includes(String db_name, String[] includes) </tt> - 
+\li <tt> void get_includes(String db_name, String[] includes) </tt> -
     fills array of includes by files which are included by the db_name or throws exception if failed.
 
   \subsection HCM_ObjectsManipulations 6.3. Objects Manipulations
@@ -873,14 +888,14 @@ This subsection explains how to create and how to destroy database objects.
 To create a new object using generated C++ DAL there are two ::Configuration template methods:
 \li <tt> const %T * Configuration::create(const std::string& at, const std::string& id, bool) </tt> -
     to create new object of class %T with identity id at existing database file with name at;
-\li <tt> const %T * Configuration::create(const ::DalObject& at, const std::string& id, bool) </tt> - 
+\li <tt> const %T * Configuration::create(const ::DalObject& at, const std::string& id, bool) </tt> -
     to create new object of class %T with identity id at a database file where object at %is stored.
 
 The methods return non-null pointer in case of success or null if failed.
 The second %method %is faster since time to search the database file where to put new object %is much smaller.
 
-When the \c init_object parameter %is %set to false, then the values of attributes and relationships 
-are not read from implementation (for a newly created object they are %set to default values in 
+When the \c init_object parameter %is %set to false, then the values of attributes and relationships
+are not read from implementation (for a newly created object they are %set to default values in
 accordance with the database schema).
 
 An example how to create two new objects of the online dal::Computer class %is shown below:
@@ -924,7 +939,7 @@ catch(conffwk.SystemException ex) {
 
   \subsubsection HCM_ObjectsDestruction Objects Destruction
 
-To destroy an existing object there %is template %method in the C++ ::Configuration class bool destroy(T& obj). 
+To destroy an existing object there %is template %method in the C++ ::Configuration class bool destroy(T& obj).
 It returns true in case of success and false if failed. See example:
 \code{.cpp}
 try {
@@ -951,8 +966,8 @@ catch(conffwk.SystemException ex) {
 
   \subsection HCM_ModificationAttributeValues 6.4. Modification Values of Attributes
 
-Once the objects are retrieved or created, the user can modify values of their attributes. 
-A %method to %set attribute value %is created for each attribute of each generated class. 
+Once the objects are retrieved or created, the user can modify values of their attributes.
+A %method to %set attribute value %is created for each attribute of each generated class.
 The mapping between C++/Java types and OKS types can be seen in the \ref TypesMapping section.
 
 In C++ such %method throws daq::conffwk::Exception if failed:
@@ -965,7 +980,7 @@ In Java such %method throws an exception if failed:
 
   \subsection HCM_ModificationRelationshipValues 6.5. Modification Values of Relationships
 
-Once the objects are retrieved or created, the user can modify values of their relationships. 
+Once the objects are retrieved or created, the user can modify values of their relationships.
 A %method to %set relationship %value %is created for each relationship of each generated class.
 
 For C++ it has the following format and throws daq::conffwk::Exception if failed:
@@ -979,12 +994,14 @@ For Java it has the following format and throws an exception if failed:
   \subsection HCM_ModificationAndInvalidObjects 6.6. Modification of Database and Invalid Objects
 
 There are several methods which may make instances of ConfigObject and generated DAL classes be invalid:
-\li Configuration::remove_include(const std::string&, const std::string&) - this %method destroys objects belonging to files closed in result of include removal;
-\li Configuration::destroy_obj(ConfigObject&) and template Configuration::destroy(T&) - those methods destroy given object and may destroy other objects linked via composite dependent relationships.
+\li Configuration::remove_include(const std::string&, const std::string&) - this %method destroys objects belonging to
+files closed in result of include removal;
+\li Configuration::destroy_obj(ConfigObject&) and template Configuration::destroy(T&) - those methods destroy given
+object and may destroy other objects linked via composite dependent relationships.
 
-In case of ConfigObject there %is no simple way to know if an object %is valid after above remove_include() or destroy_obj() %method call,
-since by efficiency reasons all methods are redirected to implementation object without checking of it's validity. It %is recommended
-to reinitialize all instances of ConfigObject after above calls.
+In case of ConfigObject there %is no simple way to know if an object %is valid after above remove_include() or
+destroy_obj() %method call, since by efficiency reasons all methods are redirected to implementation object without
+checking of it's validity. It %is recommended to reinitialize all instances of ConfigObject after above calls.
 
 With objects of generated DAL classes the situation %is different. After implementation object destruction
 a %method invoked on corresponding DAL objects will throw daq::conffwk::DeletedObject exception,
@@ -1018,17 +1035,17 @@ for(auto& i : nodes) {
 
   \section NotificationMechanism 7. Notification mechanism
 
-The user application can be notified on changes of the configuration %data. 
-To do this user should to implement one or many %callback functions (C++) or classes (Java) 
-which will be used when the database changes are committed and to choose which changes in classes 
+The user application can be notified on changes of the configuration %data.
+To do this user should to implement one or many %callback functions (C++) or classes (Java)
+which will be used when the database changes are committed and to choose which changes in classes
 and objects should be reported (i.e. to define <em> the subscription %criteria </em>).
 
-The user receives description of information changes in one go via callbacks invoked after 
-commit of database changes. This %is more preferred way than individual %callback per object or 
-per class since user may want to see all changes at single point. Each %callback receives own 
+The user receives description of information changes in one go via callbacks invoked after
+commit of database changes. This %is more preferred way than individual %callback per object or
+per class since user may want to see all changes at single point. Each %callback receives own
 list of changes in accordance with it's subscription %criteria.
 
-The changes are reported as a collection of changes per DAL class. 
+The changes are reported as a collection of changes per DAL class.
 A change per class contains 4 parameters: the class name and the identities of created, modified and removed objects.
 
 To make a subscription it %is necessary to make three steps:
@@ -1038,8 +1055,8 @@ To make a subscription it %is necessary to make three steps:
 
   \subsection NM_UserCallback 7.1. User Callback
 
-To start with any subscription on database changes the user must to implement at least one 
-::Configuration::notify %callback function in C++ or conffwk.Callback interface on Java. 
+To start with any subscription on database changes the user must to implement at least one
+::Configuration::notify %callback function in C++ or conffwk.Callback interface on Java.
 Below there are details for C++ and Java subscriptions.
 
   \subsubsection NM_CppCallbackFunction C++ callback function
@@ -1048,8 +1065,8 @@ The user has to implement ::Configuration::notify %callback. It has the followin
 \li <tt> const std::vector<::ConfigurationChange *> & changes </tt> - description of changes
 \li <tt> void * parameter </tt> - user parameter
 
-The ::ConfigurationChange class %is declared in the conffwk/Change.h file and has 4 methods 
-to get name of the class and vectors of created, modified and removed object identities. 
+The ::ConfigurationChange class %is declared in the conffwk/Change.h file and has 4 methods
+to get name of the class and vectors of created, modified and removed object identities.
 An example of %callback functions %is shown below:
 \code{.cpp}
 void callback(const std::vector< ConfigurationChange *> & changes, void *)
@@ -1083,8 +1100,8 @@ void callback(const std::vector< ConfigurationChange *> & changes, void *)
 
   \subsubsection NM_JavaCallbackFunction Java callback interface
 
-The user has to create a class implementing the conffwk.Callback interface. It requires to 
-implement %method void process_changes(conffwk.Change[] changes, java.lang.Object parameter). 
+The user has to create a class implementing the conffwk.Callback interface. It requires to
+implement %method void process_changes(conffwk.Change[] changes, java.lang.Object parameter).
 Example below illustrates how to implement notification %callback:
 \code{.java}
 class TestCallback implements conffwk.Callback {
@@ -1093,7 +1110,7 @@ class TestCallback implements conffwk.Callback {
   public TestCallback(conffwk.Configuration d) { db = d; }
 
   public void process_changes(conffwk.Change[] changes, java.lang.Object parameter) {
-    
+
       // the parameter can be any; as an example, the callback ID is passed as string
     String cb_id = (String)parameter;
 
@@ -1109,18 +1126,18 @@ class TestCallback implements conffwk.Callback {
         // just as example, look for changed objects of the Application class
       if((change.get_class_name().equals("Application") == true) && (change.get_changed_objects() != null)) {
         System.out.println("* " + change.get_changed_objects().length + " updated objects of the Application class");
- 
-          // iterate by all changed objects and print them out
-	for(int j = 0; j < change.get_changed_objects().length; ++j) {
-	  dal.Application a = dal.Application_Helper.get(db, change.get_changed_objects()[j]);
 
-	    // an example of correct down cast
-	  if(a.class_name().equals("RunControlApplication")) {
-	    dal.RunControlApplication_Helper.get(db, a.config_object()).print("  "); // print as RC application
-	  }
-	  else {
-	    a.print("  "); // print as an application
-	  }
+          // iterate by all changed objects and print them out
+        for(int j = 0; j < change.get_changed_objects().length; ++j) {
+          dal.Application a = dal.Application_Helper.get(db, change.get_changed_objects()[j]);
+
+            // an example of correct down cast
+          if(a.class_name().equals("RunControlApplication")) {
+            dal.RunControlApplication_Helper.get(db, a.config_object()).print("  "); // print as RC application
+          }
+          else {
+            a.print("  "); // print as an application
+          }
         }
       }
     }
@@ -1131,26 +1148,26 @@ class TestCallback implements conffwk.Callback {
 
   \subsection NM_SubscriptionCriteria 7.2. Subscription criteria
 
-The subscription %criteria %is an object of ::ConfigurationSubscriptionCriteria class in C++ or 
-conffwk.Subscription class in Java. It %is used to define lists of classes and objects, which 
-changes will be monitored and reposted to user. If user provides no any class or object, 
+The subscription %criteria %is an object of ::ConfigurationSubscriptionCriteria class in C++ or
+conffwk.Subscription class in Java. It %is used to define lists of classes and objects, which
+changes will be monitored and reposted to user. If user provides no any class or object,
 it means subscription on any change and a database modification %is reported.
 
   \subsubsection NM_SubscriptionAnyClassChanges Subscription on any changes in class
 
-The notification %callback %is invoked for any changes of class objects including creation of new objects, 
+The notification %callback %is invoked for any changes of class objects including creation of new objects,
 removing or modification of existing objects.
 
-In C++ to subscribe on any changes in some class the user should to use 
-::ConfigurationSubscriptionCriteria::add(const std::string&) %method. 
-For a class generated by genconffwk the s_class_name attribute can be used, 
+In C++ to subscribe on any changes in some class the user should to use
+::ConfigurationSubscriptionCriteria::add(const std::string&) %method.
+For a class generated by genconffwk the s_class_name attribute can be used,
 e.g. to subscribe on changes in class dal::Application:
 \code{.cpp}
 ::ConfigurationSubscriptionCriteria c;
 c.add(dal::Application::s_class_name);
 \endcode
 
-In Java %method conffwk.Subscription.add(String class_name) should be used, 
+In Java %method conffwk.Subscription.add(String class_name) should be used,
 e.g. to subscribe on changes in class Application it %is necessary to write the following code:
 \code{.java}
 conffwk.Subscription s = new conffwk.Subscription(new TestCallback(db), null);
@@ -1159,11 +1176,11 @@ s.add("Application");
 
   \subsubsection NM_SubscriptionObjectChanges Subscription on object changes
 
-When subscription on object changes has done, the notification %callback %is invoked for any 
+When subscription on object changes has done, the notification %callback %is invoked for any
 changes of the objects or it's removing.
 
-In C++ to subscribe on object changes notification the user should to use 
-::ConfigurationSubscriptionCriteria::add(const ::DalObject&), 
+In C++ to subscribe on object changes notification the user should to use
+::ConfigurationSubscriptionCriteria::add(const ::DalObject&),
 e.g. to subscribe on changes of an object of the Application class:
 \code{.cpp}
 ::ConfigurationSubscriptionCriteria c;
@@ -1180,7 +1197,7 @@ s.add(app);
 
   \subsection NM_Subscription 7.3. Subscription
 
-To make the actual subscription it %is necessary to have a notification %callback been implemented 
+To make the actual subscription it %is necessary to have a notification %callback been implemented
 and a subscription %criteria object. The the %method subscribe() to be invoked on the configuration object.
 For C++ an example %is shown below:
 \code{.cpp}
@@ -1220,25 +1237,25 @@ c.add("Application");
 db.subscribe(c);
 \endcode
 
-The %method unsubscribe() can be used to remove subscription %set above. 
-In case of C++ it's parameter %is a return %value of the subscribe() %method (i.e. ::CallbackId %value). 
+The %method unsubscribe() can be used to remove subscription %set above.
+In case of C++ it's parameter %is a return %value of the subscribe() %method (i.e. ::CallbackId %value).
 For Java it's parameter %is the subscription object used as parameter of subscribe() %method.
 
 
   \section Algorithms 8. Algorithms
-  
-By default, the generated classes have one-to-one mapping to database schema and DAL objects directly 
-correspond to the database objects. If user wants to add more algorithms on top of the generated DAL 
+
+By default, the generated classes have one-to-one mapping to database schema and DAL objects directly
+correspond to the database objects. If user wants to add more algorithms on top of the generated DAL
 without modification of DAL code by hand, he has possibility to define algorithms on top of the OKS class methods.
 
-When a class %method %is created, user can add it's implementation for different programming languages. 
-To be taken into account by genconffwk, user has to provide C++ and/or Java implementation. 
+When a class %method %is created, user can add it's implementation for different programming languages.
+To be taken into account by genconffwk, user has to provide C++ and/or Java implementation.
 Then he has two possibilities:
 \li declare %method prototype, write %method implementation in the separate file and add such file when build DAL;
 \li declare %method prototype and write it's implementation in OKS.
 
 The first way %is more flexible, but requires more steps when build library.
-The second way does not require any additional steps when build library, 
+The second way does not require any additional steps when build library,
 but will require schema modifications to any %method's implementation modification.
 
 
@@ -1258,7 +1275,7 @@ In this case one has to put into method's implementation the code inside special
   Put code into initializer list of C++ or Java class containing given method.
 
 The online DAL defines several algorithms (e.g. to find partition, get all applications,
-to calculate application environment, etc.) and uses first way to implement algorithms. 
+to calculate application environment, etc.) and uses first way to implement algorithms.
 More information can be found in the <a href="https://twiki.cern.ch/twiki/bin/view/Atlas/DaqHltDal">dal package</a>.
 
 */

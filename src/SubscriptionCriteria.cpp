@@ -39,14 +39,12 @@ void
 ConfigurationSubscriptionCriteria::remove(const std::string& class_name, const std::string& object_id)
 {
   ObjectMap::iterator i = m_objects_subscription.find(class_name);
-  if (i != m_objects_subscription.end())
-    {
-      i->second.erase(object_id);
-      if (i->second.empty())
-        {
-          m_objects_subscription.erase(i);
-        }
+  if (i != m_objects_subscription.end()) {
+    i->second.erase(object_id);
+    if (i->second.empty()) {
+      m_objects_subscription.erase(i);
     }
+  }
 }
 
 void
@@ -63,38 +61,29 @@ operator<<(std::ostream& s, const ConfigurationSubscriptionCriteria& criteria)
   // print out classes subscription
   s << "  classes subscription: ";
 
-  if (criteria.get_classes_subscription().empty())
-    {
-      s << "(null)\n";
+  if (criteria.get_classes_subscription().empty()) {
+    s << "(null)\n";
+  } else {
+    s << std::endl;
+    for (const auto& i : criteria.get_classes_subscription()) {
+      s << "    \"" << i << "\"\n";
     }
-  else
-    {
-      s << std::endl;
-      for (const auto& i : criteria.get_classes_subscription())
-        {
-          s << "    \"" << i << "\"\n";
-        }
-    }
+  }
 
   // print out objects subscription
   s << "  objects subscription: ";
 
-  if (criteria.get_objects_subscription().empty())
-    {
-      s << "(null)\n";
+  if (criteria.get_objects_subscription().empty()) {
+    s << "(null)\n";
+  } else {
+    s << std::endl;
+    for (const auto& i : criteria.get_objects_subscription()) {
+      s << "    objects of class \"" << i.first << "\":\n";
+      for (const auto& j : i.second) {
+        s << "      \"" << j << "\":\n";
+      }
     }
-  else
-    {
-      s << std::endl;
-      for (const auto& i : criteria.get_objects_subscription())
-        {
-          s << "    objects of class \"" << i.first << "\":\n";
-          for (const auto& j : i.second)
-            {
-              s << "      \"" << j << "\":\n";
-            }
-        }
-    }
+  }
 
   return s;
 }

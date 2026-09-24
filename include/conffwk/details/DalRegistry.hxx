@@ -7,26 +7,26 @@ namespace dunedaq {
 namespace conffwk {
 
 //-----------------------------------------------------------------------------
-template<class T> 
-T *
-DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object) {
+template<class T>
+T*
+DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object)
+{
 
-  TLOG_DEBUG(50) << "Building object " << obj.UID() << " of class " << obj.class_name() << " and returning class " << T::s_class_name;
+  TLOG_DEBUG(50) << "Building object " << obj.UID() << " of class " << obj.class_name() << " and returning class "
+                 << T::s_class_name;
 
   // Ensure that T is a superclass of (or the same class as) obj.class_name()
-  if ( not (
-    m_confdb.is_superclass_of(obj.class_name(), T::s_class_name) ||
-    m_confdb.is_superclass_of(T::s_class_name, obj.class_name())
-   )) {
+  if (not(m_confdb.is_superclass_of(obj.class_name(), T::s_class_name) ||
+          m_confdb.is_superclass_of(T::s_class_name, obj.class_name()))) {
     // do nothing if this is the case
     return nullptr;
   }
 
   // Find the class domain of T
   auto it_dom = m_class_domain_map.find(&DalFactory::instance().get_known_class_name_ref(T::s_class_name));
-  
+
   // Class not known, this should not happen
-  if ( it_dom == m_class_domain_map.end() ) {
+  if (it_dom == m_class_domain_map.end()) {
     const std::string id(obj.UID() + '@' + obj.class_name());
     throw dunedaq::conffwk::NotFound(ERS_HERE, "object", id.c_str());
   }
@@ -53,7 +53,6 @@ DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object) {
 
     std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
     result->set(obj); // update implementation object; to be used in case if the object is re-created
-  
   }
 
   TLOG_DEBUG(50) << "Returning " << (void*)result;
@@ -61,10 +60,15 @@ DalRegistry::get(ConfigObject& obj, bool init_children, bool init_object) {
   return result;
 }
 
-
 //-----------------------------------------------------------------------------
-template<class T> T *
-DalRegistry::get(const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses) {
+template<class T>
+T*
+DalRegistry::get(const std::string& name,
+                 bool init_children,
+                 bool init_object,
+                 unsigned long rlevel,
+                 const std::vector<std::string>* rclasses)
+{
 
   TLOG_DEBUG(50) << "Building object " << name;
 
@@ -72,12 +76,11 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
 
   TLOG_DEBUG(50) << "Ref name is " << ref_name;
 
-
   // Find the class domain of T
   auto it_dom = m_class_domain_map.find(&ref_name);
 
   // Class not known, this should not happen
-  if ( it_dom == m_class_domain_map.end() ) {
+  if (it_dom == m_class_domain_map.end()) {
     const std::string id(name + '@' + T::s_class_name);
     throw dunedaq::conffwk::NotFound(ERS_HERE, "object", id.c_str());
   }
@@ -90,7 +93,7 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
 
   TLOG_DEBUG(50) << "Cache found";
 
-  if ( it_ptr == domain.cache.end()) {
+  if (it_ptr == domain.cache.end()) {
     try {
       // Search for an ConfigObject of id 'name' of class 'T'
       conffwk::ConfigObject obj;
@@ -99,7 +102,6 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
       DalObject*& dal_ptr(domain.cache[obj.m_impl->m_id]);
 
       T* result = dynamic_cast<T*>(dal_ptr);
-
 
       if (result == nullptr) {
         // result = new T(*this, obj);
@@ -117,7 +119,7 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
         std::lock_guard<std::mutex> scoped_lock(result->m_mutex);
         result->set(obj); // update implementation object; to be used in case if the object is re-created
       }
-      
+
       return result;
 
     } catch (dunedaq::conffwk::NotFound& ex) {
@@ -133,22 +135,21 @@ DalRegistry::get(const std::string& name, bool init_children, bool init_object, 
       return nullptr;
     }
   }
- 
+
   std::cout << "Found " << (void*)it_ptr->second << std::endl;
   return dynamic_cast<T*>(it_ptr->second);
-
 }
-
 
 //-----------------------------------------------------------------------------
 template<class T>
-T *
-DalRegistry::find(const std::string & id) {
+T*
+DalRegistry::find(const std::string& id)
+{
   std::lock_guard<std::mutex> scoped_lock(m_mutex);
 
   auto it_dom = m_class_domain_map.find(&T::s_class_name);
 
-  if ( it_dom == m_class_domain_map.end()) {
+  if (it_dom == m_class_domain_map.end()) {
     return nullptr;
   }
 
@@ -156,7 +157,6 @@ DalRegistry::find(const std::string & id) {
   auto it_obj = domain.cache.find(id);
   return (it_obj != domain.cache.end() ? dynamic_cast<T*>(it_obj->second) : nullptr);
 }
-
 
 //-----------------------------------------------------------------------------
 template<class T>
@@ -168,13 +168,12 @@ DalRegistry::_ref(ConfigObject& obj, const std::string& name, bool read_children
   try {
     obj.get(name, res);
   } catch (dunedaq::conffwk::Generic& ex) {
-    throw(dunedaq::conffwk::Generic(ERS_HERE, Configuration::mk_ref_ex_text("an object", T::s_class_name, name, obj).c_str(), ex));
+    throw(dunedaq::conffwk::Generic(
+      ERS_HERE, Configuration::mk_ref_ex_text("an object", T::s_class_name, name, obj).c_str(), ex));
   }
 
   return ((!res.is_null()) ? this->get<T>(res, read_children, read_children) : nullptr);
 }
-
-
 
 // Get multiple relations from object and instantiate result with it.
 template<class T>
@@ -195,62 +194,63 @@ DalRegistry::_ref(ConfigObject& obj, const std::string& name, std::vector<const 
       results.push_back(ptr);
     }
   } catch (dunedaq::conffwk::Generic& ex) {
-    throw(dunedaq::conffwk::Generic(ERS_HERE, Configuration::mk_ref_ex_text("objects", T::s_class_name, name, obj).c_str(), ex));
+    throw(dunedaq::conffwk::Generic(
+      ERS_HERE, Configuration::mk_ref_ex_text("objects", T::s_class_name, name, obj).c_str(), ex));
   }
 }
 
 //-----------------------------------------------------------------------------
 template<class T>
-bool 
-DalRegistry::is_valid(const T * object) noexcept {
+bool
+DalRegistry::is_valid(const T* object) noexcept
+{
 
   std::lock_guard<std::mutex> scoped_lock(m_mutex);
 
   auto it_dom = m_class_domain_map.find(&T::s_class_name);
-  if ( it_dom == m_class_domain_map.end()) {
+  if (it_dom == m_class_domain_map.end()) {
     return false;
   }
 
-  for( const auto& [uid, ptr] : m_cache_domains[it_dom->second].cache ) {
-    if ( ptr == object ) {
+  for (const auto& [uid, ptr] : m_cache_domains[it_dom->second].cache) {
+    if (ptr == object) {
       return true;
     }
   }
 }
 
-
 //-----------------------------------------------------------------------------
 template<class T>
 void
 DalRegistry::update(const std::vector<std::string>& modified,
-            const std::vector<std::string>& removed,
-            const std::vector<std::string>& created) {
-  
+                    const std::vector<std::string>& removed,
+                    const std::vector<std::string>& created)
+{
+
   this->update(T::s_class_name, modified, removed, created);
 }
 
-
 //-----------------------------------------------------------------------------
-template<class T> 
+template<class T>
 void
-DalRegistry::_reset_objects() {
+DalRegistry::_reset_objects()
+{
 
   // Find the class domain of T
   auto it_dom = m_class_domain_map.find(&DalFactory::instance().get_known_class_name_ref(T::s_class_name));
 
   // Class not known, this should not happen
-  if ( it_dom == m_class_domain_map.end() ) {
+  if (it_dom == m_class_domain_map.end()) {
     throw dunedaq::conffwk::NotFound(ERS_HERE, "class", T::s_class_name.c_str());
   }
 
   auto& domain = m_cache_domains[it_dom->second];
 
   // Loop over the objects in the domain and reset those inheriting from T
-  for( const auto& [uid, ptr] : domain.cache ) {
-    
+  for (const auto& [uid, ptr] : domain.cache) {
 
     T* obj_ptr = dynamic_cast<T*>(ptr);
-    
+
     if (!obj_ptr)
       continue;
 

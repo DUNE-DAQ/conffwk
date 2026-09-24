@@ -7,21 +7,21 @@
 
 #include "ers/ers.hpp"
 
-#include "conffwk/set.hpp"
 #include "conffwk/DalFactoryFunctions.hpp"
+#include "conffwk/set.hpp"
 
 #include "logging/Logging.hpp"
 
 namespace dunedaq {
 
-ERS_DECLARE_ISSUE(conffwk, DalPackageNameNotFound,
-              "Failed to find the dal package name for class " << class_name << " in its schema path '" << schema_path << "'",
-              ((std::string)class_name)((std::string)schema_path))
+ERS_DECLARE_ISSUE(conffwk,
+                  DalPackageNameNotFound,
+                  "Failed to find the dal package name for class " << class_name << " in its schema path '"
+                                                                   << schema_path << "'",
+                  ((std::string)class_name)((std::string)schema_path))
 
-ERS_DECLARE_ISSUE(conffwk, LoadDalFailed,
-                "Could not load dal shared library " << library,
-                ((std::string)library))
-                
+ERS_DECLARE_ISSUE(conffwk, LoadDalFailed, "Could not load dal shared library " << library, ((std::string)library))
+
 namespace conffwk {
 
 class DalObject;
@@ -30,13 +30,11 @@ class DalRegistry;
 class DalFactory
 {
 
-  typedef std::function<DalObject *(DalRegistry& db, ConfigObject& obj)> dal_object_instatiator_2g;
+  typedef std::function<DalObject*(DalRegistry& db, ConfigObject& obj)> dal_object_instatiator_2g;
 
 public:
-
   /** return the singleton */
-  static DalFactory &
-  instance();
+  static DalFactory& instance();
 
   // /** register DAL object creator by class name*/
   // template<class T>
@@ -45,11 +43,9 @@ public:
 
   /** register DAL object creator by class name*/
   template<class T>
-  void
-  register_dal_class(const std::string & name);
+  void register_dal_class(const std::string& name);
 
-  const std::string&
-  get_known_class_name_ref(const std::string& name);
+  const std::string& get_known_class_name_ref(const std::string& name);
 
   /**
    * \brief Get DAL object from conffwk object
@@ -57,34 +53,30 @@ public:
    * \param db                    configuration database object
    * \param obj                   conffwk object
    * \param uid                   uid for generated objects
-   * \param upcast_unregistered   if true and and native DAL class of conffwk object is not registered, search an appropriate base class within superclasses hierarchy
+   * \param upcast_unregistered   if true and and native DAL class of conffwk object is not registered, search an
+   * appropriate base class within superclasses hierarchy
    * \return                      the DAL object
    *
    * \throw                       conffwk::Generic exception if class of object is not registered
    */
 
-  DalObject *
-  get(Configuration& db, ConfigObject& obj, const std::string& uid, bool upcast_unregistered) const;
+  DalObject* get(Configuration& db, ConfigObject& obj, const std::string& uid, bool upcast_unregistered) const;
 
-  DalObject *
-  get(Configuration& db, ConfigObject& obj, const std::string& uid, const std::string& class_name) const;
-
+  DalObject* get(Configuration& db, ConfigObject& obj, const std::string& uid, const std::string& class_name) const;
 
   /**
    * \brief Get factory function
    *
    * \param db                    configuration database object
    * \param                       name of OKS class
-   * \param upcast_unregistered   if true and native DAL class of conffwk object is not registered, search an appropriate base class within superclasses hierarchy
+   * \param upcast_unregistered   if true and native DAL class of conffwk object is not registered, search an
+   * appropriate base class within superclasses hierarchy
    * \return                      the factory functions for given class
    */
 
-  const DalFactoryFunctions&
-  functions(Configuration& db, const std::string& name, bool upcast_unregistered);
+  const DalFactoryFunctions& functions(Configuration& db, const std::string& name, bool upcast_unregistered);
 
-
-  const std::string&
-  class4algo(Configuration& db, const std::string& name, const std::string& algorithm) const;
+  const std::string& class4algo(Configuration& db, const std::string& name, const std::string& algorithm) const;
 
   /**
    * \brief Get factory function
@@ -93,19 +85,16 @@ public:
    * \return                      the factory functions for given class
    */
 
-  const DalFactoryFunctions&
-  functions(const std::string& name) const;
+  const DalFactoryFunctions& functions(const std::string& name) const;
 
+  /**
+   * \brief Create a new DaqOnject2g
+   */
+  conffwk::DalObject* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered);
 
-/**
- * \brief Create a new DaqOnject2g
- */
-conffwk::DalObject* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, bool upcast_unregistered);
-
-conffwk::DalObject* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::string& fallback_class="");
+  conffwk::DalObject* make(conffwk::DalRegistry& db, conffwk::ConfigObject& o, const std::string& fallback_class = "");
 
 private:
-
   std::mutex m_class_mutex;
   std::map<std::string, DalFactoryFunctions> m_classes;
 
@@ -121,7 +110,6 @@ private:
 
 } // namespace conffwk
 } // namespace dunedaq
-
 
 #include "details/DalFactory.hxx"
 

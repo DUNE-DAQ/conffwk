@@ -12,226 +12,280 @@
 #include "conffwk/Schema.hpp"
 
 namespace dunedaq {
-  namespace conffwk {
+namespace conffwk {
 
-    const char * bool2str(bool value) { return (value ? "yes" : "no"); }
+const char*
+bool2str(bool value)
+{
+  return (value ? "yes" : "no");
+}
 
-    attribute_t::attribute_t(
-      const std::string& name, type_t type, const std::string& range,
-      int_format_t int_format, bool is_not_null, bool is_multi_value,
-      const std::string& default_value, const std::string& description
-    ) :
-      p_name             (name),
-      p_type             (type),
-      p_range            (range),
-      p_int_format       (int_format),
-      p_is_not_null      (is_not_null),
-      p_is_multi_value   (is_multi_value),
-      p_default_value    (default_value),
-      p_description      (description)
-    { ; }
+attribute_t::attribute_t(const std::string& name,
+                         type_t type,
+                         const std::string& range,
+                         int_format_t int_format,
+                         bool is_not_null,
+                         bool is_multi_value,
+                         const std::string& default_value,
+                         const std::string& description)
+  : p_name(name)
+  , p_type(type)
+  , p_range(range)
+  , p_int_format(int_format)
+  , p_is_not_null(is_not_null)
+  , p_is_multi_value(is_multi_value)
+  , p_default_value(default_value)
+  , p_description(description)
+{
+  ;
+}
 
-    const char * attribute_t::type2str(type_t type)
-    {
-      switch(type) {
-        case bool_type:   return "boolean";
-        case s8_type:     return "8-bits signed integer";
-        case u8_type:     return "8-bits unsigned integer";
-        case s16_type:    return "16-bits signed integer";
-        case u16_type:    return "16-bits unsigned integer";
-        case s32_type:    return "32-bits signed integer";
-        case u32_type:    return "32-bits unsigned integer";
-        case s64_type:    return "64-bits signed integer";
-        case u64_type:    return "64-bits unsigned integer";
-        case float_type:  return "float";
-        case double_type: return "double";
-        case date_type:   return "date";
-        case time_type:   return "time";
-        case string_type: return "string";
-        case enum_type:   return "enumeration";
-        case class_type:  return "class reference";
-        default:          return "unknown";
-      }
+const char*
+attribute_t::type2str(type_t type)
+{
+  switch (type) {
+    case bool_type:
+      return "boolean";
+    case s8_type:
+      return "8-bits signed integer";
+    case u8_type:
+      return "8-bits unsigned integer";
+    case s16_type:
+      return "16-bits signed integer";
+    case u16_type:
+      return "16-bits unsigned integer";
+    case s32_type:
+      return "32-bits signed integer";
+    case u32_type:
+      return "32-bits unsigned integer";
+    case s64_type:
+      return "64-bits signed integer";
+    case u64_type:
+      return "64-bits unsigned integer";
+    case float_type:
+      return "float";
+    case double_type:
+      return "double";
+    case date_type:
+      return "date";
+    case time_type:
+      return "time";
+    case string_type:
+      return "string";
+    case enum_type:
+      return "enumeration";
+    case class_type:
+      return "class reference";
+    default:
+      return "unknown";
+  }
+}
+
+const char*
+attribute_t::type(type_t type)
+{
+  switch (type) {
+    case bool_type:
+      return "bool";
+    case s8_type:
+      return "s8";
+    case u8_type:
+      return "u8";
+    case s16_type:
+      return "s16";
+    case u16_type:
+      return "u16";
+    case s32_type:
+      return "s32";
+    case u32_type:
+      return "u32";
+    case s64_type:
+      return "s64";
+    case u64_type:
+      return "u64";
+    case float_type:
+      return "float";
+    case double_type:
+      return "double";
+    case date_type:
+      return "date";
+    case time_type:
+      return "time";
+    case string_type:
+      return "string";
+    case enum_type:
+      return "enum";
+    case class_type:
+      return "class";
+    default:
+      return "unknown";
+  }
+}
+
+const char*
+attribute_t::format2str(int_format_t type)
+{
+  switch (type) {
+    case oct_int_format:
+      return "octal";
+    case dec_int_format:
+      return "decimal";
+    case hex_int_format:
+      return "hexadecimal";
+    default:
+      return "not applicable";
+  }
+}
+
+void
+attribute_t::print(std::ostream& out, const std::string& prefix) const
+{
+  out << prefix << "attribute \'" << p_name << "\'\n"
+      << prefix << "  type: \'" << type2str(p_type) << "\'\n"
+      << prefix << "  range: \'" << p_range << "\'\n";
+
+  if (p_int_format != na_int_format) {
+    out << prefix << "  integer format: \'" << format2str(p_int_format) << "\'\n";
+  }
+
+  out << prefix << "  is not null: " << bool2str(p_is_not_null) << '\n'
+      << prefix << "  is multi-value: " << bool2str(p_is_multi_value) << '\n'
+      << prefix << "  default value: \'" << p_default_value << "\'\n"
+      << prefix << "  description: \'" << p_description << '\'';
+}
+
+std::ostream&
+operator<<(std::ostream& out, const attribute_t& a)
+{
+  a.print(out);
+  return out;
+}
+
+relationship_t::relationship_t(const std::string& name,
+                               const std::string& type,
+                               bool can_be_null,
+                               bool is_multi_value,
+                               bool is_aggregation,
+                               const std::string& description)
+  : p_name(name)
+  , p_type(type)
+  , p_cardinality((can_be_null && !is_multi_value)   ? zero_or_one
+                  : (can_be_null && is_multi_value)  ? zero_or_many
+                  : (!can_be_null && is_multi_value) ? one_or_many
+                                                     : only_one)
+  , p_is_aggregation(is_aggregation)
+  , p_description(description)
+{
+  ;
+}
+
+const char*
+relationship_t::card2str(cardinality_t cardinality)
+{
+  switch (cardinality) {
+    case zero_or_one:
+      return "zero or one";
+    case zero_or_many:
+      return "zero or many";
+    case only_one:
+      return "one";
+    case one_or_many:
+      return "one or many";
+    default:
+      return "unknown";
+  }
+}
+
+void
+relationship_t::print(std::ostream& out, const std::string& prefix) const
+{
+  out << prefix << "relationship \'" << p_name << "\'\n"
+      << prefix << "  class type: \'" << p_type << "\'\n"
+      << prefix << "  cardinality: \'" << card2str(p_cardinality) << "\'\n"
+      << prefix << "  is aggregation: \'" << bool2str(p_is_aggregation) << "\'\n"
+      << prefix << "  description: \'" << p_description << '\'';
+}
+
+std::ostream&
+operator<<(std::ostream& out, const relationship_t& r)
+{
+  r.print(out);
+  return out;
+}
+
+class_t::class_t(const std::string& name,
+                 const std::string& description,
+                 const std::string& schema_path,
+                 bool is_abstract)
+  : p_name(name)
+  , p_description(description)
+  , p_schema_path(schema_path)
+  , p_abstract(is_abstract)
+{
+  ;
+}
+
+void
+class_t::print(std::ostream& out, const std::string& prefix) const
+{
+  out << prefix << "class \'" << p_name << "\'\n"
+      << prefix << "  is abstract: \'" << bool2str(p_abstract) << "\'\n"
+      << prefix << "  description: \'" << p_description << "\'\n"
+      << prefix << "  path: \'" << p_schema_path << "\'\n";
+
+  if (p_superclasses.empty()) {
+    out << prefix << "  there are no superclasses\n";
+  } else {
+    out << prefix << "  " << p_superclasses.size() << " superclass(es):\n";
+    for (std::vector<std::string>::const_iterator i = p_superclasses.begin(); i != p_superclasses.end(); ++i) {
+      out << prefix << "    \'" << *i << "\'\n";
     }
+  }
 
-    const char * attribute_t::type(type_t type)
-    {
-      switch(type) {
-        case bool_type:   return "bool";
-        case s8_type:     return "s8";
-        case u8_type:     return "u8";
-        case s16_type:    return "s16";
-        case u16_type:    return "u16";
-        case s32_type:    return "s32";
-        case u32_type:    return "u32";
-        case s64_type:    return "s64";
-        case u64_type:    return "u64";
-        case float_type:  return "float";
-        case double_type: return "double";
-        case date_type:   return "date";
-        case time_type:   return "time";
-        case string_type: return "string";
-        case enum_type:   return "enum";
-        case class_type:  return "class";
-        default:          return "unknown";
-      }
+  if (p_subclasses.empty()) {
+    out << prefix << "  there are no subclasses\n";
+  } else {
+    out << prefix << "  " << p_subclasses.size() << " subclass(es):\n";
+    for (std::vector<std::string>::const_iterator i = p_subclasses.begin(); i != p_subclasses.end(); ++i) {
+      out << prefix << "    \'" << *i << "\'\n";
     }
+  }
 
-    const char * attribute_t::format2str(int_format_t type)
-    {
-      switch(type) {
-        case oct_int_format:   return "octal";
-        case dec_int_format:   return "decimal";
-        case hex_int_format:   return "hexadecimal";
-        default:               return "not applicable";
-      }
+  std::string new_prefix(prefix);
+  new_prefix += "    ";
+
+  if (p_attributes.empty()) {
+    out << prefix << "  there are no attributes\n";
+  } else {
+    out << prefix << "  " << p_attributes.size() << " attribute(s):\n";
+    for (std::vector<attribute_t>::const_iterator i = p_attributes.begin(); i != p_attributes.end(); ++i) {
+      (*i).print(out, new_prefix.c_str());
+      out << std::endl;
     }
+  }
 
-    void attribute_t::print(std::ostream& out, const std::string& prefix) const
-    {
-      out
-        << prefix << "attribute \'" << p_name << "\'\n"
-        << prefix << "  type: \'" << type2str(p_type) << "\'\n"
-        << prefix << "  range: \'" << p_range << "\'\n";
-
-      if(p_int_format != na_int_format) {
-        out << prefix << "  integer format: \'" << format2str(p_int_format) << "\'\n";
-      }
-
-      out
-        << prefix << "  is not null: " << bool2str(p_is_not_null) << '\n'
-        << prefix << "  is multi-value: " << bool2str(p_is_multi_value) << '\n'
-        << prefix << "  default value: \'" << p_default_value << "\'\n"
-        << prefix << "  description: \'" << p_description << '\'';
+  if (p_relationships.empty()) {
+    out << prefix << "  there are no relationships\n";
+  } else {
+    out << prefix << "  " << p_relationships.size() << " relationship(s):\n";
+    for (std::vector<relationship_t>::const_iterator i = p_relationships.begin(); i != p_relationships.end(); ++i) {
+      (*i).print(out, new_prefix.c_str());
+      out << std::endl;
     }
-    
-    std::ostream& operator<<(std::ostream& out, const attribute_t& a)
-    {
-      a.print(out);
-      return out;
-    }
+  }
+}
 
+std::ostream&
+operator<<(std::ostream& out, const class_t& c)
+{
+  c.print(out);
+  return out;
+}
 
-    relationship_t::relationship_t(
-      const std::string& name, const std::string& type, bool can_be_null,
-      bool is_multi_value, bool is_aggregation, const std::string& description
-    ) :
-      p_name             (name),
-      p_type             (type),
-      p_cardinality      (
-                            (can_be_null  && !is_multi_value) ? zero_or_one  :
-                            (can_be_null  && is_multi_value ) ? zero_or_many :
-                            (!can_be_null && is_multi_value ) ? one_or_many  :
-                            only_one
-                         ),
-      p_is_aggregation   (is_aggregation),
-      p_description      (description)
-    { ; }
-    
-    const char * relationship_t::card2str(cardinality_t cardinality)
-    {
-      switch(cardinality) {
-        case zero_or_one:    return "zero or one";
-        case zero_or_many:   return "zero or many";
-        case only_one:       return "one";
-        case one_or_many:    return "one or many";
-        default:             return "unknown";
-      }
-    }
-
-    void relationship_t::print(std::ostream& out, const std::string& prefix) const
-    {
-      out
-        << prefix << "relationship \'" << p_name << "\'\n"
-        << prefix << "  class type: \'" << p_type << "\'\n"
-        << prefix << "  cardinality: \'" << card2str(p_cardinality) << "\'\n"
-        << prefix << "  is aggregation: \'" << bool2str(p_is_aggregation) << "\'\n"
-        << prefix << "  description: \'" << p_description << '\'';
-    }
-
-    std::ostream& operator<<(std::ostream& out, const relationship_t& r)
-    {
-      r.print(out);
-      return out;
-    }
-
-    class_t::class_t(
-      const std::string& name,
-      const std::string& description,
-      const std::string& schema_path,
-      bool is_abstract
-    ) :
-    p_name             (name),
-    p_description      (description),
-    p_schema_path      (schema_path),
-    p_abstract         (is_abstract)
-    { ; }
-
-    void class_t::print(std::ostream& out, const std::string& prefix) const
-    {
-      out
-        << prefix << "class \'" << p_name << "\'\n"
-        << prefix << "  is abstract: \'" << bool2str(p_abstract) << "\'\n"
-        << prefix << "  description: \'" << p_description << "\'\n"
-        << prefix << "  path: \'" << p_schema_path << "\'\n";
-
-      if(p_superclasses.empty()) {
-        out << prefix << "  there are no superclasses\n";
-      }
-      else {
-        out << prefix << "  " << p_superclasses.size() << " superclass(es):\n";
-        for(std::vector<std::string>::const_iterator i = p_superclasses.begin(); i != p_superclasses.end(); ++i) {
-          out << prefix << "    \'" << *i << "\'\n";
-        }
-      }
-
-      if(p_subclasses.empty()) {
-        out << prefix << "  there are no subclasses\n";
-      }
-      else {
-        out << prefix << "  " << p_subclasses.size() << " subclass(es):\n";
-        for(std::vector<std::string>::const_iterator i = p_subclasses.begin(); i != p_subclasses.end(); ++i) {
-          out << prefix << "    \'" << *i << "\'\n";
-        }
-      }
-
-      std::string new_prefix(prefix);
-      new_prefix += "    ";
-
-      if(p_attributes.empty()) {
-        out << prefix << "  there are no attributes\n";
-      }
-      else {
-        out << prefix << "  " << p_attributes.size() << " attribute(s):\n";
-        for(std::vector<attribute_t>::const_iterator i = p_attributes.begin(); i != p_attributes.end(); ++i) {
-          (*i).print(out, new_prefix.c_str());
-          out << std::endl;
-        }
-      }
-
-      if(p_relationships.empty()) {
-        out << prefix << "  there are no relationships\n";
-      }
-      else {
-        out << prefix << "  " << p_relationships.size() << " relationship(s):\n";
-        for(std::vector<relationship_t>::const_iterator i = p_relationships.begin(); i != p_relationships.end(); ++i) {
-          (*i).print(out, new_prefix.c_str());
-          out << std::endl;
-        }
-      }
-    }
-
-    std::ostream& operator<<(std::ostream& out, const class_t& c)
-    {
-      c.print(out);
-      return out;
-    }
-
-
-ConfigurationImpl::ConfigurationImpl() noexcept :
-  p_number_of_cache_hits  (0),
-  p_number_of_object_read (0),
-  m_conf                  (0)
+ConfigurationImpl::ConfigurationImpl() noexcept
+  : p_number_of_cache_hits(0)
+  , p_number_of_object_read(0)
+  , m_conf(0)
 {
 }
 
@@ -243,112 +297,105 @@ ConfigurationImpl::~ConfigurationImpl()
 void
 ConfigurationImpl::print_cache_info() noexcept
 {
-  std::cout <<
-    "Configuration implementation profiler report:\n"
-    "  number of read objects: " << p_number_of_object_read << "\n"
-    "  number of cache hits: " << p_number_of_cache_hits << std::endl;
+  std::cout << "Configuration implementation profiler report:\n"
+               "  number of read objects: "
+            << p_number_of_object_read
+            << "\n"
+               "  number of cache hits: "
+            << p_number_of_cache_hits << std::endl;
 }
 
-ConfigObjectImpl *
+ConfigObjectImpl*
 ConfigurationImpl::get_impl_object(const std::string& name, const std::string& id) const noexcept
 {
 
-  conffwk::pmap<conffwk::map<ConfigObjectImpl *> *>::const_iterator i = m_impl_objects.find(&name);
+  conffwk::pmap<conffwk::map<ConfigObjectImpl*>*>::const_iterator i = m_impl_objects.find(&name);
 
-  const std::string * class_name = nullptr;
+  const std::string* class_name = nullptr;
 
-  if(i != m_impl_objects.end()) {
-    conffwk::map<ConfigObjectImpl *>::const_iterator j = i->second->find(id);
+  if (i != m_impl_objects.end()) {
+    conffwk::map<ConfigObjectImpl*>::const_iterator j = i->second->find(id);
 
-    if(j != i->second->end()) {
+    if (j != i->second->end()) {
       p_number_of_cache_hits++;
-      TLOG_DEBUG(4) << "\n  * found the object with id = \'" << id << "\' in class \'" << name << '\'' ;
+      TLOG_DEBUG(4) << "\n  * found the object with id = \'" << id << "\' in class \'" << name << '\'';
       return j->second;
     }
 
     class_name = i->first;
 
+    // prepare and print out debug message
 
-      // prepare and print out debug message
-
-    if(ers::debug_level() >= 4) {
+    if (ers::debug_level() >= 4) {
       TLOG_DEBUG(40) << " * there is no object with id = \'" << id << "\' found in the class \'" << name
                      << "\' that has " << i->second->size() << " objects in cache: ";
-      for(j=i->second->begin(); j != i->second->end();++j) {
+      for (j = i->second->begin(); j != i->second->end(); ++j) {
         TLOG_DEBUG(40) << '\'' << j->first << '\'';
       }
     }
 
-  }
-  else {
+  } else {
     class_name = &DalFactory::instance().get_known_class_name_ref(name);
     TLOG_DEBUG(40) << "  * there is no object with id = \'" << id << "\' found in the class \'" << name
                    << "\' that has no objects in cache";
   }
 
-    // check implementation objects of subclasses
+  // check implementation objects of subclasses
 
-  if(m_conf) {
+  if (m_conf) {
     conffwk::fmap<conffwk::fset>::const_iterator subclasses = m_conf->subclasses().find(class_name);
 
-    if(subclasses != m_conf->subclasses().end()) {
-      for(conffwk::fset::const_iterator k = subclasses->second.begin(); k != subclasses->second.end(); ++k) {
+    if (subclasses != m_conf->subclasses().end()) {
+      for (conffwk::fset::const_iterator k = subclasses->second.begin(); k != subclasses->second.end(); ++k) {
         i = m_impl_objects.find(*k);
-        if(i != m_impl_objects.end()) {
-          conffwk::map<ConfigObjectImpl *>::const_iterator j = i->second->find(id);
+        if (i != m_impl_objects.end()) {
+          conffwk::map<ConfigObjectImpl*>::const_iterator j = i->second->find(id);
 
-          if(j != i->second->end()) {
+          if (j != i->second->end()) {
             p_number_of_cache_hits++;
             TLOG_DEBUG(40) << "  * found the object with id = \'" << id << "\' in class \'" << *k << '\'';
 
             return j->second;
           }
 
+          // prepare and print out debug message
 
-            // prepare and print out debug message
-
-          else if(ers::debug_level() >= 4) {
+          else if (ers::debug_level() >= 4) {
             TLOG_DEBUG(40) << "  * there is no object with id = \'" << id << "\' found in the class \'" << *k
                            << "\' that has " << i->second->size() << " objects in cache: ";
-            for(j=i->second->begin(); j != i->second->end();++j) {
+            for (j = i->second->begin(); j != i->second->end(); ++j) {
               TLOG_DEBUG(40) << '\'' << j->first << '\'';
             }
           }
 
-
-        }
-        else {
+        } else {
           TLOG_DEBUG(40) << "  * there is no object with id = \'" << id << "\' found in the class \'" << *k
                          << "\' that has no objects in cache\n";
         }
-
       }
     }
 
     TLOG_DEBUG(40) << "  * there is no object \'" << id << "\' in class \'" << name
                    << "\' and it's subclasses, returning NULL ...";
-  }
-  else {
+  } else {
     TLOG_DEBUG(40) << "  * there is no object \'" << id << "\' in class \'" << name << "\', returning NULL ...";
   }
 
   return nullptr;
 }
 
-
 void
-ConfigurationImpl::put_impl_object(const std::string& name, const std::string& id, ConfigObjectImpl * obj) noexcept
+ConfigurationImpl::put_impl_object(const std::string& name, const std::string& id, ConfigObjectImpl* obj) noexcept
 {
   p_number_of_object_read++;
 
-  conffwk::pmap<conffwk::map<ConfigObjectImpl *> * >::iterator i = m_impl_objects.find(&name);
+  conffwk::pmap<conffwk::map<ConfigObjectImpl*>*>::iterator i = m_impl_objects.find(&name);
 
-  if(i != m_impl_objects.end()) {
+  if (i != m_impl_objects.end()) {
     (*i->second)[id] = obj;
     obj->m_class_name = i->first;
-  }
-  else {
-    conffwk::map<ConfigObjectImpl *> * m = new conffwk::map<ConfigObjectImpl *>();
+  } else {
+    conffwk::map<ConfigObjectImpl*>* m = new conffwk::map<ConfigObjectImpl*>();
     obj->m_class_name = &DalFactory::instance().get_known_class_name_ref(name);
     m_impl_objects[obj->m_class_name] = m;
     (*m)[id] = obj;
@@ -356,42 +403,41 @@ ConfigurationImpl::put_impl_object(const std::string& name, const std::string& i
 }
 
 void
-ConfigurationImpl::rename_impl_object(const std::string * class_name, const std::string& old_id, const std::string& new_id) noexcept
+ConfigurationImpl::rename_impl_object(const std::string* class_name,
+                                      const std::string& old_id,
+                                      const std::string& new_id) noexcept
 {
-  conffwk::pmap<conffwk::map<ConfigObjectImpl *> *>::iterator i = m_impl_objects.find(class_name);
+  conffwk::pmap<conffwk::map<ConfigObjectImpl*>*>::iterator i = m_impl_objects.find(class_name);
 
-  if (i != m_impl_objects.end())
-    {
-      conffwk::map<ConfigObjectImpl *>::iterator j = i->second->find(old_id);
+  if (i != m_impl_objects.end()) {
+    conffwk::map<ConfigObjectImpl*>::iterator j = i->second->find(old_id);
 
-      if (j != i->second->end())
-        {
-          ConfigObjectImpl*& obj = (*i->second)[new_id];
+    if (j != i->second->end()) {
+      ConfigObjectImpl*& obj = (*i->second)[new_id];
 
-          if (obj != nullptr)
-            {
-              obj->m_state = dunedaq::conffwk::Unknown;
-              m_tangled_objects.push_back(obj);
-            }
+      if (obj != nullptr) {
+        obj->m_state = dunedaq::conffwk::Unknown;
+        m_tangled_objects.push_back(obj);
+      }
 
-          obj = j->second;
+      obj = j->second;
 
-          TLOG_DEBUG(2) << "rename implementation " << (void *)j->second << " of object \'" << old_id << '@' << *class_name << "\' to \'" << new_id << '\'';
-          i->second->erase(j);
-        }
+      TLOG_DEBUG(2) << "rename implementation " << (void*)j->second << " of object \'" << old_id << '@' << *class_name
+                    << "\' to \'" << new_id << '\'';
+      i->second->erase(j);
     }
+  }
 }
 
 void
 ConfigurationImpl::clean() noexcept
 {
-  for (auto& i : m_impl_objects)
-    {
-      for (auto& j : *i.second)
-        delete j.second;
+  for (auto& i : m_impl_objects) {
+    for (auto& j : *i.second)
+      delete j.second;
 
-      delete i.second;
-    }
+    delete i.second;
+  }
 
   m_impl_objects.clear();
 
@@ -479,11 +525,12 @@ ConfigObjectImpl::convert(std::string& value, const ConfigObject& obj, const std
   m_impl->m_conf->convert(value, obj, attr_name);
 }
 
-
 void
-ConfigObjectImpl::convert(std::vector<bool>& /*value*/, const ConfigObject& /*obj*/, const std::string& /*attr_name*/) noexcept
+ConfigObjectImpl::convert(std::vector<bool>& /*value*/,
+                          const ConfigObject& /*obj*/,
+                          const std::string& /*attr_name*/) noexcept
 {
-  //m_impl->m_conf->convert2(value, obj, attr_name);
+  // m_impl->m_conf->convert2(value, obj, attr_name);
 }
 
 void
@@ -547,7 +594,9 @@ ConfigObjectImpl::convert(std::vector<double>& value, const ConfigObject& obj, c
 }
 
 void
-ConfigObjectImpl::convert(std::vector<std::string>& value, const ConfigObject& obj, const std::string& attr_name) noexcept
+ConfigObjectImpl::convert(std::vector<std::string>& value,
+                          const ConfigObject& obj,
+                          const std::string& attr_name) noexcept
 {
   m_impl->m_conf->convert2(value, obj, attr_name);
 }

@@ -30,7 +30,11 @@ construct_class_domains(dunedaq::conffwk::Configuration& cfg_db)
     std::deque<std::set<std::string>> overlapping;
     for (auto& dom : domains) {
       std::set<std::string> intersection;
-      std::set_intersection(dom.begin(), dom.end(), class_cluster.begin(), class_cluster.end(), std::inserter(intersection, intersection.begin()));
+      std::set_intersection(dom.begin(),
+                            dom.end(),
+                            class_cluster.begin(),
+                            class_cluster.end(),
+                            std::inserter(intersection, intersection.begin()));
       // non-zero intersection, overlap found
       if (intersection.size() > 0) {
         overlapping.push_back(dom);
@@ -38,18 +42,17 @@ construct_class_domains(dunedaq::conffwk::Configuration& cfg_db)
     }
 
     // If overlapping are found, merge all overlapping domains
-    if ( !overlapping.empty() ) {
-      for( auto& dom : overlapping ) {
+    if (!overlapping.empty()) {
+      for (auto& dom : overlapping) {
         // merge the existing cluster in class_cluster
         class_cluster.insert(dom.begin(), dom.end());
         // Remove the old cluster from the list
         auto it = std::find(domains.begin(), domains.end(), dom);
-        if (it!= domains.end()) {
-            domains.erase(it);
+        if (it != domains.end()) {
+          domains.erase(it);
         }
       }
     }
-
 
     domains.push_back(class_cluster);
   }
@@ -75,32 +78,29 @@ main(int argc, char const* argv[])
 
   std::deque<std::set<std::string>> domains = construct_class_domains(db);
 
-
   std::map<std::string, uint> class_domain_map;
   conffwk::fmap<uint> class_domain_map_2;
   // Print the clustered domains
   fmt::print("Found {} inheritance domains\n", domains.size());
-  for( size_t i(0); i<domains.size(); ++i ) {
+  for (size_t i(0); i < domains.size(); ++i) {
     const auto& dom = domains[i];
     fmt::print("   - {} : {}", i, fmt::join(dom, ","));
     // fmt::print("   - {} : {}", i, dom);
-    for( const auto& class_name : dom ) {
+    for (const auto& class_name : dom) {
       class_domain_map[class_name] = i;
       class_domain_map_2[&conffwk::DalFactory::instance().get_known_class_name_ref(class_name)] = i;
     }
     fmt::print("\n");
   }
 
-  for( const auto& [name, id] : class_domain_map ) {
+  for (const auto& [name, id] : class_domain_map) {
     fmt::print("- {} : {}\n", name, id);
   }
 
   fmt::print("-------------------\n");
   fmt::print("cdm2 {}\n", class_domain_map_2.size());
-  
 
-
-  for( const auto& [name, id] : class_domain_map_2 ) {
+  for (const auto& [name, id] : class_domain_map_2) {
     fmt::print("+ {} : {}\n", *name, id);
   }
 

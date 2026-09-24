@@ -5,13 +5,13 @@
 // Renamed since fork: yes (from config/Configuration.h to include/conffwk/Configuration.hpp).
 //
 
-  /**
+/**
 
-   *  \file Configuration.hpp This file contains Configuration class,
-   *  that is the entry point to access the database information.
-   *  \author Igor Soloviev
-   *  \brief conffwk entry point
-   */
+ *  \file Configuration.hpp This file contains Configuration class,
+ *  that is the entry point to access the database information.
+ *  \author Igor Soloviev
+ *  \brief conffwk entry point
+ */
 
 #ifndef CONFFWK_CONFIGURATION_H_
 #define CONFFWK_CONFIGURATION_H_
@@ -19,11 +19,11 @@
 #include <string.h>
 
 #include <atomic>
-#include <typeinfo>
-#include <string>
-#include <vector>
 #include <list>
 #include <set>
+#include <string>
+#include <typeinfo>
+#include <vector>
 
 #include <mutex>
 
@@ -31,12 +31,12 @@
 
 #include "ers/ers.hpp"
 
-#include "conffwk/SubscriptionCriteria.hpp"
 #include "conffwk/ConfigObject.hpp"
 #include "conffwk/ConfigVersion.hpp"
-#include "conffwk/Errors.hpp"
 #include "conffwk/DalFactory.hpp"
 #include "conffwk/DalRegistry.hpp"
+#include "conffwk/Errors.hpp"
+#include "conffwk/SubscriptionCriteria.hpp"
 
 #include "conffwk/map.hpp"
 #include "conffwk/set.hpp"
@@ -49,7 +49,6 @@ class ConfigurationImpl;
 class ConfigurationChange;
 class DalObject;
 class DalRegistry;
-
 
 struct class_t;
 
@@ -98,134 +97,141 @@ class Configuration;
 //   conffwk::multimap<DalObject*> m_t_cache;
 // };
 
-
-  /**
-   * \brief Provides abstract interface to database data.
-   *
-   *  The class provides interfaces to data access and notification on data changes
-   *  which are independent from the database implementation.
-   *
-   *  The class is an entry point to the database information. It provides access
-   *  to the database objects by name of the class and optionally (for named objects)
-   *  by object identities. Normally, user should use this class to open/close database
-   *  and to access objects via template \c get methods invoked with classes generated
-   *  by the genconffwk utility.
-   *
-   *  Below there is brief description of main methods. Most of then can only be used
-   *  after successful initialization (i.e. database load) of the Configuration object.
-   *
-   *  Methods throw exceptions in case of an error unless \b noexcept is explicitly
-   *  used in their specification. The following exceptions can be thrown:
-   *  - dunedaq::conffwk::Generic        is used to report most of the problems (bad DB, wrong parameter, plug-in specific, etc.)
-   *  - dunedaq::conffwk::NotFound       the conffwk object accessed by ID is not found, class accessed by name is not found
-   *  - dunedaq::conffwk::DeletedObject  accessing template object that has been deleted (via notification or by the user's code)
-   *
-   *  All above exceptions have common class dunedaq::conffwk::Exception, that can be used to catch all of them.
-   *
-\code   
-try {
-    // load database using oks file /tmp/mydb.data.xml
-  Configuration db("oksconflibs:/tmp/mydb.data.xml");
-
-    // get object "foo@bar"
-  ConfigObject obj;
-  db.get("bar", "foo", obj);
-
-    // print object to the standard output stream
-  obj.print_ref(std::cout, db);
-}
-  // the catch of dunedaq::conffwk::NotFound exception is optional:
-  // it is only used to distinguish NotFound exception from other possible once
-catch (dunedaq::conffwk::NotFound & ex) {
-  std::cerr << "Object foo@bar is not found: " << ex << std::endl;
-}
-  // always catch this exception: it can come unexpectedly from DBMS implementation,
-  // e.g. because of hardware problems or lack of computer resources
-catch (dunedaq::conffwk::Exception & ex) {
-  std::cerr << "ERROR: " << ex << std::endl;
-}
-\endcode   
-   *  \par Database Manipulation
-   *
-   *  To get data a database can be opened, closed and it's state can be checked by the following methods:
-   *  - load() open database (by default, the database is opened by the constructor)
-   *  - unload() closes database (by default, the database is closed by the destructor)
-   *  - loaded() returns true, if a database is correctly loaded
-   *
-   *  To create or to modify data a database the following methods can be used:
-   *  - create(const std::string&, const std::string&, const std::list<std::string>&) create new database
-   *  - add_include() add include to an existing database
-   *  - remove_include() remove include from an existing database
-   *  - commit() save chain of changes
-   *  - abort()  cancel all previous changes
-   *
-   *  \par Objects Access
-   *
-   *  The access to the objects is provided via two main methods:
-   *  - get(const std::string& class, const std::string& id, ConfigObject&, unsigned long, const std::vector<std::string> *) get single object by name of class and id
-   *  - get(const std::string& class, std::vector<ConfigObject>&, const std::string& query, unsigned long, const std::vector<std::string> *) get objects of class by name
-   *
-   *  Below there is example to read all computer objects
-\code   
-try {
-  Configuration db("oksconflibs:daq/partitions/part_hlt.data.xml");
-
-  // read all objects of "Computer" class
-  std::vector<ConfigObject> hosts;
-  db.get("Computer", hosts);
-
-  // print details of the Computer objects
-  for (const auto& x : objects)
-    x.print_ref(std::cout, db);
-}
-catch (dunedaq::conffwk::Exception & ex) {
-  std::cerr << "ERROR: " << ex << std::endl;
-}
-\endcode   
-   *
-   *  For objects of classes generated by genconffwk there are analogous template methods which
-   *  in addition store pointers to objects in the cache and which to be used by end-user:
-   *  - get(const std::string& id, bool, bool, unsigned long, const std::vector<std::string> *) return const pointer to object of given user class
-   *  - get(std::vector<const T*>& objects, bool, bool, const std::string& query, unsigned long, const std::vector<std::string> *) fills vector of objects of given user class
-   *
-   *  Below there is an example for generated \b dal package:
+/**
+ * \brief Provides abstract interface to database data.
+ *
+ *  The class provides interfaces to data access and notification on data changes
+ *  which are independent from the database implementation.
+ *
+ *  The class is an entry point to the database information. It provides access
+ *  to the database objects by name of the class and optionally (for named objects)
+ *  by object identities. Normally, user should use this class to open/close database
+ *  and to access objects via template \c get methods invoked with classes generated
+ *  by the genconffwk utility.
+ *
+ *  Below there is brief description of main methods. Most of then can only be used
+ *  after successful initialization (i.e. database load) of the Configuration object.
+ *
+ *  Methods throw exceptions in case of an error unless \b noexcept is explicitly
+ *  used in their specification. The following exceptions can be thrown:
+ *  - dunedaq::conffwk::Generic        is used to report most of the problems (bad DB, wrong parameter, plug-in
+specific, etc.)
+ *  - dunedaq::conffwk::NotFound       the conffwk object accessed by ID is not found, class accessed by name is not
+found
+ *  - dunedaq::conffwk::DeletedObject  accessing template object that has been deleted (via notification or by the
+user's code)
+ *
+ *  All above exceptions have common class dunedaq::conffwk::Exception, that can be used to catch all of them.
+ *
 \code
-  // include generated files for classes used below
+try {
+  // load database using oks file /tmp/mydb.data.xml
+Configuration db("oksconflibs:/tmp/mydb.data.xml");
+
+  // get object "foo@bar"
+ConfigObject obj;
+db.get("bar", "foo", obj);
+
+  // print object to the standard output stream
+obj.print_ref(std::cout, db);
+}
+// the catch of dunedaq::conffwk::NotFound exception is optional:
+// it is only used to distinguish NotFound exception from other possible once
+catch (dunedaq::conffwk::NotFound & ex) {
+std::cerr << "Object foo@bar is not found: " << ex << std::endl;
+}
+// always catch this exception: it can come unexpectedly from DBMS implementation,
+// e.g. because of hardware problems or lack of computer resources
+catch (dunedaq::conffwk::Exception & ex) {
+std::cerr << "ERROR: " << ex << std::endl;
+}
+\endcode
+ *  \par Database Manipulation
+ *
+ *  To get data a database can be opened, closed and it's state can be checked by the following methods:
+ *  - load() open database (by default, the database is opened by the constructor)
+ *  - unload() closes database (by default, the database is closed by the destructor)
+ *  - loaded() returns true, if a database is correctly loaded
+ *
+ *  To create or to modify data a database the following methods can be used:
+ *  - create(const std::string&, const std::string&, const std::list<std::string>&) create new database
+ *  - add_include() add include to an existing database
+ *  - remove_include() remove include from an existing database
+ *  - commit() save chain of changes
+ *  - abort()  cancel all previous changes
+ *
+ *  \par Objects Access
+ *
+ *  The access to the objects is provided via two main methods:
+ *  - get(const std::string& class, const std::string& id, ConfigObject&, unsigned long, const std::vector<std::string>
+*) get single object by name of class and id
+ *  - get(const std::string& class, std::vector<ConfigObject>&, const std::string& query, unsigned long, const
+std::vector<std::string> *) get objects of class by name
+ *
+ *  Below there is example to read all computer objects
+\code
+try {
+Configuration db("oksconflibs:daq/partitions/part_hlt.data.xml");
+
+// read all objects of "Computer" class
+std::vector<ConfigObject> hosts;
+db.get("Computer", hosts);
+
+// print details of the Computer objects
+for (const auto& x : objects)
+  x.print_ref(std::cout, db);
+}
+catch (dunedaq::conffwk::Exception & ex) {
+std::cerr << "ERROR: " << ex << std::endl;
+}
+\endcode
+ *
+ *  For objects of classes generated by genconffwk there are analogous template methods which
+ *  in addition store pointers to objects in the cache and which to be used by end-user:
+ *  - get(const std::string& id, bool, bool, unsigned long, const std::vector<std::string> *) return const pointer to
+object of given user class
+ *  - get(std::vector<const T*>& objects, bool, bool, const std::string& query, unsigned long, const
+std::vector<std::string> *) fills vector of objects of given user class
+ *
+ *  Below there is an example for generated \b dal package:
+\code
+// include generated files for classes used below
 #include "dal/Variable.h"
 #include "dal/Segment.h"
 
 try {
-  Configuration db("oksconflibs:daq/partitions/part_hlt.data.xml");
+Configuration db("oksconflibs:daq/partitions/part_hlt.data.xml");
 
-  // read all variables with Name = "TDAQ_DB_NAME"
-  std::vector<const daq::core::Variable*> vars;
-  db.get(vars, false, true, "(all (\"Name\" \"TDAQ_ERS_INFO\" =))");
+// read all variables with Name = "TDAQ_DB_NAME"
+std::vector<const daq::core::Variable*> vars;
+db.get(vars, false, true, "(all (\"Name\" \"TDAQ_ERS_INFO\" =))");
 
-  // print variables
-  std::cout << "Got " << vars.size() << " variables with name TDAQ_ERS_INFO:\n";
-  for (const auto& x : vars)
-    std::cout << "object " << x << " => " << x->get_Value() << std::endl;
+// print variables
+std::cout << "Got " << vars.size() << " variables with name TDAQ_ERS_INFO:\n";
+for (const auto& x : vars)
+  std::cout << "object " << x << " => " << x->get_Value() << std::endl;
 
-  // get segment with id = "online" and print if found
-  if (const daq::core::Segment * p = db.get<daq::core::Segment>("online"))
-    std::cout << "The segment object is: " << *p << std::endl;
+// get segment with id = "online" and print if found
+if (const daq::core::Segment * p = db.get<daq::core::Segment>("online"))
+  std::cout << "The segment object is: " << *p << std::endl;
 }
 catch (dunedaq::conffwk::Exception & ex) {
-  std::cerr << "ERROR: " << ex << std::endl;
+std::cerr << "ERROR: " << ex << std::endl;
 }
 \endcode
-   *
-   *  \par Notification
-   *
-   *  To subscribe and unsubscribe on changes it is necessary to create a subscription criteria
-   *  (see ConfigurationSubscriptionCriteria class for more information).
-   *  When a subscription criteria object is created, the following methods can be used:
-   *  - subscribe() subscribe on any changes according criteria
-   *  - unsubscribe() unsubscribe above changes (the CallbackId is returned by above method)
-   *
-   */
+ *
+ *  \par Notification
+ *
+ *  To subscribe and unsubscribe on changes it is necessary to create a subscription criteria
+ *  (see ConfigurationSubscriptionCriteria class for more information).
+ *  When a subscription criteria object is created, the following methods can be used:
+ *  - subscribe() subscribe on any changes according criteria
+ *  - unsubscribe() unsubscribe above changes (the CallbackId is returned by above method)
+ *
+ */
 
-class Configuration {
+class Configuration
+{
 
   friend class DalObject;
   friend class ConfigObject;
@@ -234,580 +240,573 @@ class Configuration {
   friend class DalObject;
   friend class DalRegistry;
 
-  public:
+public:
+  /**
+   *  \brief Constructor to build a configuration object using implementation plug-in.
+   *
+   *  The constructor expects parameter in format "plugin-name:plugin-parameter".
+   *  The plugin-name is used to get implementation shared library by adding "lib"
+   *  prefix and ".so" suffix, e.g. "oksconflibs" -> "liboksconflibs.so".
+   *  The plugin-parameter is optional; if non-empty, it is passed to the plug-in
+   *  constructor.
+   *
+   *  \param spec         database name to be understood by the database implementation
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
 
+  Configuration(const std::string& spec);
 
-    /**
-     *  \brief Constructor to build a configuration object using implementation plug-in.
-     *
-     *  The constructor expects parameter in format "plugin-name:plugin-parameter".
-     *  The plugin-name is used to get implementation shared library by adding "lib"
-     *  prefix and ".so" suffix, e.g. "oksconflibs" -> "liboksconflibs.so". 
-     *  The plugin-parameter is optional; if non-empty, it is passed to the plug-in
-     *  constructor.
-     *
-     *  \param spec         database name to be understood by the database implementation
-     *
-     *  \throw dunedaq::conffwk::Generic in case of an error
-     */
+  Configuration();
 
-    Configuration(const std::string& spec);
+  /** Get implementation plug-in and it's parameter used to build conffwk object */
 
-    Configuration();
-  
+  const std::string& get_impl_spec() const noexcept { return m_impl_spec; }
 
-    /** Get implementation plug-in and it's parameter used to build conffwk object */
+  /** Get implementation plug-in name used to build conffwk object */
 
-    const std::string& get_impl_spec() const noexcept {return m_impl_spec;}
+  const std::string& get_impl_name() const noexcept { return m_impl_name; }
 
+  /** Get implementation plug-in parameter used to build conffwk object */
 
-    /** Get implementation plug-in name used to build conffwk object */
-     
-    const std::string& get_impl_name() const noexcept {return m_impl_name;}
-
-
-      /** Get implementation plug-in parameter used to build conffwk object */
-
-    const std::string& get_impl_param() const noexcept {return m_impl_param;}
-
-
-    /**
-     *  \brief Destructor to destroy a configuration object.
-     *
-     *  The destructor unloads database for given database implementation
-     *  and destroys all user objects in cache.
-     */
-
-    ~Configuration() noexcept;
-
-
-  public:
-
-      /**
-       *  \brief The user notification callback function which
-       *  is invoked in case of changes.
-       *
-       *  \param changed_classes    vector of changed classes
-       *  \param parameter          user-defined parameter
-       */
-
-    typedef void (*notify)(
-      const std::vector<ConfigurationChange *> & changed_classes,
-      void * parameter
-    );
-
-      /**
-       *  \brief The user notification callback function which
-       *  is invoked before changes are going to be applied.
-       *
-       *  \param parameter          user-defined parameter
-       */
-
-    typedef void (*pre_notify)(
-      void * parameter
-    );
-
-
-  private: // Types to be used in public API below
-
-      // structure keeps information about callback subscriptions
-
-    struct CallbackSubscription {
-      notify m_cb;
-      void * m_param;
-      ConfigurationSubscriptionCriteria m_criteria;
-    };
-
-    struct CallbackPreSubscription {
-      pre_notify m_cb;
-      void * m_param;
-    };
-
-
-  public:
-
-      /**
-       *  \brief Callback identifier.
-       *
-       *  It uniquely identifies a callback inside given process.
-       *  It is returned by subscribe() method and must be used
-       *  as parameter for the unsubscribe() methods.
-       */
-
-    typedef CallbackSubscription * CallbackId;
-
-
-      /**
-       *  \brief Subscribe on configuration changes.
-       *
-       *  The method is used to make a subscription. The returned value
-       *  is a subscription handler.
-       *
-       *  When subscribed changes occurred, the user callback function is invoked with
-       *  changes description and parameter 'user_param' defined by user.
-       *
-       *  \param criteria     subscription criteria
-       *  \param user_cb      user-defined callback function
-       *  \param user_param   optional user-defined parameter
-       *
-       *  \return \b non-null value in case of success (the value to be used for unsubscribe() method).
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    CallbackId subscribe(const ConfigurationSubscriptionCriteria& criteria, notify user_cb, void * user_param = nullptr);
-
-
-      /**
-       *  \brief Subscribe on pre-notification on configuration changes.
-       *
-       *  The method is used to make complimentary subscription on pre-notification about changes,
-       *  that can only be used together with real subscription on changes, i.e. using
-       *  subscribe(const ConfigurationSubscriptionCriteria&, notify, void *) method.
-       *
-       *  When subscribed changes occurred, but before they are going to be applied,
-       *  the user callback function is invoked with parameter 'user_param' defined by user.
-       *  This subscription can be used to be informed, that some changes are took
-       *  place already and will be applied immediately after user's code exits given callback function.
-       *
-       *  \param user_cb      user-defined callback function
-       *  \param user_param   optional user-defined parameter
-       *
-       *  \return \b non-null value in case of success (the value to be used for unsubscribe() method).
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    CallbackId subscribe(pre_notify user_cb, void * user_param = nullptr);
-
-
-      /**
-       *  \brief Remove callback function.
-       *
-       *  Remove callback function previously added by the subscribe() methods.
-       *  If the parameter is a non-null value, it must be equal to id returned by the add_callback() method.
-       *  Otherwise the method stops all subscription.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error (e.g. bad ID, plugin-specific problems)
-       */
-
-    void unsubscribe(CallbackId cb_handler = 0);
-
-
-
-      /**
-       *  \brief Checks validity of pointer to an objects of given user class.
-       *
-       *  Check if the pointer to the object is a valid pointer in the cache.
-       *  Dangling pointers to removed objects may appear after notification.
-       *
-       *  \return Return \b true if the pointer is valid and \b false otherwise.
-       */
-
-    template<class T> bool is_valid(const T * object) noexcept;
-
-
-  private:
-
-    /// \throw dunedaq::conffwk::Generic in case of an error
-    void reset_subscription();
-
-
-  public:
-
-      /**
-       *  \brief Update cache of objects in case of modification.
-       *
-       *  Only is called, when a user subscription to related class is set.
-       *  It is used by automatically generated data access libraries.
-       *
-       *  \param modified  vector of modified objects of given user class (objects to be re-read in cache)
-       *  \param removed   vector of removed objects of given user class (objects to be removed from cache)
-       *  \param created   vector of created objects of given user class (objects to be reset in cache, if they were removed)
-       */
-
-    template<class T> void update(const std::vector<std::string>& modified,
-		                  const std::vector<std::string>& removed,
-				  const std::vector<std::string>& created) noexcept;
-
-
-      /**
-       *  \brief System function invoked in case of modifications.
-       *
-       *  It is used by the database implementation.
-       *  Update cache of template DB objects.
-       */
-
-    void update_cache(std::vector<ConfigurationChange *>& changes) noexcept;
-
-
-      /**
-       *  \brief System callback function invoked in case of modifications.
-       *
-       *  It is used by the database implementation.
-       *  Only is called, when a user subscription to related class is set.
-       */
-
-    static void system_cb(std::vector<ConfigurationChange *>&, Configuration *) noexcept;
-
-
-      /**
-       *  \brief System callback function invoked in case of pre-modifications.
-       *
-       *  It is used by the database implementation.
-       *  Only is called, when a user subscription is set.
-       */
-
-    static void system_pre_cb(Configuration *) noexcept;
-
-
-      /**
-       *  \brief Update state of objects after abort operations.
-       *
-       *  It is used by automatically generated data access libraries.
-       */
-
-    template<class T> void _reset_objects() noexcept;
-
-
-    //   /**
-    //    *  \brief Mark object of given template class as unread (multi-thread unsafe).
-    //    *
-    //    *  Is used by automatically generated data access libraries code after reading parameters for substitution,
-    //    *  since cache contains objects with non-substituted attributes. Should not be explicitly used by user.
-    //    *
-    //    *  The method is used by the unread_all_objects() method.
-    //    *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
-    //    */
-
-    // template<class T> static void _unread_objects(CacheBase * cache_ptr) noexcept;
-
-
-    //   /**
-    //    *  \brief Rename object of given template class (multi-thread unsafe).
-    //    *
-    //    *  Is used by automatically generated data access libraries when an object has been renamed by user's code.
-    //    *  Should not be explicitly used by user.
-    //    *
-    //    *  The method is used by the unread_all_objects() method.
-    //    *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
-    //    *  \param  old_id old object ID
-    //    *  \param  new_id new object ID
-    //    */
-
-    // template<class T> static void _rename_object(CacheBase* cache_ptr, const std::string& old_id, const std::string& new_id) noexcept;
-
-
-    //   /**
-    //    *  \brief Update state of all objects in cache after abort / commit operations.
-    //    *
-    //    *  It is used by automatically generated data access libraries.
-    //    */
-
-    // void _reset_all_objects() noexcept;
-
-
-      /**
-       *  \brief Unread all template (i.e. set their state as uninitialized) and implementation objects (i.e. clear their cache).
-       *
-       *  Unread template objects result changing their state to uninitialized. They will be re-initialized, when accessed by user code.
-       *  This feature is used by attribute converter methods using unread_all_objects().
-       *
-       *  Unread implementation objects result removing any information from implementation cache, e.g. clear any object attributes data read from server.
-       *  One may use the unread_all_objects() to re-read database after reload.
-       *
-       *  \param unread_implementation_objs  if true, clear implementation objects; otherwise only template objects are unread and the implementation conffwk objects are still valid.
-       */
-
-    void
-    unread_all_objects(bool unread_implementation_objs = false) noexcept;
-
-
-      /**
-       *  \brief Unread all template (i.e. set their state as uninitialized) objects.
-       *
-       *  Unread template objects result changing their state to uninitialized. They will be re-initialized, when accessed by user code.
-       *  This feature is used by attribute converter methods using unread_all_objects().
-       */
-
-    void
-    unread_template_objects() noexcept
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-      _unread_template_objects();
-    }
-
-
-      /**
-       *  \brief Unread implementation objects (i.e. clear their cache).
-       *
-       *  This results removing any information from implementation cache, e.g. clear any object attributes data read from server.
-       *
-       *  \param state  set state of implementation objects after unread; is set to "Unknown" after abort()
-       */
-
-    void
-    unread_implementation_objects(dunedaq::conffwk::ObjectState state) noexcept
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
-      _unread_implementation_objects(state);
-    }
-
-
-  private:
-
-    static void
-    update_impl_objects(conffwk::pmap<conffwk::map<ConfigObjectImpl *> * >& cache, ConfigurationChange& change, const std::string * class_name);
-
-    void
-    _unread_template_objects() noexcept;
-
-    void
-    _unread_implementation_objects(dunedaq::conffwk::ObjectState state) noexcept;
-
-
-  public:
-
-      /**
-       *  \brief Create new object by class name and object id.
-       *
-       *  The method tries to create an object with given id in given class.
-       *  If found, the method fills \c 'object' reference.
-       *
-       *  \param at           database file where to create new object
-       *  \param class_name   name of the class
-       *  \param id           object identity
-       *  \param object       returned value in case of success
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void create(const std::string& at, const std::string& class_name, const std::string& id, ConfigObject& object);
-
-
-      /**
-       *  \brief Create new object by class name and object id.
-       *
-       *  The method tries to create an object with given id in given class.
-       *  If found, the method fills \c 'object' reference.
-       *
-       *  \param at           create new object at the same database file where \b 'at' object is located
-       *  \param class_name   name of the class
-       *  \param id           object identity
-       *  \param object       returned value in case of success
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void create(const ConfigObject& at, const std::string& class_name, const std::string& id, ConfigObject& object);
-
-
-      /**
-       *  \brief Create object of given class by identity and instantiate the template parameter with it.
-       *
-       *  Such method to be used for user classes generated by the genconffwk utility.
-       *
-       *  \param at            database file where to create new object
-       *  \param id            object identity
-       *  \param init_object   if true, initialise object's attributes and relationships
-       *
-       *  \return \b non-null pointer to created object.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    template<class T> const T * create(const std::string& at, const std::string& id, bool init_object = false);
-
-
-      /**
-       *  \brief Create object of given class by identity and instantiate the template parameter with it.
-       *
-       *  Such method to be used for user classes generated by the genconffwk utility.
-       *
-       *  \param at            an existing object of class generated by genconffwk to define location of the file where to store new object
-       *  \param id            object identity
-       *  \param init_object   if true, initialize object's attributes and relationships
-       *       *
-       *  \return \b non-null pointer to created object.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    template<class T> const T * create(const DalObject& at, const std::string& id, bool init_object = false);
-
-
-      /**
-       *  \brief Destroy object.
-       *
-       *  The method tries to destroy given object.
-       *
-       *  \param object   the object's reference
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void destroy_obj(ConfigObject& object);
-
-
-      /**
-       *  \brief Destroy object of given class.
-       *
-       *  The method tries to destoy given object.
-       *
-       *  \param  obj  the object's reference
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    template<class T> void destroy(T& obj);
-
-
-  public:
-
-      /**
-       *  \brief Test the object existence.
-       *
-       *  The method searches an object with given id within the class and all derived subclasses.
-       *  If found, the method returns \b true, otherwise the method return \b false.
-       *
-       *  \param class_name   name of the class
-       *  \param id           object identity
-       *  \param rlevel       optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache)
-       *  \param rclasses     optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
-       *
-       *  \throw dunedaq::conffwk::Generic if there is no such class or in case of an error
-       */
-
-    bool test_object(const std::string& class_name, const std::string& id, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
-
-
-      /**
-       *  \brief Get object by class name and object id (multi-thread safe).
-       *
-       *  The method searches an object with given id within the class and all derived subclasses.
-       *
-       *  \param class_name   name of the class
-       *  \param id           object identity
-       *  \param object       returned value in case of success
-       *  \param rlevel       optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache)
-       *  \param rclasses     optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
-       *
-       *  \throw dunedaq::conffwk::NotFound exception if there is no such object or \b dunedaq::conffwk::Generic in case of an error
-       */
-
-    void get(const std::string& class_name, const std::string& id, ConfigObject& object, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
-
-
-      /**
-       *  \brief Get all objects of class.
-       *
-       *  The method returns all objects of given class and objects of subclasses derived from it.
-       *
-       *  \param class_name   name of the class
-       *  \param objects      returned value in case of success
-       *  \param query        optional parameter defining selection criteria for objects of given class
-       *  \param rlevel       optional references level to optimize performance (defines how many objects referenced by found objects have also to be read to the implementation cache)
-       *  \param rclasses     optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
-       *
-       *  \throw dunedaq::conffwk::NotFound exception if there is no such class or \b dunedaq::conffwk::Generic in case of an error
-       */
-
-    void get(const std::string& class_name, std::vector<ConfigObject>& objects, const std::string& query = "", unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
-
-
-      /**
-       *  \brief Get path between objects.
-       *
-       *  The method returns all objects which are in the path starting from source object
-       *  matching to the path query pattern.
-       *
-       *  \param obj_from   object to start from
-       *  \param query      path query
-       *  \param objects    returned value in case of success
-       *  \param rlevel     optional references level to optimize performance (defines how many objects referenced by found objects have also to be read to the implementation cache)
-       *  \param rclasses   optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void get(const ConfigObject& obj_from, const std::string& query, std::vector<ConfigObject>& objects, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
-
-
-      /**
-       *  \brief Get object of given class by identity and instantiate the template parameter with it (multi-thread safe).
-       *
-       *  Such method to be used for user classes generated by the genconffwk utility.
-       *
-       *  \param id             object identity
-       *  \param init_children  if true, the referenced objects are initialized
-       *  \param init           if true, the object's attributes and relationships are read
-       *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache)
-       *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
-       *
-       *  \return  Return 0 if there is no object with such id or pointer to object otherwise.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-  template<class T>
-    const T *
-    get(const std::string& id, bool init_children = false, bool init = true, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-      return _get<T>(id, init_children, init, rlevel, rclasses);
-    }
-
-
-
-      /**
-       *  \brief Get object of given class by object reference and instantiate the template parameter with it (multi-thread safe).
-       *
-       *  Such method to be used for user classes generated by the genconffwk utility.
-       *
-       *  \param obj            reference to conffwk object, that is used to instantiate template object
-       *  \param init_children  if true, the referenced objects are initialized
-       *  \param init           if true, the object's attributes and relationships are read
-       *
-       *  \return Return pointer to object.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-  template<class T>
-    const T *
-    get(ConfigObject& obj, bool init_children = false, bool init = true)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-      return _get<T>(obj, init_children, init);
-    }
-
-
-      /**
-       *  \brief Get all objects of given class and instantiate a vector of 
-       *  the template parameters object with it (multi-thread safe).
-       *
-       *  Such method to be used for user classes generated by the genconffwk utility.
-       *
-       *  \param objects        the vector is filled by the method
-       *  \param init_children  if true, the referenced objects are initialized
-       *  \param init           if true, the object's attributes and relationships are read
-       *  \param query          optional parameter defining selection criteria for objects of given class
-       *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by found objects have also to be read to the implementation cache)
-       *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
-       *
-       *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no such class, plug-in specific problem)
-       */
-
-  template<class T>
-    void
-    get(std::vector<const T*>& objects, bool init_children = false, bool init = true, const std::string& query = "", unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-      _get<T>(objects, init_children, init, query, rlevel, rclasses);
-    }
+  const std::string& get_impl_param() const noexcept { return m_impl_param; }
 
   /**
-   *  \brief Generate object of given class by object reference and instantiate the template parameter with it (multi-thread safe).
+   *  \brief Destructor to destroy a configuration object.
+   *
+   *  The destructor unloads database for given database implementation
+   *  and destroys all user objects in cache.
+   */
+
+  ~Configuration() noexcept;
+
+public:
+  /**
+   *  \brief The user notification callback function which
+   *  is invoked in case of changes.
+   *
+   *  \param changed_classes    vector of changed classes
+   *  \param parameter          user-defined parameter
+   */
+
+  typedef void (*notify)(const std::vector<ConfigurationChange*>& changed_classes, void* parameter);
+
+  /**
+   *  \brief The user notification callback function which
+   *  is invoked before changes are going to be applied.
+   *
+   *  \param parameter          user-defined parameter
+   */
+
+  typedef void (*pre_notify)(void* parameter);
+
+private: // Types to be used in public API below
+  // structure keeps information about callback subscriptions
+
+  struct CallbackSubscription
+  {
+    notify m_cb;
+    void* m_param;
+    ConfigurationSubscriptionCriteria m_criteria;
+  };
+
+  struct CallbackPreSubscription
+  {
+    pre_notify m_cb;
+    void* m_param;
+  };
+
+public:
+  /**
+   *  \brief Callback identifier.
+   *
+   *  It uniquely identifies a callback inside given process.
+   *  It is returned by subscribe() method and must be used
+   *  as parameter for the unsubscribe() methods.
+   */
+
+  typedef CallbackSubscription* CallbackId;
+
+  /**
+   *  \brief Subscribe on configuration changes.
+   *
+   *  The method is used to make a subscription. The returned value
+   *  is a subscription handler.
+   *
+   *  When subscribed changes occurred, the user callback function is invoked with
+   *  changes description and parameter 'user_param' defined by user.
+   *
+   *  \param criteria     subscription criteria
+   *  \param user_cb      user-defined callback function
+   *  \param user_param   optional user-defined parameter
+   *
+   *  \return \b non-null value in case of success (the value to be used for unsubscribe() method).
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  CallbackId subscribe(const ConfigurationSubscriptionCriteria& criteria, notify user_cb, void* user_param = nullptr);
+
+  /**
+   *  \brief Subscribe on pre-notification on configuration changes.
+   *
+   *  The method is used to make complimentary subscription on pre-notification about changes,
+   *  that can only be used together with real subscription on changes, i.e. using
+   *  subscribe(const ConfigurationSubscriptionCriteria&, notify, void *) method.
+   *
+   *  When subscribed changes occurred, but before they are going to be applied,
+   *  the user callback function is invoked with parameter 'user_param' defined by user.
+   *  This subscription can be used to be informed, that some changes are took
+   *  place already and will be applied immediately after user's code exits given callback function.
+   *
+   *  \param user_cb      user-defined callback function
+   *  \param user_param   optional user-defined parameter
+   *
+   *  \return \b non-null value in case of success (the value to be used for unsubscribe() method).
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  CallbackId subscribe(pre_notify user_cb, void* user_param = nullptr);
+
+  /**
+   *  \brief Remove callback function.
+   *
+   *  Remove callback function previously added by the subscribe() methods.
+   *  If the parameter is a non-null value, it must be equal to id returned by the add_callback() method.
+   *  Otherwise the method stops all subscription.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error (e.g. bad ID, plugin-specific problems)
+   */
+
+  void unsubscribe(CallbackId cb_handler = 0);
+
+  /**
+   *  \brief Checks validity of pointer to an objects of given user class.
+   *
+   *  Check if the pointer to the object is a valid pointer in the cache.
+   *  Dangling pointers to removed objects may appear after notification.
+   *
+   *  \return Return \b true if the pointer is valid and \b false otherwise.
+   */
+
+  template<class T>
+  bool is_valid(const T* object) noexcept;
+
+private:
+  /// \throw dunedaq::conffwk::Generic in case of an error
+  void reset_subscription();
+
+public:
+  /**
+   *  \brief Update cache of objects in case of modification.
+   *
+   *  Only is called, when a user subscription to related class is set.
+   *  It is used by automatically generated data access libraries.
+   *
+   *  \param modified  vector of modified objects of given user class (objects to be re-read in cache)
+   *  \param removed   vector of removed objects of given user class (objects to be removed from cache)
+   *  \param created   vector of created objects of given user class (objects to be reset in cache, if they were
+   * removed)
+   */
+
+  template<class T>
+  void update(const std::vector<std::string>& modified,
+              const std::vector<std::string>& removed,
+              const std::vector<std::string>& created) noexcept;
+
+  /**
+   *  \brief System function invoked in case of modifications.
+   *
+   *  It is used by the database implementation.
+   *  Update cache of template DB objects.
+   */
+
+  void update_cache(std::vector<ConfigurationChange*>& changes) noexcept;
+
+  /**
+   *  \brief System callback function invoked in case of modifications.
+   *
+   *  It is used by the database implementation.
+   *  Only is called, when a user subscription to related class is set.
+   */
+
+  static void system_cb(std::vector<ConfigurationChange*>&, Configuration*) noexcept;
+
+  /**
+   *  \brief System callback function invoked in case of pre-modifications.
+   *
+   *  It is used by the database implementation.
+   *  Only is called, when a user subscription is set.
+   */
+
+  static void system_pre_cb(Configuration*) noexcept;
+
+  /**
+   *  \brief Update state of objects after abort operations.
+   *
+   *  It is used by automatically generated data access libraries.
+   */
+
+  template<class T>
+  void _reset_objects() noexcept;
+
+  //   /**
+  //    *  \brief Mark object of given template class as unread (multi-thread unsafe).
+  //    *
+  //    *  Is used by automatically generated data access libraries code after reading parameters for substitution,
+  //    *  since cache contains objects with non-substituted attributes. Should not be explicitly used by user.
+  //    *
+  //    *  The method is used by the unread_all_objects() method.
+  //    *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
+  //    */
+
+  // template<class T> static void _unread_objects(CacheBase * cache_ptr) noexcept;
+
+  //   /**
+  //    *  \brief Rename object of given template class (multi-thread unsafe).
+  //    *
+  //    *  Is used by automatically generated data access libraries when an object has been renamed by user's code.
+  //    *  Should not be explicitly used by user.
+  //    *
+  //    *  The method is used by the unread_all_objects() method.
+  //    *  \param  cache_ptr pointer to the cache of template object of given template class (has to be downcasted)
+  //    *  \param  old_id old object ID
+  //    *  \param  new_id new object ID
+  //    */
+
+  // template<class T> static void _rename_object(CacheBase* cache_ptr, const std::string& old_id, const std::string&
+  // new_id) noexcept;
+
+  //   /**
+  //    *  \brief Update state of all objects in cache after abort / commit operations.
+  //    *
+  //    *  It is used by automatically generated data access libraries.
+  //    */
+
+  // void _reset_all_objects() noexcept;
+
+  /**
+   *  \brief Unread all template (i.e. set their state as uninitialized) and implementation objects (i.e. clear their
+   * cache).
+   *
+   *  Unread template objects result changing their state to uninitialized. They will be re-initialized, when accessed
+   * by user code. This feature is used by attribute converter methods using unread_all_objects().
+   *
+   *  Unread implementation objects result removing any information from implementation cache, e.g. clear any object
+   * attributes data read from server. One may use the unread_all_objects() to re-read database after reload.
+   *
+   *  \param unread_implementation_objs  if true, clear implementation objects; otherwise only template objects are
+   * unread and the implementation conffwk objects are still valid.
+   */
+
+  void unread_all_objects(bool unread_implementation_objs = false) noexcept;
+
+  /**
+   *  \brief Unread all template (i.e. set their state as uninitialized) objects.
+   *
+   *  Unread template objects result changing their state to uninitialized. They will be re-initialized, when accessed
+   * by user code. This feature is used by attribute converter methods using unread_all_objects().
+   */
+
+  void unread_template_objects() noexcept
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+    _unread_template_objects();
+  }
+
+  /**
+   *  \brief Unread implementation objects (i.e. clear their cache).
+   *
+   *  This results removing any information from implementation cache, e.g. clear any object attributes data read from
+   * server.
+   *
+   *  \param state  set state of implementation objects after unread; is set to "Unknown" after abort()
+   */
+
+  void unread_implementation_objects(dunedaq::conffwk::ObjectState state) noexcept
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_impl_mutex);
+    _unread_implementation_objects(state);
+  }
+
+private:
+  static void update_impl_objects(conffwk::pmap<conffwk::map<ConfigObjectImpl*>*>& cache,
+                                  ConfigurationChange& change,
+                                  const std::string* class_name);
+
+  void _unread_template_objects() noexcept;
+
+  void _unread_implementation_objects(dunedaq::conffwk::ObjectState state) noexcept;
+
+public:
+  /**
+   *  \brief Create new object by class name and object id.
+   *
+   *  The method tries to create an object with given id in given class.
+   *  If found, the method fills \c 'object' reference.
+   *
+   *  \param at           database file where to create new object
+   *  \param class_name   name of the class
+   *  \param id           object identity
+   *  \param object       returned value in case of success
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void create(const std::string& at, const std::string& class_name, const std::string& id, ConfigObject& object);
+
+  /**
+   *  \brief Create new object by class name and object id.
+   *
+   *  The method tries to create an object with given id in given class.
+   *  If found, the method fills \c 'object' reference.
+   *
+   *  \param at           create new object at the same database file where \b 'at' object is located
+   *  \param class_name   name of the class
+   *  \param id           object identity
+   *  \param object       returned value in case of success
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void create(const ConfigObject& at, const std::string& class_name, const std::string& id, ConfigObject& object);
+
+  /**
+   *  \brief Create object of given class by identity and instantiate the template parameter with it.
+   *
+   *  Such method to be used for user classes generated by the genconffwk utility.
+   *
+   *  \param at            database file where to create new object
+   *  \param id            object identity
+   *  \param init_object   if true, initialise object's attributes and relationships
+   *
+   *  \return \b non-null pointer to created object.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  template<class T>
+  const T* create(const std::string& at, const std::string& id, bool init_object = false);
+
+  /**
+   *  \brief Create object of given class by identity and instantiate the template parameter with it.
+   *
+   *  Such method to be used for user classes generated by the genconffwk utility.
+   *
+   *  \param at            an existing object of class generated by genconffwk to define location of the file where to
+   * store new object
+   *  \param id            object identity
+   *  \param init_object   if true, initialize object's attributes and relationships
+   *       *
+   *  \return \b non-null pointer to created object.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  template<class T>
+  const T* create(const DalObject& at, const std::string& id, bool init_object = false);
+
+  /**
+   *  \brief Destroy object.
+   *
+   *  The method tries to destroy given object.
+   *
+   *  \param object   the object's reference
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void destroy_obj(ConfigObject& object);
+
+  /**
+   *  \brief Destroy object of given class.
+   *
+   *  The method tries to destoy given object.
+   *
+   *  \param  obj  the object's reference
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  template<class T>
+  void destroy(T& obj);
+
+public:
+  /**
+   *  \brief Test the object existence.
+   *
+   *  The method searches an object with given id within the class and all derived subclasses.
+   *  If found, the method returns \b true, otherwise the method return \b false.
+   *
+   *  \param class_name   name of the class
+   *  \param id           object identity
+   *  \param rlevel       optional references level to optimize performance (defines how many objects referenced by
+   * given object have also to be read to the implementation cache)
+   *  \param rclasses     optional array of class names to optimize performance (defines which referenced objects have
+   * to be read to the implementation cache)
+   *
+   *  \throw dunedaq::conffwk::Generic if there is no such class or in case of an error
+   */
+
+  bool test_object(const std::string& class_name,
+                   const std::string& id,
+                   unsigned long rlevel = 0,
+                   const std::vector<std::string>* rclasses = 0);
+
+  /**
+   *  \brief Get object by class name and object id (multi-thread safe).
+   *
+   *  The method searches an object with given id within the class and all derived subclasses.
+   *
+   *  \param class_name   name of the class
+   *  \param id           object identity
+   *  \param object       returned value in case of success
+   *  \param rlevel       optional references level to optimize performance (defines how many objects referenced by
+   * given object have also to be read to the implementation cache)
+   *  \param rclasses     optional array of class names to optimize performance (defines which referenced objects have
+   * to be read to the implementation cache)
+   *
+   *  \throw dunedaq::conffwk::NotFound exception if there is no such object or \b dunedaq::conffwk::Generic in case of
+   * an error
+   */
+
+  void get(const std::string& class_name,
+           const std::string& id,
+           ConfigObject& object,
+           unsigned long rlevel = 0,
+           const std::vector<std::string>* rclasses = 0);
+
+  /**
+   *  \brief Get all objects of class.
+   *
+   *  The method returns all objects of given class and objects of subclasses derived from it.
+   *
+   *  \param class_name   name of the class
+   *  \param objects      returned value in case of success
+   *  \param query        optional parameter defining selection criteria for objects of given class
+   *  \param rlevel       optional references level to optimize performance (defines how many objects referenced by
+   * found objects have also to be read to the implementation cache)
+   *  \param rclasses     optional array of class names to optimize performance (defines which referenced objects have
+   * to be read to the implementation cache)
+   *
+   *  \throw dunedaq::conffwk::NotFound exception if there is no such class or \b dunedaq::conffwk::Generic in case of
+   * an error
+   */
+
+  void get(const std::string& class_name,
+           std::vector<ConfigObject>& objects,
+           const std::string& query = "",
+           unsigned long rlevel = 0,
+           const std::vector<std::string>* rclasses = 0);
+
+  /**
+   *  \brief Get path between objects.
+   *
+   *  The method returns all objects which are in the path starting from source object
+   *  matching to the path query pattern.
+   *
+   *  \param obj_from   object to start from
+   *  \param query      path query
+   *  \param objects    returned value in case of success
+   *  \param rlevel     optional references level to optimize performance (defines how many objects referenced by found
+   * objects have also to be read to the implementation cache)
+   *  \param rclasses   optional array of class names to optimize performance (defines which referenced objects have to
+   * be read to the implementation cache)
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void get(const ConfigObject& obj_from,
+           const std::string& query,
+           std::vector<ConfigObject>& objects,
+           unsigned long rlevel = 0,
+           const std::vector<std::string>* rclasses = 0);
+
+  /**
+   *  \brief Get object of given class by identity and instantiate the template parameter with it (multi-thread safe).
+   *
+   *  Such method to be used for user classes generated by the genconffwk utility.
+   *
+   *  \param id             object identity
+   *  \param init_children  if true, the referenced objects are initialized
+   *  \param init           if true, the object's attributes and relationships are read
+   *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by
+   * given object have also to be read to the implementation cache)
+   *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have
+   * to be read to the implementation cache)
+   *
+   *  \return  Return 0 if there is no object with such id or pointer to object otherwise.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  template<class T>
+  const T* get(const std::string& id,
+               bool init_children = false,
+               bool init = true,
+               unsigned long rlevel = 0,
+               const std::vector<std::string>* rclasses = 0)
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+    return _get<T>(id, init_children, init, rlevel, rclasses);
+  }
+
+  /**
+   *  \brief Get object of given class by object reference and instantiate the template parameter with it (multi-thread
+   * safe).
+   *
+   *  Such method to be used for user classes generated by the genconffwk utility.
+   *
+   *  \param obj            reference to conffwk object, that is used to instantiate template object
+   *  \param init_children  if true, the referenced objects are initialized
+   *  \param init           if true, the object's attributes and relationships are read
+   *
+   *  \return Return pointer to object.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  template<class T>
+  const T* get(ConfigObject& obj, bool init_children = false, bool init = true)
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+    return _get<T>(obj, init_children, init);
+  }
+
+  /**
+   *  \brief Get all objects of given class and instantiate a vector of
+   *  the template parameters object with it (multi-thread safe).
+   *
+   *  Such method to be used for user classes generated by the genconffwk utility.
+   *
+   *  \param objects        the vector is filled by the method
+   *  \param init_children  if true, the referenced objects are initialized
+   *  \param init           if true, the object's attributes and relationships are read
+   *  \param query          optional parameter defining selection criteria for objects of given class
+   *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by
+   * found objects have also to be read to the implementation cache)
+   *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have
+   * to be read to the implementation cache)
+   *
+   *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no such class, plug-in specific problem)
+   */
+
+  template<class T>
+  void get(std::vector<const T*>& objects,
+           bool init_children = false,
+           bool init = true,
+           const std::string& query = "",
+           unsigned long rlevel = 0,
+           const std::vector<std::string>* rclasses = 0)
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+    _get<T>(objects, init_children, init, query, rlevel, rclasses);
+  }
+
+  /**
+   *  \brief Generate object of given class by object reference and instantiate the template parameter with it
+   * (multi-thread safe).
    *
    *  Such method to be used to generate template objects.
    *
@@ -820,13 +819,11 @@ class Configuration {
    */
 
   template<class T>
-    const T *
-    get(ConfigObject& obj, const std::string& id)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-      return _get<T>(obj, id);
-    }
-
+  const T* get(ConfigObject& obj, const std::string& id)
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+    return _get<T>(obj, id);
+  }
 
   /**
    *  \brief Find object of given class (multi-thread safe).
@@ -841,912 +838,909 @@ class Configuration {
    */
 
   template<class T>
-    const T *
-    find(const std::string& id)
-    {
-      std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-      return _find<T>(id);
-    }
+  const T* find(const std::string& id)
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+    return _find<T>(id);
+  }
 
+  /**
+   *  \brief Get signle value of object's relation and instantiate result with it (multi-thread safe).
+   *
+   *  The method is used by the code generated by the genconffwk utility.
+   *
+   *  \param obj   object
+   *  \param name  name of the relationship
+   *  \param init  if true, the object and it's referenced objects are initialized
+   *
+   *  \return Return non-null pointer to object of user class in case if
+   *  relationship with such name exists and it's value is set.
+   *  Otherwise the method returns 0.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no relationship with such name, plug-in specific
+   * problem)
+   */
 
-      /**
-       *  \brief Get signle value of object's relation and instantiate result with it (multi-thread safe).
-       *
-       *  The method is used by the code generated by the genconffwk utility.
-       *
-       *  \param obj   object
-       *  \param name  name of the relationship
-       *  \param init  if true, the object and it's referenced objects are initialized
-       *
-       *  \return Return non-null pointer to object of user class in case if
-       *  relationship with such name exists and it's value is set.
-       *  Otherwise the method returns 0.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no relationship with such name, plug-in specific problem)
-       */
+  template<class T>
+  const T* ref(ConfigObject& obj, const std::string& name, bool init = false)
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+    return _ref<T>(obj, name, init);
+  }
 
-    template<class T> const T * ref(ConfigObject& obj, const std::string& name, bool init = false) {
-      std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-      return _ref<T>(obj, name, init);
-    }
+  /**
+   *  \brief Get multiple values of object's relation and instantiate result with them (multi-thread safe).
+   *
+   *  The method is used by the code generated by the genconffwk utility.
+   *
+   *  \param obj       object
+   *  \param name      name of the relationship
+   *  \param objects   returned value
+   *  \param init      if true, the objects and their referenced objects are initialized
+   *
+   *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no relationship with such name, plug-in specific
+   * problem)
+   */
 
+  template<class T>
+  void ref(ConfigObject& obj, const std::string& name, std::vector<const T*>& objects, bool init = false)
+  {
+    std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
+    _ref<T>(obj, name, objects, init);
+  }
 
+  /**
+   *  \brief Get template DAL objects holding references on this object via given relationship (multi-thread safe).
+   *
+   *  The method returns objects of class V, which have references on given object via explicitly provided relationship
+   * name. If the relationship name is set to "*", then the method takes into account  all relationships of all objects.
+   *  The method is efficient only for composite relationships (i.e. when a parent has composite reference on this
+   * object). For generic relationships the method performs full scan of all database objects. It is not recommended at
+   * large scale to build complete graph of relations between all database object.
+   *
+   *  \param obj                   object
+   *  \param objects               returned value
+   *  \param relationship_name     name of the relationship, via which the object is referenced
+   *  \param check_composite_only  only returned composite parent objects
+   *  \param init                  if true, the returned objects and their referenced objects are initialized
+   *  \param rlevel                optional references level to optimize performance (defines how many objects
+   * referenced by found objects have also to be read to the implementation cache)
+   *  \param rclasses              optional array of class names to optimize performance (defines which referenced
+   * objects have to be read to the implementation cache)
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
 
-      /**
-       *  \brief Get multiple values of object's relation and instantiate result with them (multi-thread safe).
-       *
-       *  The method is used by the code generated by the genconffwk utility.
-       *
-       *  \param obj       object
-       *  \param name      name of the relationship
-       *  \param objects   returned value
-       *  \param init      if true, the objects and their referenced objects are initialized
-       *
-       *  \throw dunedaq::conffwk::Generic in case of a problem (e.g. no relationship with such name, plug-in specific problem)
-       */
+  template<class T, class V>
+  void referenced_by(const T& obj,
+                     std::vector<const V*>& objects,
+                     const std::string& relationship_name = "*",
+                     bool check_composite_only = true,
+                     bool init = false,
+                     unsigned long rlevel = 0,
+                     const std::vector<std::string>* rclasses = nullptr);
 
-    template<class T> void ref(ConfigObject& obj, const std::string& name, std::vector<const T*>& objects, bool init = false) {
-      std::lock_guard<std::mutex> scoped_lock(m_tmpl_mutex);
-      _ref<T>(obj, name, objects, init);
-    }
+  /**
+   *  \brief Get DAL objects  holding references on this object via given relationship (multi-thread safe).
+   *
+   *  The method returns vector of DalObject, which have references on given object via explicitly provided relationship
+   * name. If the relationship name is set to "*", then the method takes into account  all relationships of all objects.
+   *
+   *  It is expected that the DAL for returned objects is generated and linked with user code. If this is not the case,
+   * then an exception will be thrown. The parameter upcast_unregistered allows to select one of the registered base
+   * classes instead. Note, this will be a random base class, not the closest based one.
+   *
+   *  The method is efficient only for composite relationships (i.e. when a parent has composite reference on this
+   * object). For generic relationships the method performs full scan of all database objects. It is not recommended at
+   * large scale to build complete graph of relations between all database object.
+   *
+   *  \param obj                   object
+   *  \param relationship_name     name of the relationship, via which the object is referenced
+   *  \param upcast_unregistered   if true, try to upcast objects of classes which DAL classes are not loaded; otherwise
+   * throw exception if such DAL class is not registered
+   *  \param check_composite_only  only returned composite parent objects
+   *  \param init                  if true, the returned objects and their referenced objects are initialized
+   *  \param rlevel                optional references level to optimize performance (defines how many objects
+   * referenced by found objects have also to be read to the implementation cache)
+   *  \param rclasses              optional array of class names to optimize performance (defines which referenced
+   * objects have to be read to the implementation cache)
+   *  \return                      objects referencing given one
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
 
+  std::vector<const DalObject*> referenced_by(const DalObject& obj,
+                                              const std::string& relationship_name = "*",
+                                              bool check_composite_only = true,
+                                              bool upcast_unregistered = true,
+                                              bool init = false,
+                                              unsigned long rlevel = 0,
+                                              const std::vector<std::string>* rclasses = nullptr);
 
+  /**
+   *  \brief Cast objects from one class to another (multi-thread safe).
+   *
+   *  Try to cast object SOURCE to TARGET. Returns 0 if not successful.
+   *  Do not use the normal \b dynamic_cast<T>() for database classes.
+   *
+   *  \return Return nullptr if the cast is not successful.
+   */
 
-      /**
-       *  \brief Get template DAL objects holding references on this object via given relationship (multi-thread safe).
-       *
-       *  The method returns objects of class V, which have references on given object via explicitly provided relationship name.
-       *  If the relationship name is set to "*", then the method takes into account  all relationships of all objects.
-       *  The method is efficient only for composite relationships (i.e. when a parent has composite reference on this object).
-       *  For generic relationships the method performs full scan of all database objects.
-       *  It is not recommended at large scale to build complete graph of relations between all database object.
-       *
-       *  \param obj                   object
-       *  \param objects               returned value
-       *  \param relationship_name     name of the relationship, via which the object is referenced
-       *  \param check_composite_only  only returned composite parent objects
-       *  \param init                  if true, the returned objects and their referenced objects are initialized
-       *  \param rlevel                optional references level to optimize performance (defines how many objects referenced by found objects have also to be read to the implementation cache)
-       *  \param rclasses              optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
+  template<class TARGET, class SOURCE>
+  const TARGET* cast(const SOURCE* s) noexcept
+  {
+    return s->template cast<TARGET>();
+  }
 
-    template<class T, class V> void referenced_by(const T& obj, std::vector<const V*>& objects, const std::string& relationship_name = "*", bool check_composite_only = true, bool init = false, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
+private:
+  /// \throw dunedaq::conffwk::Generic or dunedaq::conffwk::NotFound
+  void _get(const std::string& class_name,
+            const std::string& id,
+            ConfigObject& object,
+            unsigned long rlevel,
+            const std::vector<std::string>* rclasses);
 
+  /// \throw dunedaq::conffwk::Generic
+  template<class T>
+  const T* _get(const std::string& id,
+                bool init_children = false,
+                bool init = true,
+                unsigned long rlevel = 0,
+                const std::vector<std::string>* rclasses = 0);
 
+  /// \throw dunedaq::conffwk::Generic
+  template<class T>
+  const T* _get(ConfigObject& obj, bool init_children = false, bool init = true);
+
+  // /// \throw dunedaq::conffwk::Generic
+  // template<class T> const T * _get(ConfigObject& obj, const std::string& id);
+
+  /// \throw dunedaq::conffwk::Generic
+  template<class T>
+  void _get(std::vector<const T*>& objects,
+            bool init_children = false,
+            bool init = true,
+            const std::string& query = "",
+            unsigned long rlevel = 0,
+            const std::vector<std::string>* rclasses = 0);
+
+  /// \throw dunedaq::conffwk::Generic
+  template<class T>
+  DalObject* _make_instance(ConfigObject& obj, const std::string& uid)
+  {
+    // note upcast since the _get() returns pointer to T
+    return const_cast<T*>(_get<T>(obj, uid));
+  }
+
+  // std::vector<const DalObject*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
+
+  // const DalObject* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
+
+  // should be made private
+
+public:
+  template<class T>
+  void downcast_dal_objects(const std::vector<const T*>& objs,
+                            bool /*upcast_unregistered*/,
+                            std::vector<const DalObject*>& result)
+  {
+    for (auto& i : objs)
+      result.push_back(i);
+  }
+
+  template<class T>
+  void downcast_dal_object(const T* obj, bool /*upcast_unregistered*/, std::vector<const DalObject*>& result)
+  {
+    if (obj)
+      result.push_back(obj);
+  }
+
+  /**
+   *  \brief Multi-thread unsafe version of find(const std::string&) method
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  template<class T>
+  const T* _find(const std::string& id);
+
+  /**
+   *  \brief Multi-thread unsafe version of ref(ConfigObject&, const std::string&, bool);
+   *  The method should not be used by user.
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  template<class T>
+  const T* _ref(ConfigObject& obj, const std::string& name, bool read_children);
+
+  /**
+   *  \brief Multi-thread unsafe version of ref(ConfigObject&, const std::string&, std::vector<const T*>&, bool);
+   *  The method should not be used by user.
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  template<class T>
+  void _ref(ConfigObject& obj, const std::string& name, std::vector<const T*>& results, bool read_children);
+
+  /**
+   * \brief Checks if cast from source class to target class is allowed.
+   *
+   * \param target  name of desired class (e.g. try to cast object of "source" class to this "target" one)
+   * \param source  name of casted object class
+   *
+   * \return Return \b true if the cast is allowed by database schema
+   */
+
+  bool try_cast(const std::string& target, const std::string& source) noexcept;
+
+  bool try_cast(const std::string* target, const std::string* source) noexcept;
+
+  bool is_superclass_of(const std::string& target, const std::string& source) noexcept;
+
+  bool is_superclass_of(const std::string* target, const std::string* source) noexcept;
+
+private:
+  /** Helper method to prepare exception text when template ref() method fails **/
+
+  static std::string mk_ref_ex_text(const char* what,
+                                    const std::string& cname,
+                                    const std::string& rname,
+                                    const ConfigObject& obj) noexcept;
+
+  /** Helper method to prepare exception text when template referenced_by() method fails **/
+
+  static std::string mk_ref_by_ex_text(const std::string& cname,
+                                       const std::string& rname,
+                                       const ConfigObject& obj) noexcept;
+
+  // database manipulations
+
+public:
+  /**
+   *  \brief Check if database is correctly loaded.
+   *
+   *  Check state of the database after configuration object creation.
+   *
+   *  \return \b true if the database was successfully loaded and \b false otherwise.
+   */
+
+  bool loaded() const noexcept;
+
+  /**
+   *  \brief Load database according to the name.
+   *  If name is empty, take it from TDAQ_DB_NAME and TDAQ_DB_DATA
+   *  environment variables.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void load(const std::string& db_name);
+
+  /**
+   *  \brief Unload database.
+   *
+   *  The database should be previously loaded.
+   *  The method destroys all user objects from cache (i.e. created
+   *  via conffwk and template get methods) and frees all DB resources
+   *  allocated by the implementation plug-in.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void unload();
+
+  /**
+   *  \brief Create database.
+   *
+   *  The method creates database according to the name and list of others
+   *  database files to be included.
+   *
+   *  \param db_name       name of new database file (must be an absolute path to non-existing file)
+   *  \param includes      optional list of others database files to be included
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void create(const std::string& db_name, const std::list<std::string>& includes);
+
+  /**
+   *  \brief Get write access status.
+   *
+   *  Check if given database file is writable by current user.
+   *
+   *  \param db_name       name of database
+   *
+   *  \return \b true, if database file is writable and \b false otherwise.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  bool is_writable(const std::string& db_name) const;
+
+  /**
+   *  \brief Add include file to existing database.
+   *
+   *  The method adds (and loads) existing include file to the database.
+   *
+   *  \param db_name       name of database file to be included
+   *  \param include       file to be included
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void add_include(const std::string& db_name, const std::string& include);
+
+  /**
+   *  \brief Remove include file.
+   *
+   *  The method removes existing include file from the database.
+   *
+   *  \param db_name       name of database file from which the include to be removed
+   *  \param include       file to be removed from includes
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void remove_include(const std::string& db_name, const std::string& include);
+
+  /**
+   *  \brief Get include files.
+   *
+   *  The method returns list of files included by given database.
+   *
+   *  \param db_name       name of database file
+   *  \param includes      returned list of include files
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void get_includes(const std::string& db_name, std::list<std::string>& includes) const;
+
+  /**
+   *  \brief Get list of updated files to be committed.
+   *
+   *  The method returns list of uncommitted database files.
+   *
+   *  \param dbs           returned list of uncommitted database files
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void get_updated_dbs(std::list<std::string>& dbs) const;
+
+  /**
+   *  \brief Set commit credentials.
+   *
+   *  The method sets credentials used by commit method.
+   *
+   *  \param user       user name
+   *  \param password   user password
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void set_commit_credentials(const std::string& user, const std::string& password);
+
+  /**
+   *  \brief Commit database changes.
+   *
+   *  The method commits the changes after a database was modified.
+   *
+   *  \param log_message   log information
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void commit(const std::string& log_message = "");
+
+  /**
+   *  \brief Abort database changes.
+   *
+   *  The method rolls back non-committed database modifications.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void abort();
+
+  /**
+   *  \brief Prefetch all data into client cache.
+   *
+   *  The method reads all objects defined in database into client cache.
+   *
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  void prefetch_all_data();
+
+  // access versions
+
+public:
+  /**
+   *  \brief Get new conffwk versions.
+   *  \return repository changes: new versions created on remote origin after current HEAD version, or externally
+   * modified files
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  std::vector<dunedaq::conffwk::Version> get_changes();
+
+  /**
+   *  \brief Get repository versions in interval.
+   *
+   *  Access historical versions.
+   *
+   *  The date/time format has to be either a date in format "yyyy-mm-dd" or date-and-time in format "yyyy-mm-dd
+   * hh:mm:ss" (UTC).
+   *
+   *  \param since limit the versions committed on-or-after the specified hash key, tag or date/time; if empty, start
+   * from earliest available
+   *  \param until limit the versions committed on-or-before the specified hash key, tag or date/time; if empty,
+   * retrieve all versions until latest available
+   *  \param type define query type
+   *  \param skip_irrelevant if true, ignore changes not affecting loaded configuration
+   *  \return repository versions satisfying query
+   *  \throw dunedaq::conffwk::Generic in case of an error
+   */
+
+  std::vector<dunedaq::conffwk::Version> get_versions(
+    const std::string& since,
+    const std::string& until,
+    dunedaq::conffwk::Version::QueryType type = dunedaq::conffwk::Version::query_by_date,
+    bool skip_irrelevant = true);
+
+  // access to schema description
+
+public:
+  /**
+   *  \brief The method provides access to description of class.
+   *
+   *  \param  class_name   name of the class
+   *  \param  direct_only  if true is set explicitly, return descriptions of direct attributes, relationships, super-
+   * and subclasses; by default return all descriptions taking into account inheritance
+   *  \return              Return pointer to class description object.
+   *
+   *  \throw dunedaq::conffwk::NotFound exception if there is no class with such name or \b dunedaq::conffwk::Generic in
+   * case of a problem
+   */
+
+  const dunedaq::conffwk::class_t& get_class_info(const std::string& class_name, bool direct_only = false);
+
+private:
+  const dunedaq::conffwk::class_t& _get_class_info(const std::string& class_name, bool direct_only = false);
+
+  // cache, storing descriptions of schema
+
+  conffwk::map<dunedaq::conffwk::class_t*> p_direct_classes_desc_cache;
+  conffwk::map<dunedaq::conffwk::class_t*> p_all_classes_desc_cache;
+
+public:
+  /**
+   *  \brief Export configuration schema into ptree.
+   *
+   *  \param  tree         output ptree object
+   *  \param  classes      regex defining class names; all classes if empty
+   *  \param  direct_only  if true is set explicitly, return descriptions of direct attributes, relationships, super-
+   * and subclasses; by default return all descriptions taking into account inheritance
+   *
+   *  \throw dunedaq::conffwk::Generic in case of a problem
+   */
+
+  void export_schema(boost::property_tree::ptree& tree, const std::string& classes = "", bool direct_only = false);
+
+  /**
+   *  \brief Export configuration data into ptree.
+   *
+   *  \param  tree               output ptree object
+   *  \param  classes            regex defining class names; ignore if empty
+   *  \param  objects            regex defining object IDs; ignore if empty
+   *  \param  files              regex defining data file names; ignore if empty
+   *  \param  empty_array_item   if provided, add this item to mark empty arrays
+   *
+   *  \throw dunedaq::conffwk::Generic in case of a problem
+   */
+
+  void export_data(boost::property_tree::ptree& tree,
+                   const std::string& classes = "",
+                   const std::string& objects = "",
+                   const std::string& files = "",
+                   const std::string& empty_array_item = "");
+
+  // user-defined converters
+
+public:
+  /** Base converter class with a virtual destructor **/
+
+  class AttributeConverterBase
+  {
+
+  public:
+    virtual ~AttributeConverterBase() { ; }
+  };
+
+  /**
+   *  \brief Virtual converter class.
+   *
+   *  To implement a converter for given type of attribute, a user needs to inherit from this class
+   *  providing the attribute type and implementing the convert() method.
+   *  To be used an object of the user converter class has to be registered using register_converter() method.
+   */
+
+  template<class T>
+  class AttributeConverter : public AttributeConverterBase
+  {
+
+  public:
     /**
-     *  \brief Get DAL objects  holding references on this object via given relationship (multi-thread safe).
+     *  \brief Method to make the conversion of attribute value.
      *
-     *  The method returns vector of DalObject, which have references on given object via explicitly provided relationship name.
-     *  If the relationship name is set to "*", then the method takes into account  all relationships of all objects.
+     *  When the converter object is registered, the convert() method is called for each
+     *  attribute value of given type to read any database object. The parameters passed to
+     *  the convert method are described below:
+     *  \param value      reference on the value to be converted
+     *  \param conf       const reference on the configuration object
+     *  \param obj        const reference on the converted object
+     *  \param attr_name  name of the attribute which value to be converted
      *
-     *  It is expected that the DAL for returned objects is generated and linked with user code. If this is not the case, then an exception will be thrown.
-     *  The parameter upcast_unregistered allows to select one of the registered base classes instead.
-     *  Note, this will be a random base class, not the closest based one.
-     *
-     *  The method is efficient only for composite relationships (i.e. when a parent has composite reference on this object).
-     *  For generic relationships the method performs full scan of all database objects.
-     *  It is not recommended at large scale to build complete graph of relations between all database object.
-     *
-     *  \param obj                   object
-     *  \param relationship_name     name of the relationship, via which the object is referenced
-     *  \param upcast_unregistered   if true, try to upcast objects of classes which DAL classes are not loaded; otherwise throw exception if such DAL class is not registered
-     *  \param check_composite_only  only returned composite parent objects
-     *  \param init                  if true, the returned objects and their referenced objects are initialized
-     *  \param rlevel                optional references level to optimize performance (defines how many objects referenced by found objects have also to be read to the implementation cache)
-     *  \param rclasses              optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache)
-     *  \return                      objects referencing given one
-     *
-     *  \throw dunedaq::conffwk::Generic in case of an error
+     *  The method modifies parameter 'value', if a conversion is required.
      */
 
-    std::vector<const DalObject*>
-    referenced_by(const DalObject& obj, const std::string& relationship_name = "*", bool check_composite_only = true, bool upcast_unregistered = true, bool init = false, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = nullptr);
-
-
-      /**
-       *  \brief Cast objects from one class to another (multi-thread safe).
-       *
-       *  Try to cast object SOURCE to TARGET. Returns 0 if not successful.
-       *  Do not use the normal \b dynamic_cast<T>() for database classes.
-       *
-       *  \return Return nullptr if the cast is not successful.
-       */
-
-    template<class TARGET, class SOURCE> const TARGET *cast(const SOURCE *s) noexcept {
-      return s->template cast<TARGET>();
-    }
-
-
-  private:
-
-    /// \throw dunedaq::conffwk::Generic or dunedaq::conffwk::NotFound
-    void _get(const std::string& class_name, const std::string& id, ConfigObject& object, unsigned long rlevel, const std::vector<std::string> * rclasses);
-
-    /// \throw dunedaq::conffwk::Generic
-    template<class T> const T * _get(const std::string& id, bool init_children = false, bool init = true, unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
-
-    /// \throw dunedaq::conffwk::Generic
-    template<class T> const T * _get(ConfigObject& obj, bool init_children = false, bool init = true);
-
-    // /// \throw dunedaq::conffwk::Generic
-    // template<class T> const T * _get(ConfigObject& obj, const std::string& id);
-
-    /// \throw dunedaq::conffwk::Generic
-    template<class T> void _get(std::vector<const T*>& objects, bool init_children = false, bool init = true, const std::string& query = "", unsigned long rlevel = 0, const std::vector<std::string> * rclasses = 0);
-
-    /// \throw dunedaq::conffwk::Generic
-    template<class T> DalObject * _make_instance(ConfigObject& obj, const std::string& uid)
-    {
-      // note upcast since the _get() returns pointer to T
-      return const_cast<T*>(_get<T>(obj, uid));
-    }
-
-    // std::vector<const DalObject*> make_dal_objects(std::vector<ConfigObject>& objs, bool upcast_unregistered);
-
-    // const DalObject* make_dal_object(ConfigObject& obj, const std::string& uid, const std::string& class_name);
-
-
-    // should be made private
-
-  public:
-
-    template<class T>
-    void
-    downcast_dal_objects(const std::vector<const T *>& objs,
-                         bool /*upcast_unregistered*/, std::vector<const DalObject*>& result)
-    {
-      for (auto& i : objs)
-        result.push_back(i);
-    }
-
-    template<class T>
-    void
-    downcast_dal_object(const T * obj, bool /*upcast_unregistered*/, std::vector<const DalObject*>& result)
-    {
-      if(obj)
-        result.push_back(obj);
-    }
-
-
-      /**
-       *  \brief Multi-thread unsafe version of find(const std::string&) method
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    template<class T> const T * _find(const std::string& id);
-
-
-      /**
-       *  \brief Multi-thread unsafe version of ref(ConfigObject&, const std::string&, bool);
-       *  The method should not be used by user.
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    template<class T> const T * _ref(ConfigObject& obj, const std::string& name, bool read_children);
-
-
-      /**
-       *  \brief Multi-thread unsafe version of ref(ConfigObject&, const std::string&, std::vector<const T*>&, bool);
-       *  The method should not be used by user.
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    template<class T> void _ref(ConfigObject& obj, const std::string& name, std::vector<const T*>& results, bool read_children);
-
-
-      /**
-       * \brief Checks if cast from source class to target class is allowed.
-       *
-       * \param target  name of desired class (e.g. try to cast object of "source" class to this "target" one)
-       * \param source  name of casted object class
-       *
-       * \return Return \b true if the cast is allowed by database schema
-       */
-
-    bool try_cast(const std::string& target, const std::string& source) noexcept;
-
-    bool try_cast(const std::string* target, const std::string* source) noexcept;
-
-    bool is_superclass_of(const std::string& target, const std::string& source) noexcept;
-
-    bool is_superclass_of(const std::string* target, const std::string* source) noexcept;
-
-  private:
-
-      /** Helper method to prepare exception text when template ref() method fails **/
-
-    static std::string mk_ref_ex_text(const char * what, const std::string& cname, const std::string& rname, const ConfigObject& obj) noexcept;
-
-
-      /** Helper method to prepare exception text when template referenced_by() method fails **/
-
-    static std::string mk_ref_by_ex_text(const std::string& cname, const std::string& rname, const ConfigObject& obj) noexcept;
-
-
-    // database manipulations
-
-  public:
-
-      /**
-       *  \brief Check if database is correctly loaded.
-       *
-       *  Check state of the database after configuration object creation.
-       *
-       *  \return \b true if the database was successfully loaded and \b false otherwise.
-       */
-
-    bool loaded() const noexcept;
-
-
-      /**
-       *  \brief Load database according to the name.
-       *  If name is empty, take it from TDAQ_DB_NAME and TDAQ_DB_DATA
-       *  environment variables.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void load(const std::string& db_name);
-
-
-      /**
-       *  \brief Unload database.
-       *
-       *  The database should be previously loaded.
-       *  The method destroys all user objects from cache (i.e. created
-       *  via conffwk and template get methods) and frees all DB resources
-       *  allocated by the implementation plug-in.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void unload();
-
-
-      /**
-       *  \brief Create database.
-       *
-       *  The method creates database according to the name and list of others
-       *  database files to be included.
-       *
-       *  \param db_name       name of new database file (must be an absolute path to non-existing file)
-       *  \param includes      optional list of others database files to be included
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void create(const std::string& db_name, const std::list<std::string>& includes);
-
-
-      /**
-       *  \brief Get write access status.
-       *
-       *  Check if given database file is writable by current user.
-       *
-       *  \param db_name       name of database
-       *
-       *  \return \b true, if database file is writable and \b false otherwise.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    bool is_writable(const std::string& db_name) const;
-
-
-      /**
-       *  \brief Add include file to existing database.
-       *
-       *  The method adds (and loads) existing include file to the database.
-       *
-       *  \param db_name       name of database file to be included
-       *  \param include       file to be included
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void add_include(const std::string& db_name, const std::string& include);
-
-
-      /**
-       *  \brief Remove include file.
-       *
-       *  The method removes existing include file from the database.
-       *
-       *  \param db_name       name of database file from which the include to be removed
-       *  \param include       file to be removed from includes
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void remove_include(const std::string& db_name, const std::string& include);
-
-
-      /**
-       *  \brief Get include files.
-       *
-       *  The method returns list of files included by given database.
-       *
-       *  \param db_name       name of database file
-       *  \param includes      returned list of include files
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void get_includes(const std::string& db_name, std::list<std::string>& includes) const;
-
-
-      /**
-       *  \brief Get list of updated files to be committed.
-       *
-       *  The method returns list of uncommitted database files.
-       *
-       *  \param dbs           returned list of uncommitted database files
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void get_updated_dbs(std::list<std::string>& dbs) const;
-
-
-      /**
-       *  \brief Set commit credentials.
-       *
-       *  The method sets credentials used by commit method.
-       *
-       *  \param user       user name
-       *  \param password   user password
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void set_commit_credentials(const std::string& user, const std::string& password);
-
-
-      /**
-       *  \brief Commit database changes.
-       *
-       *  The method commits the changes after a database was modified.
-       *
-       *  \param log_message   log information
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void commit(const std::string& log_message = "");
-
-
-      /**
-       *  \brief Abort database changes.
-       *
-       *  The method rolls back non-committed database modifications.
-       *
-       *  \throw dunedaq::conffwk::Generic in case of an error
-       */
-
-    void abort();
-
-
-    /**
-     *  \brief Prefetch all data into client cache.
-     *
-     *  The method reads all objects defined in database into client cache.
-     *
-     *  \throw dunedaq::conffwk::Generic in case of an error
-     */
-
-    void prefetch_all_data();
-
-
-    // access versions
-
-  public:
-
-    /**
-     *  \brief Get new conffwk versions.
-     *  \return repository changes: new versions created on remote origin after current HEAD version, or externally modified files
-     *  \throw dunedaq::conffwk::Generic in case of an error
-     */
-
-    std::vector<dunedaq::conffwk::Version>
-    get_changes();
-
-
-    /**
-     *  \brief Get repository versions in interval.
-     *
-     *  Access historical versions.
-     *
-     *  The date/time format has to be either a date in format "yyyy-mm-dd" or date-and-time in format "yyyy-mm-dd hh:mm:ss" (UTC).
-     *
-     *  \param since limit the versions committed on-or-after the specified hash key, tag or date/time; if empty, start from earliest available
-     *  \param until limit the versions committed on-or-before the specified hash key, tag or date/time; if empty, retrieve all versions until latest available
-     *  \param type define query type
-     *  \param skip_irrelevant if true, ignore changes not affecting loaded configuration
-     *  \return repository versions satisfying query
-     *  \throw dunedaq::conffwk::Generic in case of an error
-     */
-
-    std::vector<dunedaq::conffwk::Version>
-    get_versions(const std::string& since, const std::string& until, dunedaq::conffwk::Version::QueryType type = dunedaq::conffwk::Version::query_by_date, bool skip_irrelevant = true);
-
-
-
-    // access to schema description
-
-  public:
-
-      /**
-       *  \brief The method provides access to description of class.
-       *
-       *  \param  class_name   name of the class
-       *  \param  direct_only  if true is set explicitly, return descriptions of direct attributes, relationships, super- and subclasses; by default return all descriptions taking into account inheritance
-       *  \return              Return pointer to class description object.
-       *
-       *  \throw dunedaq::conffwk::NotFound exception if there is no class with such name or \b dunedaq::conffwk::Generic in case of a problem
-       */
-
-    const dunedaq::conffwk::class_t& get_class_info(const std::string& class_name, bool direct_only = false);
-
-
-  private:
-
-    const dunedaq::conffwk::class_t& _get_class_info(const std::string& class_name, bool direct_only = false);
-
-      // cache, storing descriptions of schema
-
-    conffwk::map<dunedaq::conffwk::class_t *> p_direct_classes_desc_cache;
-    conffwk::map<dunedaq::conffwk::class_t *> p_all_classes_desc_cache;
-
-  public:
-
-    /**
-     *  \brief Export configuration schema into ptree.
-     *
-     *  \param  tree         output ptree object
-     *  \param  classes      regex defining class names; all classes if empty
-     *  \param  direct_only  if true is set explicitly, return descriptions of direct attributes, relationships, super- and subclasses; by default return all descriptions taking into account inheritance
-     *
-     *  \throw dunedaq::conffwk::Generic in case of a problem
-     */
-
-    void
-    export_schema(boost::property_tree::ptree& tree, const std::string& classes = "", bool direct_only = false);
-
-
-    /**
-     *  \brief Export configuration data into ptree.
-     *
-     *  \param  tree               output ptree object
-     *  \param  classes            regex defining class names; ignore if empty
-     *  \param  objects            regex defining object IDs; ignore if empty
-     *  \param  files              regex defining data file names; ignore if empty
-     *  \param  empty_array_item   if provided, add this item to mark empty arrays
-     *
-     *  \throw dunedaq::conffwk::Generic in case of a problem
-     */
-
-    void
-    export_data(boost::property_tree::ptree& tree, const std::string& classes = "", const std::string& objects = "", const std::string& files = "", const std::string& empty_array_item = "");
-
-
-    // user-defined converters
-
-  public:
-
-       /** Base converter class with a virtual destructor **/
-
-    class AttributeConverterBase {
-
-      public:
-
-        virtual ~AttributeConverterBase() {;}
-
-    };
-
-
-      /**
-       *  \brief Virtual converter class.
-       *
-       *  To implement a converter for given type of attribute, a user needs to inherit from this class
-       *  providing the attribute type and implementing the convert() method.
-       *  To be used an object of the user converter class has to be registered using register_converter() method.
-       */
-
-    template<class T> class AttributeConverter : public AttributeConverterBase {
-
-      public:
-
-          /**
-           *  \brief Method to make the conversion of attribute value.
-           *
-           *  When the converter object is registered, the convert() method is called for each
-	   *  attribute value of given type to read any database object. The parameters passed to
-	   *  the convert method are described below:
-           *  \param value      reference on the value to be converted
-           *  \param conf       const reference on the configuration object
-           *  \param obj        const reference on the converted object
-           *  \param attr_name  name of the attribute which value to be converted
-           *
-           *  The method modifies parameter 'value', if a conversion is required.
-           */
-
-        virtual void convert(T& value, const Configuration& conf, const ConfigObject& obj, const std::string& attr_name) = 0;
-
-    };
-
-
-      /**
-       *  \brief Register user function for attribute conversion.
-       *
-       *  The user can register several objects which are used for attribute
-       *  values conversion. The attributes conversion type is defined by the
-       *  template parameter, e.g. given object to be used for string attribute
-       *  values conversion, another object to be used for short unsigned integers, etc.
-       *  It is possible to define several converters for each type. There is no
-       *  check that given object was already registered or not. It is registered
-       *  several times, the conversion will be done several times.
-       *  \param object  the converter object
-       */
-
-    template<class T> void register_converter(AttributeConverter<T> * object) noexcept;
-
-
-      /**
-       *  \brief Converts single value.
-       *
-       *  The method is used by the code generated by the genconffwk utility.
-       */
-
-    template<class T> void convert(T& value, const ConfigObject& obj, const std::string& attr_name) noexcept;
-
-
-      /**
-       *  \brief Converts vector of single values.
-       *
-       *  The method is used by the code generated by the genconffwk utility.
-       */
-
-    template<class T> void convert2(std::vector<T>& value, const ConfigObject& obj, const std::string& attr_name) noexcept;
-
-
-  public:
-
-
-      /**
-       *  \brief Print out profiling information.
-       *
-       *  The method prints out to the standard output stream profiling information of configuration
-       *  object and it's implementation.
-       */
-
-    void print_profiling_info() noexcept;
-
-
-  private:
-
-    std::atomic<uint_least64_t> p_number_of_cache_hits;
-    std::atomic<uint_least64_t> p_number_of_template_object_created;
-    std::atomic<uint_least64_t> p_number_of_template_object_read;
-
-
-  private:
-
-    conffwk::fmap<conffwk::fset> p_superclasses;
-    conffwk::fmap<conffwk::fset> p_subclasses;
-    conffwk::fmap<uint> p_class_domain_map;
-
-    void set_subclasses() noexcept;
-    
-    void set_class_domain_map();
-
-    void update_classes() noexcept;
-
-    std::deque<std::set<std::string>> find_class_domains();
-
-  public:
-
-      /** Get names of superclasses for each class **/
-
-    const conffwk::fmap<conffwk::fset>& superclasses() const noexcept {return p_superclasses;}
-
-
-      /** Get names of subclasses for each class **/
-
-    const conffwk::fmap<conffwk::fset>& subclasses() const {return p_subclasses;}
-
-    std::vector<std::string> classes_in_python() const;
-  
-  
- 
-  private:
-
-    conffwk::map<std::list<AttributeConverterBase*> * > m_convert_map;
-
-
-    // cache of objects for user-defined classes
-
-  public:
-
-      /**
-       * \brief Cache of template object of given type.
-       *
-       *  The class defines the cache of template objects of given type.
-       *  The objects are stored in cache, where the key is object-ID and the value is a pointer on template object.
-       *
-       *  The access to cache and objects insertion are provided via two get() methods:
-       *  \li <tt> T * get(Configuration&, ConfigObject&, bool, bool) </tt> - get template object for given conffwk object
-       *  \li <tt> T * get(Configuration&, const std::string&, bool, bool, unsigned long, const std::vector<std::string> *) </tt> - get template object for given object ID
-       *
-       */
-
-    // template<class T> class Cache : public CacheBase {
-    
-    //   friend class Configuration;
-    
-    //   public:
-
-    //     Cache() :
-    //         CacheBase(DalFactory::instance().functions(T::s_class_name))
-    //     {
-    //       ;
-    //     }
-
-
-    //     virtual ~Cache() noexcept;
-
-
-      //      /**
-      //       *  \brief Get template object from cache by conffwk object.
-      //       *
-      //       *  The method searches an object with id of given conffwk object within the cache.
-      //       *  If found, the method sets given conffwk object as implementation of the template
-	    // *  object and returns pointer on the template object.
-      //       *  If there is no such object in cache, then it is created from given conffwk object.
-      //       *
-      //       *  In case of success, the new object is put into cache and pointer to the object is returned.
-      //       *  If there is no such object for given template class, then \b null pointer is returned.
-      //       *
-      //       *  \param conffwk         the configuration object
-      //       *  \param obj            the conffwk object used to set for the template object
-      //       *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new object)
-      //       *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation of new object)
-      //       *
-      //       *  \return Return pointer to object.
-      //       *
-      //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-      //       */
-
-      //   T * get(Configuration& conffwk, ConfigObject& obj, bool init_children, bool init_object);
-
-
-      //      /**
-      //       *  \brief Get template object from cache by object's ID.
-      //       *
-      //       *  The method searches an object with given id within the cache.
-      //       *  If found, the method returns pointer on it.
-      //       *  If there is no such object in cache, there is an attempt to create new object.
-      //       *  In case of success, the new object is put into cache and pointer to the object is returned.
-      //       *  If there is no such object for given template class, then \b null pointer is returned.
-      //       *
-      //       *  \param conffwk         the configuration object
-      //       *  \param name           object identity
-      //       *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of new object)
-      //       *  \param init_object    if true, the object's attributes and relationships are read(only applicable during creation of new object)
-      //       *  \param rlevel         optional references level to optimize performance (defines how many objects referenced by given object have also to be read to the implementation cache during creation of new object)
-      //       *  \param rclasses       optional array of class names to optimize performance (defines which referenced objects have to be read to the implementation cache during creation of new object)
-      //       *
-      //       *  \return Return pointer to object. It can be \b null, if there is no such object found.
-      //       *
-      //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-      //       */
-
-      //     T * get(Configuration& conffwk, const std::string& name, bool init_children, bool init_object, unsigned long rlevel, const std::vector<std::string> * rclasses);
-
-
-      //      /**
-      //       *  \brief Find template object using ID.
-      //       *
-      //       *  The method is suitable for generated template objects.
-      //       *
-      //       *  In case of success, the new object is put into cache and pointer to the object is returned.
-      //       *  If there is no such object for given template class, then \b null pointer is returned.
-      //       *
-      //       *  \param id             ID of generated object
-      //       *
-      //       *  \return Return pointer to object.
-      //       *
-      //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-      //       */
-
-
-      //     T *
-      //     find(const std::string& id);
-
-
-      //      /**
-      //       *  \brief Generate template object using conffwk object and ID.
-      //       *
-      //       *  The method searches an object with id of given conffwk object within the cache using given ID.
-      //       *  If found, the method sets given conffwk object as implementation of the template
-      //       *  object and returns pointer on the template object.
-      //       *  If there is no such object in cache, then it is created from given conffwk object.
-      //       *
-      //       *  In case of success, the new object is put into cache and pointer to the object is returned.
-      //       *  If there is no such object for given template class, then \b null pointer is returned.
-      //       *
-      //       *  \param conffwk         the configuration object
-      //       *  \param obj            the conffwk object used to set for the template object
-      //       *  \param id             ID of generated object
-      //       *
-      //       *  \return Return pointer to object.
-      //       *
-      //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an error
-      //       */
-
-      //     T *
-      //     get(Configuration& conffwk, ConfigObject& obj, const std::string& id);
-
-
-      // private:
-
-      //   conffwk::map<T*> m_cache;
-      //   conffwk::multimap<T*> m_t_cache;
-
-
-    // };
-
-  private:
-
-    // Get cache for this type of objects.
-
-    // template<class T> Cache<T> * get_cache() noexcept;
-
-    // template<class T> Cache<T> * get_cache( const std::string& class_name ) {
-
-    //   const std::string& class_name_ref = DalFactory::instance().get_known_class_name_ref(class_name);
-    //   CacheBase*& c(m_cache_map[&class_name_ref]);
-
-    //   if (c == nullptr)
-    //     // c = new CacheBase(DalFactory::instance().functions(class_name_ref));
-    //     c = new CacheBase(class_name_ref, DalFactory::instance().functions(*this, class_name_ref, true));
-  
-    //   return static_cast<Cache<T>*>(c);
-
-    //   // return c;
-    // }
-
-    // conffwk::fmap<CacheBase*> m_cache_map;
-
-    void rename_object(ConfigObject& obj, const std::string& new_id);
-
-    // template<class T>
-    // void
-    // set_cache_unread(const std::vector<std::string>& objects, Cache<T>& c) noexcept
-    // {
-    //   for (const auto& i : objects)
-    //     {
-    //       // unread template objects
-    //       auto x = c.m_cache.find(i);
-    //       if (x != c.m_cache.end())
-    //         {
-    //           std::lock_guard<std::mutex> scoped_lock(x->second->m_mutex);
-    //           x->second->p_was_read = false;
-    //         }
-
-    //       // unread generated objects if any
-    //       auto range = c.m_t_cache.equal_range(i);
-    //       for (auto it = range.first; it != range.second; it++)
-    //         {
-    //           std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
-    //           it->second->p_was_read = false;
-    //         }
-    //     }
-    // }
-
-
-  public:
-
-      /**
-       *  \brief Prints out details of configuration object.
-       * 
-       *  For the moment only inheritance hierarchy of configuration database is printed.
-       *  In future it is planned to add more details, such as:
-       *  - conffwk objects
-       *  - status of template cache
-       *  - profiling info
-       */
-
-    void print(std::ostream&) const noexcept;
-
-
-    // representation
-
-  private:
-
-    ConfigurationImpl * m_impl;
-    std::string m_impl_spec;
-    std::string m_impl_name;
-    std::string m_impl_param;
-
-
-
-    void * m_shlib_h;
-
-
-    // user notification
-
-  private:
-
-      // user callbacks with parameters
-
-    typedef std::set< CallbackSubscription * , std::less<CallbackSubscription *> > CallbackSet;
-    typedef std::set< CallbackPreSubscription * , std::less<CallbackPreSubscription *> > PreCallbackSet;
-
-    CallbackSet m_callbacks;
-    PreCallbackSet m_pre_callbacks;
-
-
-      // method to find callback by handler
-
-    CallbackSubscription * find_callback(CallbackId cb_handler) const;
-
-
-  public:
-
-    /** Add global action performed by user code on db [un]load and updates. */
-    void
-    add_action(ConfigAction * ac);
-
-    /** Remove global action performed by user code on db [un]load and updates. */
-    void
-    remove_action(ConfigAction * ac);
-
-  private:
-
-    std::list<ConfigAction *> m_actions;
-    void action_on_update(const ConfigObject& obj, const std::string& name);
-
-
-  private:
-    DalRegistry m_registry;
-
-    mutable std::mutex m_impl_mutex;  // mutex used to access implementation objects (i.e. ConfigObjectImpl objects)
-    mutable std::mutex m_tmpl_mutex;  // mutex used to access template objects (i.e. generated DAL)
-    mutable std::mutex m_actn_mutex;  // mutex is used to access actions
-    mutable std::mutex m_else_mutex;  // mutex used to access subscription, attribute converter, etc. objects
-
-
-    // prevent copy constructor and operator=
-
-  private:
-
-    Configuration(const Configuration&);
-    Configuration& operator=(const Configuration&);
-
-  public:
-
+    virtual void convert(T& value,
+                         const Configuration& conf,
+                         const ConfigObject& obj,
+                         const std::string& attr_name) = 0;
+  };
+
+  /**
+   *  \brief Register user function for attribute conversion.
+   *
+   *  The user can register several objects which are used for attribute
+   *  values conversion. The attributes conversion type is defined by the
+   *  template parameter, e.g. given object to be used for string attribute
+   *  values conversion, another object to be used for short unsigned integers, etc.
+   *  It is possible to define several converters for each type. There is no
+   *  check that given object was already registered or not. It is registered
+   *  several times, the conversion will be done several times.
+   *  \param object  the converter object
+   */
+
+  template<class T>
+  void register_converter(AttributeConverter<T>* object) noexcept;
+
+  /**
+   *  \brief Converts single value.
+   *
+   *  The method is used by the code generated by the genconffwk utility.
+   */
+
+  template<class T>
+  void convert(T& value, const ConfigObject& obj, const std::string& attr_name) noexcept;
+
+  /**
+   *  \brief Converts vector of single values.
+   *
+   *  The method is used by the code generated by the genconffwk utility.
+   */
+
+  template<class T>
+  void convert2(std::vector<T>& value, const ConfigObject& obj, const std::string& attr_name) noexcept;
+
+public:
+  /**
+   *  \brief Print out profiling information.
+   *
+   *  The method prints out to the standard output stream profiling information of configuration
+   *  object and it's implementation.
+   */
+
+  void print_profiling_info() noexcept;
+
+private:
+  std::atomic<uint_least64_t> p_number_of_cache_hits;
+  std::atomic<uint_least64_t> p_number_of_template_object_created;
+  std::atomic<uint_least64_t> p_number_of_template_object_read;
+
+private:
+  conffwk::fmap<conffwk::fset> p_superclasses;
+  conffwk::fmap<conffwk::fset> p_subclasses;
+  conffwk::fmap<uint> p_class_domain_map;
+
+  void set_subclasses() noexcept;
+
+  void set_class_domain_map();
+
+  void update_classes() noexcept;
+
+  std::deque<std::set<std::string>> find_class_domains();
+
+public:
+  /** Get names of superclasses for each class **/
+
+  const conffwk::fmap<conffwk::fset>& superclasses() const noexcept { return p_superclasses; }
+
+  /** Get names of subclasses for each class **/
+
+  const conffwk::fmap<conffwk::fset>& subclasses() const { return p_subclasses; }
+
+  std::vector<std::string> classes_in_python() const;
+
+private:
+  conffwk::map<std::list<AttributeConverterBase*>*> m_convert_map;
+
+  // cache of objects for user-defined classes
+
+public:
+  /**
+   * \brief Cache of template object of given type.
+   *
+   *  The class defines the cache of template objects of given type.
+   *  The objects are stored in cache, where the key is object-ID and the value is a pointer on template object.
+   *
+   *  The access to cache and objects insertion are provided via two get() methods:
+   *  \li <tt> T * get(Configuration&, ConfigObject&, bool, bool) </tt> - get template object for given conffwk object
+   *  \li <tt> T * get(Configuration&, const std::string&, bool, bool, unsigned long, const std::vector<std::string> *)
+   * </tt> - get template object for given object ID
+   *
+   */
+
+  // template<class T> class Cache : public CacheBase {
+
+  //   friend class Configuration;
+
+  //   public:
+
+  //     Cache() :
+  //         CacheBase(DalFactory::instance().functions(T::s_class_name))
+  //     {
+  //       ;
+  //     }
+
+  //     virtual ~Cache() noexcept;
+
+  //      /**
+  //       *  \brief Get template object from cache by conffwk object.
+  //       *
+  //       *  The method searches an object with id of given conffwk object within the cache.
+  //       *  If found, the method sets given conffwk object as implementation of the template
+  // *  object and returns pointer on the template object.
+  //       *  If there is no such object in cache, then it is created from given conffwk object.
+  //       *
+  //       *  In case of success, the new object is put into cache and pointer to the object is returned.
+  //       *  If there is no such object for given template class, then \b null pointer is returned.
+  //       *
+  //       *  \param conffwk         the configuration object
+  //       *  \param obj            the conffwk object used to set for the template object
+  //       *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of
+  //       new object)
+  //       *  \param init_object    if true, the object's attributes and relationships are read(only applicable during
+  //       creation of new object)
+  //       *
+  //       *  \return Return pointer to object.
+  //       *
+  //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an
+  //       error
+  //       */
+
+  //   T * get(Configuration& conffwk, ConfigObject& obj, bool init_children, bool init_object);
+
+  //      /**
+  //       *  \brief Get template object from cache by object's ID.
+  //       *
+  //       *  The method searches an object with given id within the cache.
+  //       *  If found, the method returns pointer on it.
+  //       *  If there is no such object in cache, there is an attempt to create new object.
+  //       *  In case of success, the new object is put into cache and pointer to the object is returned.
+  //       *  If there is no such object for given template class, then \b null pointer is returned.
+  //       *
+  //       *  \param conffwk         the configuration object
+  //       *  \param name           object identity
+  //       *  \param init_children  if true, the referenced objects are initialized (only applicable during creation of
+  //       new object)
+  //       *  \param init_object    if true, the object's attributes and relationships are read(only applicable during
+  //       creation of new object)
+  //       *  \param rlevel         optional references level to optimize performance (defines how many objects
+  //       referenced by given object have also to be read to the implementation cache during creation of new object)
+  //       *  \param rclasses       optional array of class names to optimize performance (defines which referenced
+  //       objects have to be read to the implementation cache during creation of new object)
+  //       *
+  //       *  \return Return pointer to object. It can be \b null, if there is no such object found.
+  //       *
+  //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an
+  //       error
+  //       */
+
+  //     T * get(Configuration& conffwk, const std::string& name, bool init_children, bool init_object, unsigned long
+  //     rlevel, const std::vector<std::string> * rclasses);
+
+  //      /**
+  //       *  \brief Find template object using ID.
+  //       *
+  //       *  The method is suitable for generated template objects.
+  //       *
+  //       *  In case of success, the new object is put into cache and pointer to the object is returned.
+  //       *  If there is no such object for given template class, then \b null pointer is returned.
+  //       *
+  //       *  \param id             ID of generated object
+  //       *
+  //       *  \return Return pointer to object.
+  //       *
+  //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an
+  //       error
+  //       */
+
+  //     T *
+  //     find(const std::string& id);
+
+  //      /**
+  //       *  \brief Generate template object using conffwk object and ID.
+  //       *
+  //       *  The method searches an object with id of given conffwk object within the cache using given ID.
+  //       *  If found, the method sets given conffwk object as implementation of the template
+  //       *  object and returns pointer on the template object.
+  //       *  If there is no such object in cache, then it is created from given conffwk object.
+  //       *
+  //       *  In case of success, the new object is put into cache and pointer to the object is returned.
+  //       *  If there is no such object for given template class, then \b null pointer is returned.
+  //       *
+  //       *  \param conffwk         the configuration object
+  //       *  \param obj            the conffwk object used to set for the template object
+  //       *  \param id             ID of generated object
+  //       *
+  //       *  \return Return pointer to object.
+  //       *
+  //       *  \throw dunedaq::conffwk::Generic is no such class for loaded configuration DB schema or in case of an
+  //       error
+  //       */
+
+  //     T *
+  //     get(Configuration& conffwk, ConfigObject& obj, const std::string& id);
+
+  // private:
+
+  //   conffwk::map<T*> m_cache;
+  //   conffwk::multimap<T*> m_t_cache;
+
+  // };
+
+private:
+  // Get cache for this type of objects.
+
+  // template<class T> Cache<T> * get_cache() noexcept;
+
+  // template<class T> Cache<T> * get_cache( const std::string& class_name ) {
+
+  //   const std::string& class_name_ref = DalFactory::instance().get_known_class_name_ref(class_name);
+  //   CacheBase*& c(m_cache_map[&class_name_ref]);
+
+  //   if (c == nullptr)
+  //     // c = new CacheBase(DalFactory::instance().functions(class_name_ref));
+  //     c = new CacheBase(class_name_ref, DalFactory::instance().functions(*this, class_name_ref, true));
+
+  //   return static_cast<Cache<T>*>(c);
+
+  //   // return c;
+  // }
+
+  // conffwk::fmap<CacheBase*> m_cache_map;
+
+  void rename_object(ConfigObject& obj, const std::string& new_id);
+
+  // template<class T>
+  // void
+  // set_cache_unread(const std::vector<std::string>& objects, Cache<T>& c) noexcept
+  // {
+  //   for (const auto& i : objects)
+  //     {
+  //       // unread template objects
+  //       auto x = c.m_cache.find(i);
+  //       if (x != c.m_cache.end())
+  //         {
+  //           std::lock_guard<std::mutex> scoped_lock(x->second->m_mutex);
+  //           x->second->p_was_read = false;
+  //         }
+
+  //       // unread generated objects if any
+  //       auto range = c.m_t_cache.equal_range(i);
+  //       for (auto it = range.first; it != range.second; it++)
+  //         {
+  //           std::lock_guard<std::mutex> scoped_lock(it->second->m_mutex);
+  //           it->second->p_was_read = false;
+  //         }
+  //     }
+  // }
+
+public:
+  /**
+   *  \brief Prints out details of configuration object.
+   *
+   *  For the moment only inheritance hierarchy of configuration database is printed.
+   *  In future it is planned to add more details, such as:
+   *  - conffwk objects
+   *  - status of template cache
+   *  - profiling info
+   */
+
+  void print(std::ostream&) const noexcept;
+
+  // representation
+
+private:
+  ConfigurationImpl* m_impl;
+  std::string m_impl_spec;
+  std::string m_impl_name;
+  std::string m_impl_param;
+
+  void* m_shlib_h;
+
+  // user notification
+
+private:
+  // user callbacks with parameters
+
+  typedef std::set<CallbackSubscription*, std::less<CallbackSubscription*>> CallbackSet;
+  typedef std::set<CallbackPreSubscription*, std::less<CallbackPreSubscription*>> PreCallbackSet;
+
+  CallbackSet m_callbacks;
+  PreCallbackSet m_pre_callbacks;
+
+  // method to find callback by handler
+
+  CallbackSubscription* find_callback(CallbackId cb_handler) const;
+
+public:
+  /** Add global action performed by user code on db [un]load and updates. */
+  void add_action(ConfigAction* ac);
+
+  /** Remove global action performed by user code on db [un]load and updates. */
+  void remove_action(ConfigAction* ac);
+
+private:
+  std::list<ConfigAction*> m_actions;
+  void action_on_update(const ConfigObject& obj, const std::string& name);
+
+private:
+  DalRegistry m_registry;
+
+  mutable std::mutex m_impl_mutex; // mutex used to access implementation objects (i.e. ConfigObjectImpl objects)
+  mutable std::mutex m_tmpl_mutex; // mutex used to access template objects (i.e. generated DAL)
+  mutable std::mutex m_actn_mutex; // mutex is used to access actions
+  mutable std::mutex m_else_mutex; // mutex used to access subscription, attribute converter, etc. objects
+
+  // prevent copy constructor and operator=
+
+private:
+  Configuration(const Configuration&);
+  Configuration& operator=(const Configuration&);
+
+public:
   // JCF, Jan-1-2023: a set of functions written specifically for Python bindings
 
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> attributes_pybind(const std::string& class_name, bool all);
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> attributes_pybind(
+    const std::string& class_name,
+    bool all);
   std::vector<std::string> get_class_list() const;
-  ConfigObject* create_and_return_obj_pybind(const std::string& at, const std::string& class_name, const std::string& id);
-  ConfigObject* create_and_return_obj_pybind(const ConfigObject& at, const std::string& class_name, const std::string& id);
+  ConfigObject* create_and_return_obj_pybind(const std::string& at,
+                                             const std::string& class_name,
+                                             const std::string& id);
+  ConfigObject* create_and_return_obj_pybind(const ConfigObject& at,
+                                             const std::string& class_name,
+                                             const std::string& id);
   ConfigObject* get_obj_pybind(const std::string& class_name, const std::string& id);
-  std::vector<ConfigObject>* get_objs_pybind(const std::string& class_name, const std::string& query="");
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> relations_pybind(const std::string& class_name, bool all);
+  std::vector<ConfigObject>* get_objs_pybind(const std::string& class_name, const std::string& query = "");
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> relations_pybind(
+    const std::string& class_name,
+    bool all);
   std::list<std::string>* return_includes_pybind(const std::string& db_name);
   std::vector<std::string> subclasses_pybind(const std::string& class_name, bool all);
   std::vector<std::string> superclasses_pybind(const std::string& class_name, bool all);
   [[nodiscard]] const std::string& get_schema_path_pybind(const std::string& class_name);
 };
 
-  /**
-   *  Operator prints out to stream configuration using method print().
-   */
+/**
+ *  Operator prints out to stream configuration using method print().
+ */
 
-std::ostream& operator<<(std::ostream& s, const Configuration & c);
+std::ostream&
+operator<<(std::ostream& s, const Configuration& c);
 
 //////////////////////////////////////////////
 //// Implementation of template methods.  ////
@@ -1756,8 +1750,5 @@ std::ostream& operator<<(std::ostream& s, const Configuration & c);
 } // namespace dunedaq
 
 #include "details/Configuration.hxx"
-
-
-
 
 #endif // CONFFWK_CONFIGURATION_H_
