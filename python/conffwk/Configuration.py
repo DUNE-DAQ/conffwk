@@ -36,7 +36,7 @@ class Configuration(_ConfigurationProxy):
 
         # initialize the inner set of configuration files available
         self.databases = []
-        self.active_database = None
+        self.active_database: str | None = None
         if self.get_impl_param():
             self.databases.append(self.get_impl_param())
             self.active_database = self.get_impl_param()
